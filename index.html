@@ -551,11 +551,13 @@
   .news-sub{padding:6px 14px 0; font-size:12.5px; color:#8a7b80; flex:none;}
   .news-list{overflow-y:auto; padding:8px 10px 12px; display:flex; flex-direction:column; gap:6px;}
   .news-item{display:flex; gap:10px; align-items:center; padding:7px 8px; border-radius:6px;
-    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06);}
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); text-decoration:none; cursor:pointer;}
+  .news-item:hover{background:rgba(255,255,255,.08);}
   .news-item-icon{flex:none; width:34px; height:34px; border-radius:6px; background:#1f1a22; display:flex;
     align-items:center; justify-content:center; font-size:17px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
   .news-item-title{font-size:14.5px; color:#ead9de; line-height:1.25;}
   .news-item-date{font-size:11.5px; color:#8a7b80; margin-top:2px;}
+  .news-item-off{padding:14px 12px; font-size:13px; color:#8a7b80; text-align:center;}
   .news-link{display:flex; align-items:center; justify-content:center; gap:6px; margin:4px 12px 12px; flex:none;
     padding:7px 10px; border-radius:7px; font-size:15px; color:#fff; background:#c0392b;
     text-decoration:none; box-shadow:0 3px 5px rgba(0,0,0,.35);}
@@ -1118,7 +1120,7 @@
     <div class="news-box">
       <button class="news-close" aria-label="Fechar">✕</button>
       <div class="news-head">📰 Notícias (Flow Games)</div>
-      <div class="news-sub">dados de demonstração</div>
+      <div class="news-sub">ao vivo via flowgames.gg</div>
       <div class="news-list" id="newsList"></div>
       <a class="news-link" href="https://flowgames.gg/" target="_blank" rel="noopener noreferrer">🔗 Ver mais em flowgames.gg</a>
     </div>
@@ -1204,25 +1206,19 @@
         <button class="forge-tab" data-tab="calendario">📅 Calendário</button>
       </div>
       <div class="forge-pane active" id="forgePanePrecos">
-        <div class="forge-sub">exemplo de busca — a ferramenta real roda no site, com 9 lojas parceiras</div>
+        <div class="forge-sub">busca ao vivo em 9 lojas parceiras — mesmo backend seguro (Cloudflare Worker) do site</div>
         <div class="forge-search">
           <input id="forgePrecoInput" placeholder="Nome do jogo..." value="God of War Ragnarök">
           <button id="forgePrecoBtn">Buscar</button>
         </div>
         <div id="forgePrecoResults"></div>
-        <a class="forge-link" href="https://iamtgames.github.io/colecao/" target="_blank" rel="noopener noreferrer">🔗 Usar o Buscador de Preços real</a>
       </div>
       <div class="forge-pane" id="forgePaneStats">
-        <div class="forge-sub">dados de demonstração</div>
-        <div class="forge-stats-grid">
-          <div class="forge-stat-card"><div class="num">187</div><div class="lbl">jogos na coleção</div></div>
-          <div class="forge-stat-card"><div class="num">R$ 9.4k</div><div class="lbl">valor estimado</div></div>
-          <div class="forge-stat-card"><div class="num">62%</div><div class="lbl">PS4 · 24% PS5 · 14% PS3</div></div>
-          <div class="forge-stat-card"><div class="num">14</div><div class="lbl">dias p/ próx. lançamento</div></div>
-        </div>
+        <div class="forge-sub">calculado ao vivo a partir da coleção real (81 jogos)</div>
+        <div class="forge-stats-grid" id="forgeStatsGrid"></div>
       </div>
       <div class="forge-pane" id="forgePaneCalendario">
-        <div class="forge-sub">dados de demonstração</div>
+        <div class="forge-sub">lançamentos reais, buscados ao vivo do site</div>
         <div id="forgeCalList"></div>
       </div>
     </div>
@@ -1237,12 +1233,11 @@
         <button class="forge-tab" data-mtab="anime">📺 Anime Dublado</button>
       </div>
       <div class="forge-pane active" id="mediaPaneSemana">
-        <div class="forge-sub">dados de demonstração — o player real roda no site, com embed adaptativo</div>
+        <div class="forge-sub">mesmo painel do site — o filme é escolhido manualmente, por isso pode ficar vazio por um tempo</div>
         <div class="forge-result"><div class="nome" id="mediaSemanaTitulo"></div></div>
-        <a class="forge-link" href="https://iamtgames.github.io/colecao/" target="_blank" rel="noopener noreferrer">🔗 Abrir o Media Player real</a>
       </div>
       <div class="forge-pane" id="mediaPaneAnime">
-        <div class="forge-sub">playlist dublada via Crunchyroll (dados de demonstração)</div>
+        <div class="forge-sub">playlist dublada via Crunchyroll — mesma lista real do site</div>
         <div id="mediaAnimeList"></div>
       </div>
     </div>
@@ -1983,8 +1978,10 @@ function renderBookshelves(){
 }
 
 /* ---------- Locadora Online: espelha as duas seções reais do Media Player do site (Filme da
-   Semana + playlist de Anime Dublado via Crunchyroll). Protótipo sem backend -> conteúdo fixo
-   de demonstração, igual aos "dados de demonstração" já usados no painel do Ferreiro. ---------- */
+   Semana + playlist de Anime Dublado via Crunchyroll) -- ambos dados reais, não inventados.
+   "Filme da Semana" é escolhido manualmente no site e por isso pode ficar vazio por um tempo;
+   quando isso acontece mostramos o mesmo estado honesto do site ("Nenhum filme selecionado
+   no momento"), em vez de inventar um título. ---------- */
 const LOCADORA_FILME_SEMANA = { titulo: '' };
 const LOCADORA_ANIME = [
   'A Couple of Cuckoos', 'Assassination Classroom', 'BLUE LOCK', 'Bye Bye Earth',
@@ -2157,25 +2154,33 @@ function hideCinemaScreen(){
   cinemaScreenBox.innerHTML = '';
 }
 
-/* banca de jornal (rua): mesmo esquema de notícias do site real (painel "Notícias (Flow Games)",
-   alimentado por news.json gerado via GitHub Action a partir do RSS da Flow Games) -- aqui, como é
-   um arquivo de demonstração isolado sem o Action rodando, usamos manchetes fictícias no mesmo
-   formato (título + data), deixando isso claro no próprio painel. */
-const NOTICIAS_DEMO = [
-  { icon:'🎮', title:'Novo trailer de GTA 6 reacende expectativa dos fãs', data:'02/10/2026' },
-  { icon:'🕹️', title:'PS5 Pro recebe atualização de firmware com melhorias de desempenho', data:'01/10/2026' },
-  { icon:'💿', title:'Remaster de clássico de PS3 é anunciado para este ano', data:'30/09/2026' },
-  { icon:'🏆', title:'Evento de retrogaming reúne colecionadores em Minas Gerais', data:'28/09/2026' },
-  { icon:'💸', title:'Promoção de fim de semana traz descontos em dezenas de jogos', data:'27/09/2026' },
-  { icon:'📟', title:'Nova geração de consoles portáteis promete rodar jogos AAA', data:'25/09/2026' },
-];
-function showNewsPanel(){
-  newsListEl.innerHTML = NOTICIAS_DEMO.map(n =>
-    '<div class="news-item"><div class="news-item-icon">' + n.icon + '</div>' +
-      '<div><div class="news-item-title">' + esc(n.title) + '</div>' +
-        '<div class="news-item-date">🗓️ ' + esc(n.data) + '</div></div></div>'
-  ).join('');
+/* banca de jornal (rua): usa o MESMO news.json real do site colecao (iamtgames.github.io),
+   gerado por GitHub Action a partir do RSS da Flow Games -- mesma origem, então dá pra buscar
+   direto sem CORS, igual já é feito com canais_live.json pro Cinema. Cada manchete abre o
+   artigo de verdade em flowgames.gg; nunca mostramos texto inventado aqui. */
+async function showNewsPanel(){
   newsPanelEl.classList.add('show');
+  newsListEl.innerHTML = '<div class="news-item-off">📡 Carregando notícias…</div>';
+  try {
+    const r = await fetch('https://iamtgames.github.io/colecao/news.json', { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    const items = Array.isArray(j.items) ? j.items.slice(0, 8) : [];
+    if (!items.length) throw new Error('sem itens');
+    newsListEl.innerHTML = items.map(n => {
+      const d = new Date(n.pubDate);
+      const dataFmt = isNaN(d.getTime()) ? '' : d.toLocaleDateString('pt-BR');
+      const iconHtml = n.image
+        ? '<div class="news-item-icon" style="background-image:url(\'' + esc(n.image) + '\'); background-size:cover; background-position:center;"></div>'
+        : '<div class="news-item-icon">📰</div>';
+      return '<a class="news-item" href="' + esc(n.link) + '" target="_blank" rel="noopener noreferrer">' + iconHtml +
+        '<div><div class="news-item-title">' + esc(n.title) + '</div>' +
+          (dataFmt ? '<div class="news-item-date">🗓️ ' + esc(dataFmt) + '</div>' : '') + '</div></a>';
+    }).join('');
+  } catch (e) {
+    console.warn('Não deu pra carregar as notícias reais (news.json):', e);
+    newsListEl.innerHTML = '<div class="news-item-off">📡 Não foi possível carregar as notícias agora. Tente de novo mais tarde.</div>';
+  }
 }
 function hideNewsPanel(){ newsPanelEl.classList.remove('show'); }
 
@@ -2642,34 +2647,117 @@ pcPanelEl.addEventListener('click', (e) => {
 });
 
 /* ===================================================================================
-   FERREIRO: painel de ferramentas (Buscador de Preços em destaque, Estatísticas,
-   Calendário). Preços e Estatísticas usam dados de demonstração claramente rotulados
-   (a ferramenta real de busca de preços roda no site, com Cloudflare Worker + 9 lojas);
-   o Calendário também é demo. O link de "usar a ferramenta real" aponta pro site ao vivo.
+   FERREIRO: painel de ferramentas, 100% real -- nada de dados inventados.
+   - Preços: consulta ao vivo o MESMO Cloudflare Worker do site colecao
+     (buscador-precos.ocultobadguy.workers.dev). Mundo e colecao compartilham origem
+     (iamtgames.github.io), então o Worker responde aqui sem precisar abrir o site antigo.
+   - Estatísticas: calculadas na hora a partir de JOGOS_COLECAO (a coleção real, mesma
+     usada na Biblioteca) + do calendário real buscado abaixo.
+   - Calendário: busca o index.html público do colecao (mesma origem, mesmo padrão já
+     usado pro news.json/canais_live.json), extrai o array real "lancamentosFuturos" com
+     uma regex simples (sem eval) e mostra só datas futuras.
    =================================================================================== */
-const FORGE_PRECOS_DEMO = [
-  { loja: 'Loja Parceira 1', preco: 'R$ 249,90' },
-  { loja: 'Loja Parceira 2', preco: 'R$ 259,00' },
-  { loja: 'Loja Parceira 3', preco: 'R$ 239,90' },
-];
-const FORGE_CAL_DEMO = [
-  { data: '18/10', titulo: 'Jogo Exemplo A — PS5' },
-  { data: '02/11', titulo: 'Jogo Exemplo B — PS4/PS5' },
-  { data: '21/11', titulo: 'Jogo Exemplo C — PS5' },
-  { data: '05/12', titulo: 'Jogo Exemplo D — PS4' },
-];
-function forgeRenderPrecos(){
+const BUSCA_PRECO_WORKER_URL = 'https://buscador-precos.ocultobadguy.workers.dev';
+let forgeBuscaEmAndamento = false;
+let forgeLancamentosCache = null;
+
+function forgeFormatarPrecoBRL(valor){
+  return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+async function forgeRenderPrecos(){
+  const input = document.getElementById('forgePrecoInput');
+  const btn = document.getElementById('forgePrecoBtn');
   const box = document.getElementById('forgePrecoResults');
-  box.innerHTML = FORGE_PRECOS_DEMO.map(p =>
-    '<div class="forge-result"><span class="nome">' + p.loja + '</span><span class="preco">' + p.preco + '</span></div>'
-  ).join('');
+  const termo = (input.value || '').trim();
+  if (!termo || forgeBuscaEmAndamento) return;
+  forgeBuscaEmAndamento = true;
+  btn.disabled = true;
+  box.innerHTML = '<div class="forge-result"><span class="nome">Buscando ao vivo…</span></div>';
+  try {
+    const url = BUSCA_PRECO_WORKER_URL + '/?jogo=' + encodeURIComponent(termo);
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const dados = await r.json();
+    const resultados = Array.isArray(dados.resultados) ? dados.resultados.slice(0, 6) : [];
+    if (!resultados.length) {
+      box.innerHTML = '<div class="forge-result"><span class="nome">Nenhum anúncio com preço identificável agora. Tente um nome mais simples.</span></div>';
+    } else {
+      box.innerHTML = resultados.map(r =>
+        '<div class="forge-result"><span class="nome">' + esc(r.jogo) + ' · ' + esc(r.site) + '</span><span class="preco">' + forgeFormatarPrecoBRL(r.preco) + '</span></div>'
+      ).join('');
+    }
+  } catch (e) {
+    console.warn('Busca de preços falhou:', e);
+    box.innerHTML = '<div class="forge-result"><span class="nome">⚠️ Não consegui buscar agora. Tente de novo em instantes.</span></div>';
+  } finally {
+    forgeBuscaEmAndamento = false;
+    btn.disabled = false;
+  }
 }
-function forgeRenderCalendario(){
+
+/* extrai o array real "lancamentosFuturos" do index.html público do colecao, sem eval:
+   casa cada objeto literal { data:"...", n:"...", plat:"..." } por regex. */
+async function fetchLancamentosFuturos(){
+  if (forgeLancamentosCache) return forgeLancamentosCache;
+  try {
+    const r = await fetch('https://iamtgames.github.io/colecao/', { cache: 'no-store' });
+    if (!r.ok) return [];
+    const html = await r.text();
+    const i = html.indexOf('lancamentosFuturos');
+    if (i === -1) return [];
+    const start = html.indexOf('[', i);
+    const end = html.indexOf('];', start);
+    if (start === -1 || end === -1) return [];
+    const bloco = html.slice(start, end + 1);
+    const re = /\{\s*data\s*:\s*"([^"]+)"\s*,\s*n\s*:\s*"([^"]+)"\s*,\s*plat\s*:\s*"([^"]+)"\s*\}/g;
+    const itens = [];
+    let m;
+    while ((m = re.exec(bloco))) itens.push({ data: m[1], n: m[2], plat: m[3] });
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const futuros = itens.filter(it => new Date(it.data) >= hoje).sort((a, b) => new Date(a.data) - new Date(b.data));
+    forgeLancamentosCache = futuros;
+    return futuros;
+  } catch (e) {
+    console.warn('Não deu pra buscar o calendário real de lançamentos:', e);
+    return [];
+  }
+}
+
+function forgeRenderStats(){
+  const total = JOGOS_COLECAO.length;
+  const porPlat = {};
+  JOGOS_COLECAO.forEach(j => { porPlat[j.plat] = (porPlat[j.plat] || 0) + 1; });
+  const pctPlat = Object.keys(porPlat).sort().map(p => p + ' ' + Math.round(porPlat[p] / total * 100) + '%').join(' · ');
+  const raros = JOGOS_COLECAO.filter(j => j.rar === 'raro' || j.rar === 'muito').length;
+  let diasTxt = '—';
+  if (forgeLancamentosCache && forgeLancamentosCache.length) {
+    const prox = forgeLancamentosCache[0];
+    const dias = Math.max(0, Math.ceil((new Date(prox.data) - new Date()) / 86400000));
+    diasTxt = dias + 'd · ' + prox.n;
+  }
+  document.getElementById('forgeStatsGrid').innerHTML =
+    '<div class="forge-stat-card"><div class="num">' + total + '</div><div class="lbl">jogos na coleção</div></div>' +
+    '<div class="forge-stat-card"><div class="num">' + raros + '</div><div class="lbl">raros / muito raros</div></div>' +
+    '<div class="forge-stat-card"><div class="num" style="font-size:15px;">' + esc(pctPlat) + '</div><div class="lbl">distribuição por plataforma</div></div>' +
+    '<div class="forge-stat-card"><div class="num" style="font-size:13px;">' + esc(diasTxt) + '</div><div class="lbl">próx. lançamento grande</div></div>';
+}
+
+async function forgeRenderCalendario(){
   const box = document.getElementById('forgeCalList');
-  box.innerHTML = FORGE_CAL_DEMO.map(c =>
-    '<div class="forge-cal-item"><span class="data">' + c.data + '</span><span class="titulo">' + c.titulo + '</span></div>'
-  ).join('');
+  box.innerHTML = '<div class="forge-cal-item"><span class="titulo">Carregando lançamentos reais…</span></div>';
+  const itens = await fetchLancamentosFuturos();
+  if (!itens.length) {
+    box.innerHTML = '<div class="forge-cal-item"><span class="titulo">Não foi possível carregar o calendário agora.</span></div>';
+    return;
+  }
+  box.innerHTML = itens.slice(0, 8).map(c => {
+    const dataFmt = new Date(c.data).toLocaleDateString('pt-BR');
+    return '<div class="forge-cal-item"><span class="data">' + esc(dataFmt) + '</span><span class="titulo">' + esc(c.n) + ' — ' + esc(c.plat) + '</span></div>';
+  }).join('');
+  forgeRenderStats();
 }
+
 function switchForgeTab(tab){
   document.querySelectorAll('.forge-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.getElementById('forgePanePrecos').classList.toggle('active', tab === 'precos');
@@ -2679,12 +2767,15 @@ function switchForgeTab(tab){
 function showForgePanel(tab){
   forgePanelEl.classList.add('show');
   switchForgeTab(tab || 'precos');
-  forgeRenderPrecos();
+  forgeRenderStats();
   forgeRenderCalendario();
 }
 function hideForgePanel(){ forgePanelEl.classList.remove('show'); }
 document.querySelectorAll('#forgePanel .forge-tab').forEach(b => b.addEventListener('click', () => switchForgeTab(b.dataset.tab)));
 document.getElementById('forgePrecoBtn').addEventListener('click', forgeRenderPrecos);
+document.getElementById('forgePrecoInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') forgeRenderPrecos();
+});
 forgePanelEl.addEventListener('click', (e) => {
   if (e.target.classList.contains('forge-backdrop') || e.target.classList.contains('forge-close')) hideForgePanel();
 });
