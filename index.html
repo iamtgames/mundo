@@ -270,7 +270,7 @@
      .forge-wall-sign: textura de madeira em CSS, sem sprite — convenção já usada em toda
      sinalização com texto do jogo). Setas levemente rotacionadas pra dar o clássico efeito
      "placa de encruzilhada apontando pra tudo quanto é lado". ---------- */
-  .crossroads-sign{position:absolute; bottom:20%; width:12px; height:214px; z-index:5;}
+  .crossroads-sign{position:absolute; bottom:20%; width:12px; height:214px; z-index:6;}
   .crossroads-sign .post{position:absolute; left:50%; bottom:0; width:12px; height:100%; transform:translateX(-50%);
     background:linear-gradient(90deg,#4a2f18 0%,#6b4725 30%,#8a5a32 50%,#6b4725 70%,#4a2f18 100%);
     border-radius:2px; box-shadow:0 2px 3px rgba(0,0,0,.4), inset 1px 0 0 rgba(255,255,255,.08);}
@@ -288,7 +288,7 @@
 
   /* ---------- estante de livros (biblioteca): mesma madeira entalhada das placas/portas,
      agora como móvel. Livros = coleção real do site, cor por plataforma, borda dourada se raro. ---------- */
-  .bookshelf{position:absolute; bottom:42%; width:230px; height:192px; padding:8px 6px 6px;
+  .bookshelf{position:absolute; bottom:42%; width:230px; height:192px; padding:8px 6px 6px; z-index:6;
     display:flex; flex-direction:column; gap:3px; box-sizing:border-box;
     background:
       repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0px, rgba(0,0,0,.12) 2px, transparent 2px, transparent 7px),
@@ -329,7 +329,7 @@
      (NPC fica "atrás do balcão", como um lojista de feira) + placa de madeira entalhada com o nome,
      mesmo estilo das placas das casas. Cor do toldo/selo por tipo de canal: vermelho=youtube,
      roxo=twitch, rosa=instagram, verde=loja. Cada NPC usa um sprite diferente, nenhum repetido. ---------- */
-  .stall{position:absolute; bottom:42%; width:96px; height:134px;}
+  .stall{position:absolute; bottom:42%; width:96px; height:134px; z-index:6;}
   .tent-pole{position:absolute; top:3px; width:5px; height:50px; z-index:1;
     background:linear-gradient(90deg,#6b4725 0%,#8a5a32 45%,#6b4725 100%); box-shadow:0 1px 2px rgba(0,0,0,.4);}
   .tent-pole.l{left:8px;} .tent-pole.r{right:8px;}
@@ -506,7 +506,7 @@
   /* ---------- banca de jornal (rua): toldo listrado + jornais em leque na bancada + placa de madeira
      pendurada, reaproveitando poste/toldo/balcão já usados na tenda e o mesmo esqueleto de placa das
      casas. Jornais são retângulos de papel desenhados em CSS (sem asset Kenney equivalente). ---------- */
-  .newsstand{position:absolute; bottom:20%; width:104px; height:118px; cursor:pointer;}
+  .newsstand{position:absolute; bottom:20%; width:104px; height:118px; cursor:pointer; z-index:6;}
   .newsstand .tent-canopy{--platc:#1c1c1c; width:100px; height:28px;}
   /* a banca é mais alta que a barraca padrão (balcão mais baixo, pra caber o leque de jornais
      em cima), então o poste padrão (50px) ficava curto e sobrava um vão vazio entre o toldo e
@@ -561,7 +561,7 @@
   /* ---------- caixa de correio (rua): poste + caixa + bandeirinha vermelha balançando, CSS puro
      (sem asset Kenney equivalente). Reúne as duas funções que já existem no site real: formulário
      de Sugestão/Parceria (ICQ) e Livro de Visitas (Giscus), uma em cada aba do painel. ---------- */
-  .mailbox{position:absolute; bottom:20%; width:40px; height:72px; cursor:pointer;}
+  .mailbox{position:absolute; bottom:20%; width:40px; height:72px; cursor:pointer; z-index:6;}
   .mailbox .post{position:absolute; left:50%; bottom:0; width:6px; height:42px; transform:translateX(-50%);
     background:linear-gradient(90deg,#6b4725,#8a5a32,#6b4725); box-shadow:0 1px 2px rgba(0,0,0,.4);}
   .mailbox .box{position:absolute; left:50%; bottom:38px; width:34px; height:24px; transform:translateX(-50%);
@@ -629,7 +629,7 @@
   .saloon-bar-bottle::before{content:''; position:absolute; left:50%; top:-5px; width:3px; height:5px;
     background:inherit; transform:translateX(-50%);}
 
-  .game-table{position:absolute; bottom:42%; width:170px; height:130px; cursor:pointer; z-index:4;}
+  .game-table{position:absolute; bottom:42%; width:170px; height:130px; cursor:pointer; z-index:6;}
   .game-table .felt{position:absolute; box-sizing:border-box; left:6px; right:6px; top:0; height:92px; border-radius:50%/44%;
     background:radial-gradient(ellipse at 50% 34%, #3a9462 0%, #257049 55%, #163f27 100%);
     border:10px solid #6b4725; box-shadow:0 8px 12px rgba(0,0,0,.55), inset 0 0 22px rgba(0,0,0,.45), inset 0 3px 0 rgba(255,255,255,.1);}
@@ -774,7 +774,7 @@
      "slot" de item em cima, pra parecer uma coleção padronizada — só a estação em destaque
      escala um pouco maior (ainda múltiplo exato da base). */
   .forge-work-area .forge-bench{position:relative; width:130px; height:118px; flex:none;}
-  .forge-station{position:absolute; bottom:42%; width:130px; height:118px; cursor:pointer; z-index:4;}
+  .forge-station{position:absolute; bottom:42%; width:130px; height:118px; cursor:pointer; z-index:6;}
   .forge-bench .ft-table, .forge-station .ft-table{position:absolute; left:50%; bottom:0; width:120px; height:90px; transform:translateX(-50%);}
   .forge-bench .ft-item, .forge-station .ft-item{position:absolute; left:50%; bottom:58px; width:58px; height:58px; transform:translateX(-50%);
     filter:drop-shadow(0 3px 3px rgba(0,0,0,.5));}
@@ -807,7 +807,7 @@
      fita/VHS dedicada, então as "fitas" nas prateleiras reaproveitam a mesma lombada (.book) já
      usada na Biblioteca, só com outra paleta — igual fizemos com martelo+mesa no lugar da
      bigorna no Ferreiro: transparente sobre o que é sprite real e o que é convenção visual. */
-  .media-station{position:absolute; bottom:42%; width:170px; height:170px; cursor:pointer; z-index:4;}
+  .media-station{position:absolute; bottom:42%; width:170px; height:170px; cursor:pointer; z-index:6;}
   .media-station .ms-counter{position:absolute; left:50%; bottom:0; width:160px; height:104px; transform:translateX(-50%);}
   .media-station .ms-tv{position:absolute; left:18px; bottom:88px; width:92px; height:92px;
     filter:drop-shadow(0 3px 3px rgba(0,0,0,.5));}
@@ -953,7 +953,7 @@
   .deco-rug{position:absolute; width:140px;height:50px; border-radius:50%; background:#5a3f6e; opacity:.5; box-shadow:0 0 0 6px rgba(90,63,110,.25);}
 
   /* ---------- hotspots do cenário (objetos reais do site) ---------- */
-  .hotspot{position:absolute; cursor:pointer;}
+  .hotspot{position:absolute; cursor:pointer; z-index:6;}
   .hotspot .glow{position:absolute; inset:-6px; border-radius:8px; opacity:0; transition:opacity .15s;}
   .hotspot:hover .glow{opacity:1; box-shadow:0 0 0 2px rgba(255,255,255,.5), 0 0 18px rgba(255,255,255,.35);}
 
