@@ -22,7 +22,14 @@
   #stage{position:relative; width:960px; height:540px; overflow:hidden; cursor:crosshair; flex:none;}
 
   /* ---------- mundo largo: tudo que rola com a câmera vive aqui ---------- */
-  #world{position:absolute; top:0; left:0; height:100%; will-change:transform;}
+  /* z-index explícito: #world tem transform (câmera), o que já cria um stacking context próprio;
+     sem um z-index aqui, esse contexto inteiro empata com #floorclick no nível "auto" do #stage e
+     perde pra ele (ficando sempre atrás), mesmo que elementos internos como .hotspot tenham
+     z-index maior — porque a comparação de pintura acontece no nível do #world, não dos filhos.
+     Com isso aqui o conteúdo do mundo (portas, banca, correio, estações...) passa a ficar acima
+     do #floorclick, que só continua funcionando pro clique-pra-andar genérico (ver fallback de
+     clique abaixo, registrado por último no #world). */
+  #world{position:absolute; top:0; left:0; height:100%; will-change:transform; z-index:10;}
   #roomlayer{position:absolute; inset:0;}
 
   /* ---------- cena base: quarto/sala estilo VGA pintado (reaproveitado por cômodo) ----------
@@ -3139,6 +3146,21 @@ world.addEventListener('click', (e) => {
   const bx = (r.left - sr.left) / viewScale + (r.width / viewScale) / 2;
   const by = (r.top - sr.top) / viewScale - 4;
   showBubble(bx, by, label, 2800);
+});
+
+/* ---------- clique-pra-andar genérico dentro do #world ---------- */
+/* #world tem transform (câmera) e agora z-index acima do #floorclick (ver CSS), então o próprio
+   #world passa a receber o clique em áreas decorativas (céu, prédio, chão) que antes caíam no
+   #floorclick. Esse listener, registrado por último, serve de "chão clicável": só anda se o
+   clique não caiu em nenhum elemento interativo específico (porta, banca, correio, estação,
+   livro/fita, seta da placa) — esses já tratam o próprio clique e retornam antes de chegar aqui. */
+world.addEventListener('click', (e) => {
+  if (e.target.closest('.hotspot, .newsstand, .mailbox, .game-table, .forge-station, .media-station, .book[data-tape], .crossroads-sign .arrow, .npc')) return;
+  const p = toLocal(e.clientX, e.clientY);
+  const x = p.x + camX;
+  const y = p.y;
+  hint.style.display = 'none';
+  walkTo(x, y);
 });
 
 /* ---------- boot ---------- */
