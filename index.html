@@ -451,7 +451,7 @@
   .cinema-screen-overlay{position:absolute; inset:0; z-index:95; display:none; align-items:center; justify-content:center;}
   .cinema-screen-overlay.show{display:flex;}
   .cinema-screen-backdrop{position:absolute; inset:0; background:rgba(5,2,8,.82); cursor:pointer;}
-  .cinema-screen-box{position:relative; z-index:1; width:460px; max-width:90%; background:linear-gradient(180deg,#1a0e14,#0d070a);
+  .cinema-screen-box{position:relative; z-index:1; width:620px; max-width:94%; background:linear-gradient(180deg,#1a0e14,#0d070a);
     border:3px solid #000; border-radius:10px; box-shadow:0 14px 40px rgba(0,0,0,.6), inset 0 0 0 2px rgba(255,255,255,.04);
     overflow:hidden; font-family:'VT323',monospace; animation:cinemaPop .2s ease;}
   @keyframes cinemaPop{from{transform:scale(.92); opacity:0;} to{transform:scale(1); opacity:1;}}
@@ -466,22 +466,18 @@
   .cinema-screen-video{position:relative; aspect-ratio:16/9; background:#050505; display:flex; align-items:center;
     justify-content:center; overflow:hidden;
     background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px);}
+  .cinema-screen-video iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
   .cinema-screen-video .avatar-glow{position:absolute; inset:0;
     background:radial-gradient(circle at 50% 45%, var(--platc,#777) 0%, transparent 62%); opacity:.3;}
   .cinema-screen-video .sprite{width:68px; height:68px; background-size:contain; background-repeat:no-repeat;
     background-position:center; image-rendering:pixelated; filter:drop-shadow(0 6px 10px rgba(0,0,0,.6)); z-index:1;}
-  .cinema-screen-video .play-ico{position:absolute; z-index:2; font-size:30px; color:rgba(255,255,255,.85);
-    text-shadow:0 2px 6px rgba(0,0,0,.6);}
   .cinema-screen-video .offline-tag{position:absolute; bottom:8px; left:0; right:0; text-align:center;
-    font-size:12.5px; color:#c9bfc4; letter-spacing:.5px;}
+    font-size:12.5px; color:#c9bfc4; letter-spacing:.5px; padding:0 10px;}
   .cinema-screen-info{padding:9px 12px 6px; font-size:15px; color:#ead9de; line-height:1.35;}
   .cinema-screen-info b{color:#fff;}
-  .cinema-screen-chat{height:112px; overflow:hidden; position:relative; background:rgba(0,0,0,.28);
+  .cinema-screen-chat{height:220px; overflow:hidden; position:relative; background:rgba(0,0,0,.28);
     border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06);}
-  .cinema-screen-chat-track{position:absolute; left:0; right:0; padding:4px 12px; animation:chatScroll 14s linear infinite;}
-  .cinema-screen-chat-track div{font-size:13px; color:#cfc3c8; margin-bottom:5px; line-height:1.25;}
-  .cinema-screen-chat-track b{color:var(--platc,#ff9f43);}
-  @keyframes chatScroll{0%{transform:translateY(0);} 100%{transform:translateY(-50%);}}
+  .cinema-screen-chat iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
   .cinema-screen-chat-off{padding:14px 12px; font-size:13px; color:#8a7b80; text-align:center;}
   .cinema-screen-link{display:flex; align-items:center; justify-content:center; gap:6px; margin:10px 12px 12px;
     padding:7px 10px; border-radius:7px; font-size:15px; color:#fff; background:var(--platc,#6c3fa0);
@@ -1881,6 +1877,14 @@ const CANAIS_CINEMA = [
    iamtgames.github.io, então dá pra buscar direto sem CORS). Promove
    CANAIS_CINEMA[i].live só quando o canal aparece de fato na lista "live"
    retornada -- sem chute, sem dado estático. */
+/* extrai o videoId (11 chars) de qualquer formato de URL do YouTube que o
+   canais_live.json possa trazer (watch?v=, /live/, youtu.be/, /embed/) --
+   usado pra montar o embed real do vídeo/chat da live, nunca chutado. */
+function extrairYoutubeVideoId(url){
+  if (!url) return null;
+  const m = String(url).match(/(?:v=|\/live\/|youtu\.be\/|\/embed\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
 async function fetchCanaisLiveStatus(){
   try {
     const r = await fetch('https://iamtgames.github.io/colecao/canais_live.json', { cache: 'no-store' });
@@ -1889,13 +1893,15 @@ async function fetchCanaisLiveStatus(){
     const liveList = Array.isArray(j.live) ? j.live : [];
     let mudou = false;
     CANAIS_CINEMA.forEach(ch => {
-      const estaAoVivo = liveList.some(l =>
+      const match = liveList.find(l =>
         (l.login && ch.login && l.login.toLowerCase() === ch.login.toLowerCase()) ||
         (l.n && ch.login && l.n.toLowerCase() === ch.login.toLowerCase()) ||
         (l.n && l.n.toLowerCase() === ch.n.toLowerCase())
       );
+      const estaAoVivo = !!match;
       if (ch.live !== estaAoVivo) mudou = true;
       ch.live = estaAoVivo;
+      ch.videoId = (match && ch.plat === 'youtube') ? extrairYoutubeVideoId(match.videoUrl || match.link) : null;
     });
     return mudou;
   } catch (e) {
@@ -2102,21 +2108,30 @@ function renderLiveNowPin(){
   bldg.appendChild(pin);
 }
 
-/* "sessão de cinema": ao clicar no NPC de um quiosque, abre uma tela grande simulando a transmissão
-   ao vivo (mesmo link/chat já usado nos balões, só que em formato de "filme" dentro do cinema).
-   Chat é só decorativo/simulado aqui -- no site real os embeds oficiais de chat (Twitch/YouTube)
-   só carregam quando o usuário clica, igual é descrito pro visitante no rodapé do painel. */
-const CHAT_DEMO = {
-  youtube: ['<b>retrogamer_br:</b> bom dia! 🎮', '<b>colecionador92:</b> esse jogo é raro demais', '<b>Fe_PS4:</b> kkkkkk boa', '<b>vhs_player:</b> preço desse tá bom?', '<b>pixel_nando:</b> vim pela playlist 🔥'],
-  twitch: ['<b>xXGamerXx:</b> PogChamp', '<b>retro_viny:</b> GG essa run', '<b>loja_colecionador:</b> alguém tem esse case?', '<b>duda_ps:</b> Kappa', '<b>nina_retro:</b> comprei o mesmo mês passado'],
-  instagram: ['<b>fan_colecao:</b> 😍😍 que capa', '<b>retromania:</b> onde compra isso?', '<b>gui.ps4:</b> salvei o post', '<b>theplayer:</b> top demais'],
-};
+/* "sessão de cinema": ao clicar no NPC de um quiosque, abre uma tela grande com o player e o
+   chat REAIS (Twitch/YouTube), igual ao painel de live do site colecao (mesmo domínio
+   iamtgames.github.io, então o parâmetro `parent`/`embed_domain` da Twitch/YouTube bate certinho).
+   Quando o canal não está ao vivo (ou é Instagram, que não tem embed oficial de live), mostra
+   só o aviso honesto + link pra plataforma -- nunca um player ou chat fingido. */
 function showCinemaScreen(ch){
   const cor = PLAT_COR[ch.plat] || '#777';
-  const lines = CHAT_DEMO[ch.plat] || CHAT_DEMO.youtube;
-  const chatHtml = ch.live
-    ? '<div class="cinema-screen-chat-track">' + lines.concat(lines).map(l => '<div>' + l + '</div>').join('') + '</div>'
-    : '<div class="cinema-screen-chat-off">💬 Chat abre automaticamente quando a live começa.</div>';
+  const dominio = 'iamtgames.github.io';
+  let videoHtml, chatHtml;
+
+  if (ch.live && ch.plat === 'twitch') {
+    videoHtml = '<iframe src="https://player.twitch.tv/?channel=' + encodeURIComponent(ch.login) + '&parent=' + dominio + '&autoplay=true&muted=true" allowfullscreen></iframe>';
+    chatHtml = '<iframe src="https://www.twitch.tv/embed/' + encodeURIComponent(ch.login) + '/chat?parent=' + dominio + '&darkpopout"></iframe>';
+  } else if (ch.live && ch.plat === 'youtube' && ch.videoId) {
+    videoHtml = '<iframe src="https://www.youtube.com/embed/' + encodeURIComponent(ch.videoId) + '?autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+    chatHtml = '<iframe src="https://www.youtube.com/live_chat?v=' + encodeURIComponent(ch.videoId) + '&embed_domain=' + dominio + '&dark_theme=1"></iframe>';
+  } else {
+    videoHtml =
+      '<div class="avatar-glow"></div>' +
+      '<div class="sprite" style="background-image:url(\'data:image/png;base64,' + ch.sprite + '\')"></div>' +
+      (ch.live ? '<div class="offline-tag">ao vivo agora -- toque em "Assistir" pra acompanhar na plataforma</div>' : '<div class="offline-tag">offline no momento · volta no próximo horário</div>');
+    chatHtml = '<div class="cinema-screen-chat-off">💬 ' + (ch.live ? 'Chat disponível direto na plataforma.' : 'Chat abre automaticamente quando a live começa.') + '</div>';
+  }
+
   const horarioRow = ch.horario ? '<div>🕒 <b>Horário:</b> ' + esc(ch.horario) + '</div>' : '';
   cinemaScreenBox.style.setProperty('--platc', cor);
   cinemaScreenBox.innerHTML =
@@ -2125,11 +2140,7 @@ function showCinemaScreen(ch){
       (ch.live ? '<span class="cinema-screen-live"><span class="dot"></span>AO VIVO</span>' : '<span class="cinema-screen-live">offline</span>') +
     '</div>' +
     '<div class="cinema-screen-body">' +
-      '<div class="cinema-screen-video">' +
-        '<div class="avatar-glow"></div>' +
-        '<div class="sprite" style="background-image:url(\'data:image/png;base64,' + ch.sprite + '\')"></div>' +
-        (ch.live ? '<div class="play-ico">▶</div>' : '<div class="offline-tag">sessão encerrada · volta no próximo horário</div>') +
-      '</div>' +
+      '<div class="cinema-screen-video">' + videoHtml + '</div>' +
       '<div class="cinema-screen-sidebar">' +
         '<div class="cinema-screen-info">' + horarioRow +
           '<div>🎯 <b>Foco:</b> ' + esc(ch.nota) + '</div></div>' +
@@ -2140,7 +2151,11 @@ function showCinemaScreen(ch){
     '</div>';
   cinemaScreenEl.classList.add('show');
 }
-function hideCinemaScreen(){ cinemaScreenEl.classList.remove('show'); }
+function hideCinemaScreen(){
+  cinemaScreenEl.classList.remove('show');
+  // zera o conteúdo pra garantir que qualquer iframe de vídeo/chat pare de tocar em segundo plano
+  cinemaScreenBox.innerHTML = '';
+}
 
 /* banca de jornal (rua): mesmo esquema de notícias do site real (painel "Notícias (Flow Games)",
    alimentado por news.json gerado via GitHub Action a partir do RSS da Flow Games) -- aqui, como é
