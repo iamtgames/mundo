@@ -181,11 +181,33 @@
   #stage.cloudy .clouds-rua, #stage.rainy .clouds-rua{opacity:1;}
   @keyframes cloudsDrift{from{background-position-x:0,0,0;} to{background-position-x:220px,-260px,180px;}}
 
+  /* chuva como pingos discretos (não linhas contínuas): 3 camadas de gotas em grade,
+     cada gota é um radial-gradient estreito e alongado, com espaço vazio entre elas;
+     cada camada cai em velocidade/tamanho diferentes pra dar sensação de profundidade. */
   .rain-rua{position:absolute; inset:0; opacity:0; pointer-events:none; transition:opacity .6s ease;
-    background-image: repeating-linear-gradient(100deg, rgba(190,210,230,.55) 0px, rgba(190,210,230,.55) 1px, transparent 2px, transparent 14px);
-    background-size: 100% 220%; animation: rainFall .35s linear infinite;}
+    background-image: radial-gradient(ellipse 1.6px 8px at 50% 50%, rgba(195,215,235,.8) 45%, transparent 75%);
+    background-repeat: repeat;
+    background-size: 30px 50px;
+    animation: rainDrops1 .55s linear infinite;}
+  .rain-rua::before, .rain-rua::after{content:''; position:absolute; inset:0;}
+  .rain-rua::before{
+    background-image: radial-gradient(ellipse 1.3px 6px at 50% 50%, rgba(195,215,235,.5) 45%, transparent 75%);
+    background-repeat: repeat;
+    background-size: 44px 68px;
+    background-position: 16px 0;
+    opacity:.85;
+    animation: rainDrops2 .75s linear infinite;}
+  .rain-rua::after{
+    background-image: radial-gradient(ellipse 2.1px 10px at 50% 50%, rgba(220,235,250,.65) 45%, transparent 75%);
+    background-repeat: repeat;
+    background-size: 22px 36px;
+    background-position: 6px 0;
+    opacity:.9;
+    animation: rainDrops3 .4s linear infinite;}
   #stage.rainy .rain-rua{opacity:.5;}
-  @keyframes rainFall{from{background-position-y:-220%;} to{background-position-y:0%;}}
+  @keyframes rainDrops1{from{background-position:0 -50px;} to{background-position:-16px 50px;}}
+  @keyframes rainDrops2{from{background-position:16px -68px;} to{background-position:-8px 68px;}}
+  @keyframes rainDrops3{from{background-position:6px -36px;} to{background-position:-12px 36px;}}
 
   /* ---------- cenário de fundo: montanhas, lago/mar no horizonte e animais voando ----------
      tudo em CSS (silhuetas recortadas com clip-path, em degraus, pra ler como 8-bit) já que os
@@ -1824,23 +1846,72 @@ const VENDEDORES_LOJA = [
   {n:'Arena Games',plat:'loja',link:'https://lojaarenagames.com.br/',horario:'',nota:'Excelentes preços, jogos raros a preços populares.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAAA9QTFRFAAAAwMvc6qVsvWxKPyYxaqQ8bwAAAAF0Uk5TAEDm2GYAAABYSURBVAjXPY3BDcAwCAN5ZIROQDJBzQBVcvvPVKBSXz5hozOzAY9ZJxSAe50GDiuBzdexqmq43WeOmLc0I+FIKLtxFJ6fCSAVXBcRQTukKNvYitb+Vut8AR9xFXg+RlAJAAAAAElFTkSuQmCC'}
 ];
 
+/* roster real sincronizado manualmente com o array `canais` do site colecao (iamtgames.github.io/colecao) --
+   mesmos nomes/links/plataformas; `login` é o handle usado pra casar com canais_live.json em tempo real
+   (ver fetchCanaisLiveStatus). O campo `live` começa sempre false e só é promovido a true depois que a
+   checagem real confirma -- nunca mostramos "AO VIVO" chutado/estático. */
 const CANAIS_CINEMA = [
-  {n:'Diego Sheth',plat:'youtube',live:true,link:'https://www.youtube.com/live/KcYAtGqUbog',horario:'Live toda sexta-feira',nota:'Variedade geral, preço bom. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAAi5u0JitE4Zpldjs2wMvc98KCvWxKPyYxHCVAtQAAAAF0Uk5TAEDm2GYAAABpSURBVAjXRc3BCcAgDAVQjy7QCQQXKJRuUK8ehE4QFyj9HoVazNhNcum/5PEJiXN/WKLTK7oWA0ha8QFcBlRUw01EBooUDVtYg+HZaGc9k4FFDvFbJCfL7lJKJsUEmoJHGkneep5tNu4fSh4qTrVfKjgAAAAASUVORK5CYII='},
-  {n:'Antec.r',plat:'youtube',live:false,link:'https://www.youtube.com/@antec.r',horario:'Lives quinta e domingo',nota:'Variedade geral, preço bom. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAAJitEdjs24ZplvWxK98KCPyYxJ/6HCgAAAAF0Uk5TAEDm2GYAAABnSURBVAjXHc3RDYQwDAPQfN0CiA1OXQC6AHI7ANT3jXrF+49Aky8/WZFjZibdZpGS50cDUakDySt9gSOAhhYoJANcuQbysi2Bf+YunzmBMof0UOJP8za3ctExgOpQTz3Nt/NnHVX3CzMJIOPp/rZKAAAAAElFTkSuQmCC'},
-  {n:'Garimpo dos Games',plat:'youtube',live:false,link:'https://www.youtube.com/@Garimpodosgames',horario:'Lives às segundas-feiras',nota:'Consoles usados, preços bons. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAJitEdjs2////4ZplvWxK98KCPyYxLIt81AAAAAF0Uk5TAEDm2GYAAABhSURBVAjXJcuxDYAwEAPA7xggG1DAIigLoCc9kE8bISVen3fi6mTZIgKPeBaiOtDMEiucZnnAPBPHESeeMJv4hBd8d46roKvqVeCTDPAGi6u9A/3eCqGf6q5sWmqJDQjgByPAK1mAzG9+AAAAAElFTkSuQmCC'},
-  {n:'Cara de Barata',plat:'youtube',live:false,link:'https://www.youtube.com/@caradebarata',horario:'Vendas online',nota:'Vendas gerais, preços bons. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAAA9QTFRFAAAA6qVswMvci5u0PyYxqLPFjAAAAAF0Uk5TAEDm2GYAAABaSURBVAjXPY3bDYAwDAPz0QUqmCB0gjoD8Lj9ZyIpEl8+2ZbOzBqcZiuhAHqvqtFhT+Di29hx/2C6H3lim9IRCY+EcmuPwvECkArGICJYDinK1m7F0v5WW/kC9SMVJG0p8YYAAAAASUVORK5CYII='},
-  {n:'DJ Games Retro',plat:'youtube',live:false,link:'https://www.youtube.com/@djgamesretro',horario:'Lives às terças-feiras',nota:'Variedade de jogos, preços bons. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAAJitE4ZplvWxKwMvcdjs298KCi5u0PyYx2oMaEAAAAAF0Uk5TAEDm2GYAAABzSURBVAjXY2BAgI6OjgYQzdEBZXW0l7hXdIAY5eUu5R0gmfIS93KgHEd7uZJ6eQWQ0VKUllbuAWK4CSaKgBllaWppHmA1aWnpQDUdbeFKSqUZHQwdaamhpmFpIEazcbFFMpDR0RoaGmHRATQ5NNQ0wqIBANQWKpjCoiiYAAAAAElFTkSuQmCC'},
-  {n:'Jotape Arcade',plat:'youtube',live:false,link:'https://www.youtube.com/@JotapeArcade',horario:'Live aos domingos',nota:'Jogos retro, bons preços. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAAB5QTFRFAAAAJitEdjs2i5u04ZplUmB8wMvc98KCvWxKPyYxfAswwAAAAAF0Uk5TAEDm2GYAAABuSURBVAjXY2BAgJlAAKI5QYwJIIFJHR2aIKGZGh0dTWBGR0VHBZjRXl5eDmaUi5eLgxnuIi4iYMYU93JPIINzWubMmdMyJzDMnJaclmaWOZNhZqhxaphxKIgxo6OjE8SYOTVyaiTQWk6gSqD6CQB9Ni8Nvp1qkgAAAABJRU5ErkJggg=='},
-  {n:'Sigchap',plat:'youtube',live:true,link:'https://www.youtube.com/@sigchap',horario:'Lives, leilões e vendas',nota:'Raridades e itens exclusivos. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAAvWxKdjs298KC/3Bt6EU3PyYx+VGpDwAAAAF0Uk5TAEDm2GYAAABiSURBVAjXPY3BDYAwCEU5uUA3qC5QmziAKRsUzk0Mf/8RBEzk9OB9gAhZRNsHi2CYDAVBefI0B9hk9RDMRDTVXeuRau/9TFWeq6VCKwg1fMVGgAASIPFBIhwTD/9P/dDyhl4G/yqjkvUB4wAAAABJRU5ErkJggg=='},
-  {n:'D Games Brasil',plat:'instagram',live:false,link:'https://www.instagram.com/dgames_brasil/',horario:'Lives todas as quintas',nota:'Games repro. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAAB5QTFRFAAAA6qVsJitE4Zpldjs20XbQm0yj98KCvWxKPyYxwZOybwAAAAF0Uk5TAEDm2GYAAABuSURBVAjXRc2xDYAwDATAtBmBCRiAgg2QGAAkFjCiR3IYAOXpUiDgt8Wm4Ruf/guH8IcWv9FRvDgTeq+YM0BfkAwlxBPIqTc8qLU+HNlQfdBWvwaqq4E3mqbbGKhJxlkdz7BPDl4ii72NFBkXlheWKDJppxZU3AAAAABJRU5ErkJggg=='},
-  {n:'Rodrigo Retro Games',plat:'youtube',live:false,link:'https://www.youtube.com/@RodrigoRetroGames',horario:'Lives às terças-feiras',nota:'Variedade de jogos, lives especiais de R$30.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAAB5QTFRFAAAA98KC4ZplUmB8JitE6qVsi5u0vWxKwMvcPyYx+MwxjQAAAAF0Uk5TAEDm2GYAAABvSURBVAjXRYyxDYBADAO/ZQzGoISCDZBgARQGgPyXNFG+QyDBe1sSGtzkHNkO4RdMdip8OszfSov9MJCSrA5RSR2ecRaaYGHppbdwwN7WnfdxMif4jjBH3ymaELO1mKJu7HCrLg64mquB75RcMo4XRRU3svu3bDYAAAAASUVORK5CYII='},
-  {n:'VG Invest',plat:'youtube',live:false,link:'https://www.youtube.com/@vginvest',horario:'Lives de empreendedorismo',nota:'Empreendedorismo e investimento em games.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAAJitEvWxK4Zpl98KCUmB8wMvci5u0PyYxmtG2YwAAAAF0Uk5TAEDm2GYAAABkSURBVAjXRc0xDoAgDIXhju5wAid3jiBXULmAyK6hKzER37FtMcZ/6Te0KdEfpCKzU0BRmbMCt9SwfGCpYTfONBzW2xej89DrBNRUCHWLMScQJl5nnhRn3w8KXOEK8qyTTdkvD8k/K13Jrxc5AAAAAElFTkSuQmCC'},
-  {n:'PELEHZADA',plat:'twitch',live:false,link:'https://www.twitch.tv/pelehzada',horario:'Todos os dias após 18h',nota:'Gameplay FPS em 3ª pessoa, GTA RP.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAAvWxKUmB8wMvci5u0PyYx3fDfjAAAAAF0Uk5TAEDm2GYAAABaSURBVAjXY2BAAqGhMBrCYg0NNg0NAAmEGBu7goRCVYyNncAMFyCAMEJCQtAYEClWoGagAQEMocEmxsbOpqEMoUouRsouSiBGoKCgKIgRGqQapAq0DWQVyDIAH0QZnVyQmb0AAAAASUVORK5CYII='},
-  {n:'tofogames10',plat:'twitch',live:false,link:'https://www.twitch.tv/tofogames10',horario:'Lives de vendas',nota:'Talk shows e podcasts.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAAB5QTFRFAAAAqrfM6EU3i5u0djs298KC6qVswMvcvWxKPyYxmozc2AAAAAF0Uk5TAEDm2GYAAABkSURBVAjXTc2xEYAwCAXQtGyiG+gIDpAVvLO0Ik4gdClyyt9WSBp/9Q4OfkoE1BQBhggiQMDaEMFE1Jdku0cdjwJ2xCSgHTOmQNOXbYt/umLxK2RhLhk/iDFf0nGf6vBSLl7xAcJoOIwl8JTnAAAAAElFTkSuQmCC'},
-  {n:'corvofps',plat:'twitch',live:false,link:'https://www.twitch.tv/corvofps',horario:'Lives frequentes',nota:'Gameplay FPS e bate-papo.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAA////6qVsUmB8djs2i5u0wMvcvWxKPyYxDvufLAAAAAF0Uk5TAEDm2GYAAABrSURBVAjXLYyxDYAwDARdegNGYATYgEyAWIDILQHJlJGA8GPzAVyd7+0XhQIZWfCPYII7LkLsUrtGgp2pDYWA0z3Um7FzX+caHdvQ18imYbteMPfyQbO8ALv3wi9lNYuzCLgaRKg4FFRZKR4R4TZTX/aSZAAAAABJRU5ErkJggg=='},
-  {n:'gianzao',plat:'twitch',live:false,link:'https://www.twitch.tv/gianzao',horario:'Lives frequentes',nota:'Bate-papo, músicas e vibes.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAAQ+GzJitE4Zpl98KCdjs2JZVqvWxKPyYxG/cZZQAAAAF0Uk5TAEDm2GYAAABwSURBVAjXHc0xDsIwEATAK2nzhvgHRMoDYp4QcEvBJX0w6zISMt5nc75qR3vSnogIeYp4kj0vbPCKFUi94gPIDn0O6ngv1+iIIQbHFOLo+N7WmX3mtea7DbEpqYXC4wPd7Eb8FDsMrKkme2s/Sys8//d5LEDyRCxcAAAAAElFTkSuQmCC'},
-  {n:'joaodobife',plat:'twitch',live:false,link:'https://www.twitch.tv/joaodobife',horario:'Lives frequentes',nota:'Gameplay, Corinthians e bate-papo.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAAi5u0JitE4ZplwMvcdjs2vWxK98KCPyYxqlFl6gAAAAF0Uk5TAEDm2GYAAABjSURBVAjXY2BAgA4gANEcIEYDSKC5vNwCJNRhXl5eDGakl5eXoTLKlYrUwYzwsrBSMKM1tDSiA2SMW2hoCNCgjhY3F5cUjw6gWtG0tMByEKMtLS0DxAAqDo0AWsvRARLpaAAAnUUrTOxRKb0AAAAASUVORK5CYII='},
+  {n:'Diego Sheth',plat:'youtube',live:false,login:'DiegoSheth',link:'https://www.youtube.com/live/KcYAtGqUbog',horario:'Live toda sexta-feira',nota:'Variedade geral, preço bom. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAAi5u0JitE4Zpldjs2wMvc98KCvWxKPyYxHCVAtQAAAAF0Uk5TAEDm2GYAAABpSURBVAjXRc3BCcAgDAVQjy7QCQQXKJRuUK8ehE4QFyj9HoVazNhNcum/5PEJiXN/WKLTK7oWA0ha8QFcBlRUw01EBooUDVtYg+HZaGc9k4FFDvFbJCfL7lJKJsUEmoJHGkneep5tNu4fSh4qTrVfKjgAAAAASUVORK5CYII='},
+  {n:'Antec.r',plat:'youtube',live:false,login:'antec.r',link:'https://www.youtube.com/@antec.r',horario:'Lives quinta e domingo',nota:'Variedade geral, preço bom. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAAJitEdjs24ZplvWxK98KCPyYxJ/6HCgAAAAF0Uk5TAEDm2GYAAABnSURBVAjXHc3RDYQwDAPQfN0CiA1OXQC6AHI7ANT3jXrF+49Aky8/WZFjZibdZpGS50cDUakDySt9gSOAhhYoJANcuQbysi2Bf+YunzmBMof0UOJP8za3ctExgOpQTz3Nt/NnHVX3CzMJIOPp/rZKAAAAAElFTkSuQmCC'},
+  {n:'Garimpo dos Games',plat:'youtube',live:false,login:'Garimpodosgames',link:'https://www.youtube.com/@Garimpodosgames',horario:'Lives às segundas-feiras',nota:'Consoles usados, preços bons. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAJitEdjs2////4ZplvWxK98KCPyYxLIt81AAAAAF0Uk5TAEDm2GYAAABhSURBVAjXJcuxDYAwEAPA7xggG1DAIigLoCc9kE8bISVen3fi6mTZIgKPeBaiOtDMEiucZnnAPBPHESeeMJv4hBd8d46roKvqVeCTDPAGi6u9A/3eCqGf6q5sWmqJDQjgByPAK1mAzG9+AAAAAElFTkSuQmCC'},
+  {n:'Cara de Barata',plat:'youtube',live:false,login:'caradebarata',link:'https://www.youtube.com/@caradebarata',horario:'Vendas online',nota:'Vendas gerais, preços bons. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAAA9QTFRFAAAA6qVswMvci5u0PyYxqLPFjAAAAAF0Uk5TAEDm2GYAAABaSURBVAjXPY3bDYAwDAPz0QUqmCB0gjoD8Lj9ZyIpEl8+2ZbOzBqcZiuhAHqvqtFhT+Di29hx/2C6H3lim9IRCY+EcmuPwvECkArGICJYDinK1m7F0v5WW/kC9SMVJG0p8YYAAAAASUVORK5CYII='},
+  {n:'DJ Games Retro',plat:'youtube',live:false,login:'djgamesretro',link:'https://www.youtube.com/@djgamesretro',horario:'Lives às terças-feiras',nota:'Variedade de jogos, preços bons. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAAJitE4ZplvWxKwMvcdjs298KCi5u0PyYx2oMaEAAAAAF0Uk5TAEDm2GYAAABzSURBVAjXY2BAgI6OjgYQzdEBZXW0l7hXdIAY5eUu5R0gmfIS93KgHEd7uZJ6eQWQ0VKUllbuAWK4CSaKgBllaWppHmA1aWnpQDUdbeFKSqUZHQwdaamhpmFpIEazcbFFMpDR0RoaGmHRATQ5NNQ0wqIBANQWKpjCoiiYAAAAAElFTkSuQmCC'},
+  {n:'Sigchap',plat:'youtube',live:false,login:'sigchap',link:'https://www.youtube.com/@sigchap',horario:'Lives, leilões e vendas',nota:'Raridades e itens exclusivos. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAAvWxKdjs298KC/3Bt6EU3PyYx+VGpDwAAAAF0Uk5TAEDm2GYAAABiSURBVAjXPY3BDYAwCEU5uUA3qC5QmziAKRsUzk0Mf/8RBEzk9OB9gAhZRNsHi2CYDAVBefI0B9hk9RDMRDTVXeuRau/9TFWeq6VCKwg1fMVGgAASIPFBIhwTD/9P/dDyhl4G/yqjkvUB4wAAAABJRU5ErkJggg=='},
+  {n:'D Games Brasil',plat:'instagram',live:false,login:'dgames_brasil',link:'https://www.instagram.com/dgames_brasil/',horario:'Lives todas as quintas',nota:'Games repro. Já comprei.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAAB5QTFRFAAAA6qVsJitE4Zpldjs20XbQm0yj98KCvWxKPyYxwZOybwAAAAF0Uk5TAEDm2GYAAABuSURBVAjXRc2xDYAwDATAtBmBCRiAgg2QGAAkFjCiR3IYAOXpUiDgt8Wm4Ruf/guH8IcWv9FRvDgTeq+YM0BfkAwlxBPIqTc8qLU+HNlQfdBWvwaqq4E3mqbbGKhJxlkdz7BPDl4ii72NFBkXlheWKDJppxZU3AAAAABJRU5ErkJggg=='},
+  {n:'Rodrigo Retro Games',plat:'youtube',live:false,login:'RodrigoRetroGames',link:'https://www.youtube.com/@RodrigoRetroGames',horario:'Lives às terças-feiras',nota:'Variedade de jogos, lives especiais de R$30.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAAB5QTFRFAAAA98KC4ZplUmB8JitE6qVsi5u0vWxKwMvcPyYx+MwxjQAAAAF0Uk5TAEDm2GYAAABvSURBVAjXRYyxDYBADAO/ZQzGoISCDZBgARQGgPyXNFG+QyDBe1sSGtzkHNkO4RdMdip8OszfSov9MJCSrA5RSR2ecRaaYGHppbdwwN7WnfdxMif4jjBH3ymaELO1mKJu7HCrLg64mquB75RcMo4XRRU3svu3bDYAAAAASUVORK5CYII='},
+  {n:'VG Invest',plat:'youtube',live:false,login:'vginvest',link:'https://www.youtube.com/@vginvest',horario:'Lives de empreendedorismo',nota:'Empreendedorismo e investimento em games.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAAJitEvWxK4Zpl98KCUmB8wMvci5u0PyYxmtG2YwAAAAF0Uk5TAEDm2GYAAABkSURBVAjXRc0xDoAgDIXhju5wAid3jiBXULmAyK6hKzER37FtMcZ/6Te0KdEfpCKzU0BRmbMCt9SwfGCpYTfONBzW2xej89DrBNRUCHWLMScQJl5nnhRn3w8KXOEK8qyTTdkvD8k/K13Jrxc5AAAAAElFTkSuQmCC'},
+  {n:'Gilson Barbosa',plat:'youtube',live:false,login:'gilsonbarbosa7804',link:'https://www.youtube.com/@gilsonbarbosa7804',horario:'',nota:'Canal de lives e vendas.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAAJitEvWxK4Zpl98KCUmB8wMvci5u0PyYxmtG2YwAAAAF0Uk5TAEDm2GYAAABkSURBVAjXRc0xDoAgDIXhju5wAid3jiBXULmAyK6hKzER37FtMcZ/6Te0KdEfpCKzU0BRmbMCt9SwfGCpYTfONBzW2xej89DrBNRUCHWLMScQJl5nnhRn3w8KXOEK8qyTTdkvD8k/K13Jrxc5AAAAAElFTkSuQmCC'},
+  {n:'PELEHZADA',plat:'twitch',live:false,login:'pelehzada',link:'https://www.twitch.tv/pelehzada',horario:'Todos os dias após 18h',nota:'Gameplay FPS em 3ª pessoa, GTA RP.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAAvWxKUmB8wMvci5u0PyYx3fDfjAAAAAF0Uk5TAEDm2GYAAABaSURBVAjXY2BAAqGhMBrCYg0NNg0NAAmEGBu7goRCVYyNncAMFyCAMEJCQtAYEClWoGagAQEMocEmxsbOpqEMoUouRsouSiBGoKCgKIgRGqQapAq0DWQVyDIAH0QZnVyQmb0AAAAASUVORK5CYII='},
+  {n:'tofogames10',plat:'twitch',live:false,login:'tofogames10',link:'https://www.twitch.tv/tofogames10',horario:'Lives de vendas',nota:'Talk shows e podcasts.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAAB5QTFRFAAAAqrfM6EU3i5u0djs298KC6qVswMvcvWxKPyYxmozc2AAAAAF0Uk5TAEDm2GYAAABkSURBVAjXTc2xEYAwCAXQtGyiG+gIDpAVvLO0Ik4gdClyyt9WSBp/9Q4OfkoE1BQBhggiQMDaEMFE1Jdku0cdjwJ2xCSgHTOmQNOXbYt/umLxK2RhLhk/iDFf0nGf6vBSLl7xAcJoOIwl8JTnAAAAAElFTkSuQmCC'},
+  {n:'corvofps',plat:'twitch',live:false,login:'corvofps',link:'https://www.twitch.tv/corvofps',horario:'Lives frequentes',nota:'Gameplay FPS e bate-papo.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAA////6qVsUmB8djs2i5u0wMvcvWxKPyYxDvufLAAAAAF0Uk5TAEDm2GYAAABrSURBVAjXLYyxDYAwDARdegNGYATYgEyAWIDILQHJlJGA8GPzAVyd7+0XhQIZWfCPYII7LkLsUrtGgp2pDYWA0z3Um7FzX+caHdvQ18imYbteMPfyQbO8ALv3wi9lNYuzCLgaRKg4FFRZKR4R4TZTX/aSZAAAAABJRU5ErkJggg=='},
+  {n:'gianzao',plat:'twitch',live:false,login:'gianzao',link:'https://www.twitch.tv/gianzao',horario:'Lives frequentes',nota:'Bate-papo, músicas e vibes.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAAQ+GzJitE4Zpl98KCdjs2JZVqvWxKPyYxG/cZZQAAAAF0Uk5TAEDm2GYAAABwSURBVAjXHc0xDsIwEATAK2nzhvgHRMoDYp4QcEvBJX0w6zISMt5nc75qR3vSnogIeYp4kj0vbPCKFUi94gPIDn0O6ngv1+iIIQbHFOLo+N7WmX3mtea7DbEpqYXC4wPd7Eb8FDsMrKkme2s/Sys8//d5LEDyRCxcAAAAAElFTkSuQmCC'},
+  {n:'joaodobife',plat:'twitch',live:false,login:'joaodobife',link:'https://www.twitch.tv/joaodobife',horario:'Lives frequentes',nota:'Gameplay, Corinthians e bate-papo.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAAi5u0JitE4ZplwMvcdjs2vWxK98KCPyYxqlFl6gAAAAF0Uk5TAEDm2GYAAABjSURBVAjXY2BAgA4gANEcIEYDSKC5vNwCJNRhXl5eDGakl5eXoTLKlYrUwYzwsrBSMKM1tDSiA2SMW2hoCNCgjhY3F5cUjw6gWtG0tMByEKMtLS0DxAAqDo0AWsvRARLpaAAAnUUrTOxRKb0AAAAASUVORK5CYII='},
+  {n:'cowboynanoo',plat:'twitch',live:false,login:'cowboynanoo',link:'https://www.twitch.tv/cowboynanoo',horario:'',nota:'Gameplay e bate-papo.',sprite:'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAAQ+GzJitE4Zpl98KCdjs2JZVqvWxKPyYxG/cZZQAAAAF0Uk5TAEDm2GYAAABwSURBVAjXHc0xDsIwEATAK2nzhvgHRMoDYp4QcEvBJX0w6zISMt5nc75qR3vSnogIeYp4kj0vbPCKFUi94gPIDn0O6ngv1+iIIQbHFOLo+N7WmX3mtea7DbEpqYXC4wPd7Eb8FDsMrKkme2s/Sys8//d5LEDyRCxcAAAAAElFTkSuQmCC'},
 ];
+
+/* checa o status REAL de quem está ao vivo agora, batendo com o mesmo
+   canais_live.json que o site colecao gera via GitHub Action (mesma origem
+   iamtgames.github.io, então dá pra buscar direto sem CORS). Promove
+   CANAIS_CINEMA[i].live só quando o canal aparece de fato na lista "live"
+   retornada -- sem chute, sem dado estático. */
+async function fetchCanaisLiveStatus(){
+  try {
+    const r = await fetch('https://iamtgames.github.io/colecao/canais_live.json', { cache: 'no-store' });
+    if (!r.ok) return false;
+    const j = await r.json();
+    const liveList = Array.isArray(j.live) ? j.live : [];
+    let mudou = false;
+    CANAIS_CINEMA.forEach(ch => {
+      const estaAoVivo = liveList.some(l =>
+        (l.login && ch.login && l.login.toLowerCase() === ch.login.toLowerCase()) ||
+        (l.n && ch.login && l.n.toLowerCase() === ch.login.toLowerCase()) ||
+        (l.n && l.n.toLowerCase() === ch.n.toLowerCase())
+      );
+      if (ch.live !== estaAoVivo) mudou = true;
+      ch.live = estaAoVivo;
+    });
+    return mudou;
+  } catch (e) {
+    console.warn('Não deu pra checar quem está ao vivo agora (canais_live.json):', e);
+    return false;
+  }
+}
+/* dispara a checagem ao carregar e a cada 2min; sempre que o status muda,
+   redesenha o Cinema (se estiver aberto) e o balão da Rua. */
+function refreshLiveStatusUI(){
+  if (currentRoomId === 'cinema') {
+    const row = document.getElementById('kiosksRow');
+    if (row) row.innerHTML = '';
+    renderCinema();
+  }
+  if (currentRoomId === 'rua') {
+    const old = document.querySelector('#roomlayer .live-now-pin');
+    if (old) old.remove();
+    renderLiveNowPin();
+  }
+}
+fetchCanaisLiveStatus().then(mudou => { if (mudou) refreshLiveStatusUI(); });
+setInterval(() => { fetchCanaisLiveStatus().then(mudou => { if (mudou) refreshLiveStatusUI(); }); }, 120000);
 
 let currentRoomId = null;
 let WORLD_W = 0;
@@ -1901,10 +1972,16 @@ function renderBookshelves(){
 /* ---------- Locadora Online: espelha as duas seções reais do Media Player do site (Filme da
    Semana + playlist de Anime Dublado via Crunchyroll). Protótipo sem backend -> conteúdo fixo
    de demonstração, igual aos "dados de demonstração" já usados no painel do Ferreiro. ---------- */
-const LOCADORA_FILME_SEMANA = { titulo: 'Ghost of Tsushima — Diretor\'s Cut' };
+const LOCADORA_FILME_SEMANA = { titulo: '' };
 const LOCADORA_ANIME = [
-  'Naruto Shippuden', 'Fullmetal Alchemist: Brotherhood', 'One Piece',
-  'Death Note', 'Attack on Titan', 'Demon Slayer',
+  'A Couple of Cuckoos', 'Assassination Classroom', 'BLUE LOCK', 'Bye Bye Earth',
+  'Classroom of the Elite', 'DARK MOON THE BLOOD ALTAR', 'Death March to the Parallel World Rhapsody',
+  'Gachiakuta', "Gods' Games We Play", 'Hana-Kimi', 'Hanako-kun e os Mistérios do Colégio Kamome',
+  'In the Land of Leadale', 'Laid-Back Camp', 'May I Ask For One Final Thing?',
+  'My Dress-Up Darling', 'Nyaight of the Living Cat', 'ORIENT', 'Overlord IV',
+  'Pass the Monster Meat Milady!', 'ROLL OVER AND DIE', 'Sentenced to be a Hero',
+  'Shangri-La Frontier', 'The Quintessential Quintuplets', 'TO BE HERO X',
+  'TSUKIMICHI -Moonlit Fantasy-', 'VTuber Legend: How I Went Viral after Forgetting to Turn Off My Stream',
 ];
 function renderLocadora(){
   const semanaRow = document.querySelector('#roomlayer .video-shelf[data-cat="semana"] .book-row');
@@ -2606,7 +2683,7 @@ function mediaRenderAnime(){
 function showMediaPanel(tab){
   mediaPanelEl.classList.add('show');
   switchMediaTab(tab || 'semana');
-  document.getElementById('mediaSemanaTitulo').textContent = LOCADORA_FILME_SEMANA.titulo;
+  document.getElementById('mediaSemanaTitulo').textContent = LOCADORA_FILME_SEMANA.titulo || 'Nenhum filme selecionado no momento';
   mediaRenderAnime();
 }
 function hideMediaPanel(){ mediaPanelEl.classList.remove('show'); }
@@ -3055,7 +3132,7 @@ world.addEventListener('click', (e) => {
   e.stopPropagation();
   const key = tape.dataset.tape;
   const label = key === 'semana'
-    ? '🎬 ' + LOCADORA_FILME_SEMANA.titulo + ' — Filme da Semana'
+    ? '🎬 ' + (LOCADORA_FILME_SEMANA.titulo || 'Nenhum filme selecionado no momento')
     : '📺 ' + LOCADORA_ANIME[parseInt(key.split(':')[1], 10)] + ' (dublado)';
   const sr = stage.getBoundingClientRect();
   const r = tape.getBoundingClientRect();
