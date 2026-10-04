@@ -1712,8 +1712,8 @@ const ROOMS = {
         <div class="hotspot door arch-wood" data-door="bldgOffice" style="left:50%; bottom:0; transform:translateX(-50%);"><div class="glow"></div>
           <div class="arch-img"></div><div class="lbl">ENTRAR ▲</div></div>
       </div>
-      <div class="prop prop-crate" style="left:760px;"></div>
-      <div class="prop prop-barrel" style="left:815px;"></div>
+      <div class="prop prop-crate" style="left:872px;"></div>
+      <div class="prop prop-barrel" style="left:722px;"></div>
       <div class="building skin-salajogos" style="left:900px;">
         <div class="roof"></div>
         <div class="wall-upper"><div class="bwindow"></div><div class="bwindow-sm"></div></div>
@@ -1913,7 +1913,7 @@ const ROOMS = {
     `,
   },
   cinema: {
-    width: 1850,
+    width: 1930,
     name: '🎬 Cinema das Lives',
     vars: '--amb1:#2a1420; --wallgrade:brightness(0.5) saturate(1.2) hue-rotate(300deg) contrast(1.15); --floorgrade:brightness(0.55) saturate(1.1) hue-rotate(300deg);',
     groundY: [0.61, 0.965],
@@ -3664,6 +3664,8 @@ world.addEventListener('click', (e) => {
   hint.style.display = 'none';
   walkTo(x, y);
 });
+
+
 
 
 
@@ -5981,8 +5983,8 @@ dgLockReason = function(i){
 const idxDg = id => DUNGEONS.findIndex(d => d.id === id);
 const ENTRADAS = [
   { id:'e_forja', room:'office', dg:'forja', cls:'hatch', label:'▼ FORJA ESQUECIDA', left:170, top:448, ver:() => true },
-  { id:'e_vazio', room:'rua', dg:'vazio', cls:'cave', label:'CATACUMBA DO VAZIO', left:2490, top:392, ver:() => true },
-  { id:'e_prisma', room:'tenda', dg:'prisma', cls:'sealed', label:'SANTUÁRIO PRISMA', left:130, top:340, ver:() => true },
+  { id:'e_vazio', room:'rua', dg:'vazio', cls:'cave', label:'CATACUMBA DO VAZIO', left:760, top:348, ver:() => true },
+  { id:'e_prisma', room:'tenda', dg:'prisma', cls:'sealed', label:'SANTUÁRIO PRISMA', left:185, top:217, ver:() => true },
   { id:'e_lua1', room:'rua', dg:'lua1', cls:'moon', label:'GRUTA DA LUA', left:40, top:392, ver:luaAberta },
   { id:'e_lua2', room:'salajogos', dg:'lua2', cls:'moon', label:'ADEGA LUNAR', left:180, top:352, ver:luaAberta },
   { id:'e_lua3', room:'cinema', dg:'lua3', cls:'moon', label:'SALA ESCARLATE', left:140, top:352, ver:luaAberta },
