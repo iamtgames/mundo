@@ -1390,6 +1390,13 @@
   .dy-text h3{margin:0 0 8px; font-size:22px; color:#ffe08a; font-weight:normal;}
   .dy-text p{margin:0;}
   .dy-hint{color:#9d90bd;}
+  .map-pin{position:absolute; transform:translate(-50%,-50%); padding:2px 7px; font-family:inherit; font-size:13px; line-height:1.1; white-space:nowrap; background:#120a22; color:#e9dcff; border:1px solid #6b4ca3; border-radius:10px; cursor:pointer; z-index:2;}
+  .map-pin:hover{background:#3d2570;}
+  .map-pin.open{border-color:#7dffb0; color:#c9ffe0;}
+  .map-pin.done{border-color:#ffd24d; color:#ffe08a;}
+  .map-pin.lock{border-color:#ff8a8a; color:#ffc2c2;}
+  .map-pin.hid{border-style:dashed; color:#9d90bd;}
+  .map-pin.soon{border-color:#ffd24d; color:#ffe08a;}
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3664,6 +3671,7 @@ world.addEventListener('click', (e) => {
   hint.style.display = 'none';
   walkTo(x, y);
 });
+
 
 
 
@@ -6203,6 +6211,39 @@ window.addEventListener('keydown', e => {
 setInterval(() => { LORE.forEach(c => c.u()); if (LORE.every(c => c.u())) grantItem('tomo_do_mundo'); }, 10000);
 syncAcoes();
 window.__x7 = { luaCheia, luaAberta, idadeLua, estadoMercado, ofertas, award, syncAcoes, LORE, PA_DROPS, JANELAS, ENTRADAS, pintaEntradas, checaChaves };
+
+/* ---------- mapa: entradas de dungeon, mercado e criptas ---------- */
+(function(){
+  const cr = MAP_NODES.find(n => n.id === 'criptas'); if (cr) { cr.x = 87; cr.y = 50; }
+  const POS = { e_vazio:[32,50], e_lua1:[68,50] };
+  const NOMES = { e_forja:'Forja Esquecida', e_vazio:'Catacumba do Vazio', e_prisma:'Santuário Prisma', e_lua1:'Gruta da Lua', e_lua2:'Adega Lunar', e_lua3:'Sala Escarlate', e_chave1:'Câmara do Baralho', e_chave2:'Galeria das Minas' };
+  const ROOM_POS = { biblioteca:[11,16,1], office:[27,84,-1], salajogos:[43,16,1], cinema:[59,84,-1], tenda:[75,16,1], locadora:[91,84,-1] };
+  const _rm7 = renderMap;
+  renderMap = function(){
+    _rm7.apply(this, arguments);
+    const body = document.getElementById('mapBody'); if (!body) return;
+    const cnt = {};
+    const pin = (x, y, txt, cls, onclick) => {
+      const b = mkEl('button', { className:'map-pin ' + cls }); b.style.left = x + '%'; b.style.top = y + '%'; b.textContent = txt;
+      b.addEventListener('click', onclick); body.appendChild(b);
+    };
+    const place = room => { const rp = ROOM_POS[room]; if (!rp) return null; const k = cnt[room] = (cnt[room] || 0) + 1; return [rp[0], rp[1] + rp[2] * (14 + (k - 1) * 8)]; };
+    const ir = (room, sel) => { hideMapPanel(); travelTo(room); if (sel) setTimeout(() => { const el = roomlayer.querySelector(sel); if (el) el.click(); }, 1000); };
+    ENTRADAS.forEach(e => {
+      const i = idxDg(e.dg), d = DUNGEONS[i], lock = dgLockReason(i), done = dgCleared(i);
+      let txt, cls;
+      if (done) { txt = '✔ ' + NOMES[e.id]; cls = 'done'; }
+      else if (d.special === 'moon' && lock) { txt = '🌕 ??? (lua cheia)'; cls = 'hid'; }
+      else if (d.special === 'key' && lock) { txt = '🗝️ ??? (chave secreta)'; cls = 'hid'; }
+      else if (lock) { txt = '🔒 ' + NOMES[e.id]; cls = 'lock'; }
+      else { txt = '🚪 ' + NOMES[e.id]; cls = 'open'; }
+      const p = POS[e.id] || place(e.room); if (!p) return;
+      pin(p[0], p[1], txt, cls, () => ir(e.room, '.dgate[data-dg="' + e.dg + '"]'));
+    });
+    const m = estadoMercado(), p = place('tenda');
+    pin(p[0], p[1], m.hoje ? '🛒 Mercado: HOJE!' : (m.vespera ? '🛒 Mercado: amanhã' : '🛒 Mercado semanal'), m.hoje ? 'open' : (m.vespera ? 'soon' : 'hid'), () => ir('tenda', m.hoje ? '.mkt-merchant' : null));
+  };
+})();
 
 /*EXTRAS_JS_END*/
 
