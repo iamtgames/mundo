@@ -1171,7 +1171,7 @@
   .inv-left{flex:0 0 250px; display:flex; flex-direction:column; gap:8px; align-items:center;}
   .inv-stage{width:100%; height:236px; border-radius:8px; background:radial-gradient(circle at 50% 70%, #3d2a5c 0%, #1a1128 70%); border:2px solid rgba(255,255,255,.08); position:relative; overflow:hidden;}
   .inv-stage .pv{position:absolute; left:50%; top:62%; width:72px; height:78px; transform:translate(-50%,-50%) scale(2.6); transform-origin:50% 50%;}
-  .inv-slots{display:grid; grid-template-columns:repeat(4,1fr); gap:6px; width:100%;}
+  .inv-slots{display:grid; grid-template-columns:repeat(5,1fr); gap:6px; width:100%;}
   .inv-slot{background:#0d0816; border:2px solid #3a2a55; border-radius:6px; height:50px; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative;}
   .inv-slot canvas{width:36px; height:36px; image-rendering:pixelated;}
   .inv-slot .lbl{position:absolute; left:0; right:0; bottom:-1px; font-size:11px; text-align:center; color:#8a7b9e; text-transform:uppercase; letter-spacing:.4px;}
@@ -1221,6 +1221,20 @@
   #audioPop .ap-btn{flex:1; padding:5px 6px; font-family:inherit; font-size:16px; border:2px solid #6b4ca3; border-radius:6px; background:#2a1c45; color:#fff; cursor:pointer;}
   #audioPop .ap-btn:hover{background:#3d2570;}
   #audioPop .ap-note{font-size:13px; color:#8a7b9e; margin-top:4px;}
+  .eq-back{left:-12px; top:22px; width:96px; height:48px; z-index:0;}
+  .fx-glow{filter:drop-shadow(0 0 3px #ffd24d); animation:fxGlow 2s ease-in-out infinite;}
+  @keyframes fxGlow{0%,100%{filter:drop-shadow(0 0 2px #ffd24d) brightness(1);}50%{filter:drop-shadow(0 0 7px #fff3a0) brightness(1.25);}}
+  .fx-fire{animation:fxFire .5s steps(2) infinite alternate;}
+  @keyframes fxFire{0%{filter:drop-shadow(0 0 3px #ff7a1a) brightness(1);}100%{filter:drop-shadow(0 -2px 8px #ffcf33) brightness(1.3);}}
+  .fx-ice{animation:fxIce 2.6s ease-in-out infinite;}
+  @keyframes fxIce{0%,100%{filter:drop-shadow(0 0 3px #7fe8ff) brightness(1);}50%{filter:drop-shadow(0 0 8px #d8f6ff) brightness(1.25);}}
+  .fx-void{animation:fxVoid 2.4s ease-in-out infinite;}
+  @keyframes fxVoid{0%,100%{filter:drop-shadow(0 0 3px #7a2dff) brightness(.95);}50%{filter:drop-shadow(0 0 9px #00e5ff) brightness(1.25);}}
+  .fx-rainbow{animation:fxRainbow 3s linear infinite;}
+  @keyframes fxRainbow{0%{filter:hue-rotate(0deg) drop-shadow(0 0 5px #fff);}100%{filter:hue-rotate(360deg) drop-shadow(0 0 5px #fff);}}
+  .fx-aurora{animation:fxAurora 4s ease-in-out infinite;}
+  @keyframes fxAurora{0%,100%{filter:hue-rotate(-30deg) drop-shadow(0 0 4px #3ee0a0);}50%{filter:hue-rotate(70deg) drop-shadow(0 0 9px #b57bff);}}
+  .inv-item.eq-on canvas, .inv-item canvas{image-rendering:pixelated;}
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3500,6 +3514,7 @@ world.addEventListener('click', (e) => {
 
 
 
+
 /*EXTRAS_JS_START*/
 /* =====================================================================
    iamT World — EXTRAS: save, áudio 8-bit medieval (máx 5%), inventário/equipamentos,
@@ -3535,7 +3550,16 @@ const PAL = {
   staff:   {m:'#6bd4ff', d:'#6a4a2a', l:'#d8f6ff', a:'#e5b93a'},
   hammer:  {m:'#9aa5b8', d:'#6a4a2a', l:'#d5dcea', a:'#c9a24a'},
   axe:     {m:'#c08a3e', d:'#5a3a1a', l:'#f0c36a', a:'#fff0b0'},
-  goldsw:  {m:'#e5b93a', d:'#7a4f1b', l:'#fff1a0', a:'#d03a3a'}
+  goldsw:  {m:'#e5b93a', d:'#7a4f1b', l:'#fff1a0', a:'#d03a3a'},
+  fire:    {m:'#e8441a', d:'#7a1a08', l:'#ffb347', a:'#ffe27a'},
+  ice:     {m:'#5ec8f0', d:'#1f6a96', l:'#d8f6ff', a:'#ffffff'},
+  void:    {m:'#5a2d9c', d:'#1a0a33', l:'#b57bff', a:'#00e5ff'},
+  midnight:{m:'#2a3a8a', d:'#0f1740', l:'#6f86ff', a:'#ffe27a'},
+  solar:   {m:'#ffc933', d:'#c9670a', l:'#fff6b0', a:'#ff7a1a'},
+  storm:   {m:'#6f7f9a', d:'#2c3750', l:'#cfe0ff', a:'#ffe94d'},
+  aurora:  {m:'#3ee0a0', d:'#126a6a', l:'#c8ffe8', a:'#b57bff'},
+  rainbow: {m:'#ff5fa8', d:'#7a2a9c', l:'#ffe94d', a:'#4fe0ff'},
+  angel:   {m:'#f6f2ea', d:'#b8b0a0', l:'#ffffff', a:'#ffd24d'}
 };
 const SHAPES = {
   helm: {
@@ -3558,6 +3582,10 @@ const SHAPES = {
     grevas: [['...ll.......','...mm.......'], ['.......ll...','.......mm...']],
     cuff:   [['...aa.......','...mm.......'], ['.......aa...','.......mm...']]
   },
+  back: {
+    capa:  ['..mmmmmmmmmmmm..','.mmmmmmmmmmmmmm.','.mmlmmmmmmmmlmm.','.mmmmmmmmmmmmmm.','mmmmmmmmmmmmmmmm','mmdmmmmmmmmmmdmm','mmmmmmmmmmmmmmmm','.dm..........md.'],
+    asas:  ['ll............ll','lml..........lml','lmml........lmml','lmmml......lmmml','.lmmml....lmmml.','..lmmmmllmmmml..','...lmmm..mmml...','....lm....ml....']
+  },
   weapon: {
     espada: ['..l..','..l..','..m..','..m..','..m..','..m..','..m..','.aaa.','..d..','..d..','..a..'],
     machado:['.lll.','lmdml','lmdml','.mdm.','..d..','..d..','..d..','..d..','..d..','..d..','..d..'],
@@ -3566,13 +3594,13 @@ const SHAPES = {
     tocha:  ['..a..','.aaa.','.ala.','..d..','..d..','..d..','..d..','..d..','..d..','..d..','..d..']
   }
 };
-const RAR_COR = { comum:'#8a7b9e', incomum:'#4fcf6a', raro:'#4f9bff', epico:'#b86bff', lendario:'#ffb42e' };
-const RAR_ORD = { comum:0, incomum:1, raro:2, epico:3, lendario:4 };
-const SLOT_NOME = { helm:'Capacete', chest:'Peito', legs:'Pernas', weapon:'Arma' };
-const SLOT_ORDEM = ['helm','chest','legs','weapon'];
+const RAR_COR = { comum:'#8a7b9e', incomum:'#4fcf6a', raro:'#4f9bff', epico:'#b86bff', lendario:'#ffb42e', mitico:'#ff4fa3', ultra:'#00e5ff' };
+const RAR_ORD = { comum:0, incomum:1, raro:2, epico:3, lendario:4, mitico:5, ultra:6 };
+const SLOT_NOME = { helm:'Capacete', chest:'Peito', legs:'Pernas', back:'Costas', weapon:'Arma' };
+const SLOT_ORDEM = ['helm','chest','legs','back','weapon'];
 
 const ITEMS = [];
-function defItem(id, slot, nome, shape, pal, rar, hint){ ITEMS.push({ id, slot, nome, shape, pal, rar, hint }); }
+function defItem(id, slot, nome, shape, pal, rar, hint, fx){ ITEMS.push({ id, slot, nome, shape, pal, rar, hint, fx: fx || '' }); }
 /* capacetes */
 defItem('capuz_floresta','helm','Capuz da Floresta','capuz','forest','incomum','Leia as notícias da banca da rua');
 defItem('elmo_ferro','helm','Elmo de Ferro','elmo','iron','incomum','Fique 20 min no mundo');
@@ -3604,10 +3632,30 @@ defItem('cajado_mago','weapon','Cajado do Mago','cajado','staff','epico','Escond
 defItem('martelo','weapon','Martelo do Ferreiro','martelo','hammer','raro','Fique 45 min no mundo');
 defItem('espada_dourada','weapon','Espada Dourada','espada','goldsw','lendario','Venza 5 jogos no Saloon');
 defItem('tocha','weapon','Tocha','tocha','torch','comum','Escondida num barril da rua');
+/* ---- coleção rara: efeitos visuais (fx) + raridades mítico/ultra ---- */
+defItem('capa_viajante','back','Capa de Viajante','capa','leather','incomum','Fique 15 min no mundo');
+defItem('capa_real','back','Capa Real','capa','crimson','raro','Escondido numa barraca da Tenda');
+defItem('capa_estrelas','back','Capa Estrelada','capa','midnight','epico','Escondida numa pilha de caixas da rua','void');
+defItem('asas_anjo','back','Asas de Anjo','asas','angel','mitico','Fique 5 horas no mundo','glow');
+defItem('asas_fenix','back','Asas de Fênix','asas','fire','ultra','Reúna 35 itens','fire');
+defItem('elmo_dragao','helm','Elmo do Dragão','chifres','fire','mitico','Reúna 20 itens','fire');
+defItem('coroa_gelo','helm','Coroa de Gelo','coroa','ice','epico','Fique 3 horas no mundo','ice');
+defItem('elmo_vazio','helm','Elmo do Vazio','elmo','void','ultra','Venza 10 jogos no Saloon','void');
+defItem('tiara_arcoiris','helm','Tiara Arco-Íris','coroa','rainbow','ultra','Encontre todos os segredos','rainbow');
+defItem('manto_noite','chest','Manto da Meia-Noite','manto','midnight','epico','Jogue de madrugada (0h às 5h)','void');
+defItem('armadura_solar','chest','Armadura Solar','placa','solar','mitico','Jogue por volta do meio-dia','glow');
+defItem('armadura_arcoiris','chest','Armadura Arco-Íris','placa','rainbow','ultra','Reúna todos os itens lendários','rainbow');
+defItem('botas_tempestade','legs','Botas da Tempestade','cuff','storm','epico','Jogue num dia de chuva real','glow');
+defItem('grevas_lava','legs','Grevas de Lava','grevas','fire','epico','Venza 3 jogos no Saloon','fire');
+defItem('botas_vazio','legs','Botas do Vazio','botas','void','mitico','Escondidas num lugar sem filme','void');
+defItem('espada_chamas','weapon','Espada em Chamas','espada','fire','epico','Assista uma live no Cinema por 1 min','fire');
+defItem('martelo_trovao','weapon','Martelo do Trovão','martelo','storm','epico','Fique 2h30 no mundo','glow');
+defItem('cajado_aurora','weapon','Cajado da Aurora','cajado','aurora','mitico','Fique 4 horas no mundo','aurora');
+defItem('lamina_arcoiris','weapon','Lâmina Arco-Íris','espada','rainbow','ultra','Reúna 40 itens','rainbow');
 const ITEM_BY_ID = {}; ITEMS.forEach(i => ITEM_BY_ID[i.id] = i);
 
 const START_ITEMS = ['tunica','botas_couro'];
-const TIME_DROPS = [[300,'espada_ferro'],[600,'cota_malha'],[1200,'elmo_ferro'],[1800,'grevas_ferro'],[2700,'martelo'],[3600,'chifres'],[5400,'placa_ferro'],[7200,'coroa']];
+const TIME_DROPS = [[300,'espada_ferro'],[900,'capa_viajante'],[9000,'martelo_trovao'],[10800,'coroa_gelo'],[14400,'cajado_aurora'],[18000,'asas_anjo'],[600,'cota_malha'],[1200,'elmo_ferro'],[1800,'grevas_ferro'],[2700,'martelo'],[3600,'chifres'],[5400,'placa_ferro'],[7200,'coroa']];
 const PC_POOL = ['elmo_bronze','arm_bronze','grevas_carmesim'];
 const MS_POOL = ['arm_carmesim','grevas_bronze'];
 const SECRETS = [
@@ -3616,6 +3664,9 @@ const SECRETS = [
   { key:'bib_livro',   room:'biblioteca', sel:'.book',            idx:40, item:'chapeu_mago',   msg:'Esse livro escondia um chapéu de mago!' },
   { key:'forja_bau',   room:'office',     sel:'.ft-item.sp-chest',idx:0, item:'machado_bronze', msg:'No fundo do baú da forja: um machado!' },
   { key:'saloon_banco',room:'salajogos',  sel:'.saloon-stool',    idx:3, item:'botas_reais',    msg:'Esqueceram um par de botas atrás do banco!' },
+  { key:'rua_pilha',   room:'rua',        sel:'.prop-cratestack', idx:1, item:'capa_estrelas',  msg:'Entre as caixas, uma capa cheia de estrelas!' },
+  { key:'tenda_balcao',room:'tenda',      sel:'.counter-item',    idx:0, item:'capa_real',      msg:'Embaixo do balcão: uma capa real!' },
+  { key:'loc_fita',    room:'locadora',   sel:'.book[data-tape="semana"]', idx:0, item:'botas_vazio', msg:'A fita do Filme da Semana estava vazia... mas escondia botas!' },
   { key:'cinema_cortina',room:'cinema',   sel:'.cinema-curtain',  idx:0, item:'cajado_mago',    msg:'Atrás da cortina havia um cajado brilhando!' }
 ];
 
@@ -3652,6 +3703,7 @@ function itemThumb(it, size){
     const rows = SHAPES[it.slot][it.shape];
     drawRows(ctx, rows, pal, Math.floor((16 - rows[0].length) / 2), Math.floor((16 - rows.length) / 2));
   }
+  if (it.fx) cv.className = 'fx-' + it.fx;
   if (size) { cv.style.width = size + 'px'; cv.style.height = size + 'px'; }
   return cv;
 }
@@ -3659,17 +3711,18 @@ function applyEquip(root, equip){
   root.querySelectorAll('.eq').forEach(n => n.remove());
   root.querySelectorAll('.eq-leg').forEach(n => n.remove());
   const bw = root.querySelector('.bodywrap'); if (!bw) return;
-  const mk = (cls, url) => { const d = document.createElement('div'); d.className = 'eq ' + cls; d.style.backgroundImage = 'url(' + url + ')'; return d; };
+  const mk = (cls, url, fx) => { const d = document.createElement('div'); d.className = 'eq ' + cls + (fx ? ' fx-' + fx : ''); d.style.backgroundImage = 'url(' + url + ')'; return d; };
   const get = s => equip && equip[s] ? ITEM_BY_ID[equip[s]] : null;
-  const h = get('helm');   if (h) bw.appendChild(mk('eq-helm', patURL(SHAPES.helm[h.shape], PAL[h.pal])));
-  const c = get('chest');  if (c) bw.appendChild(mk('eq-chest', patURL(SHAPES.chest[c.shape], PAL[c.pal])));
-  const w = get('weapon'); if (w) bw.appendChild(mk('eq-weapon', patURL(SHAPES.weapon[w.shape], PAL[w.pal])));
+  const h = get('helm');   if (h) bw.appendChild(mk('eq-helm', patURL(SHAPES.helm[h.shape], PAL[h.pal]), h.fx));
+  const c = get('chest');  if (c) bw.appendChild(mk('eq-chest', patURL(SHAPES.chest[c.shape], PAL[c.pal]), c.fx));
+  const w = get('weapon'); if (w) bw.appendChild(mk('eq-weapon', patURL(SHAPES.weapon[w.shape], PAL[w.pal]), w.fx));
+  const bk = get('back');  if (bk) bw.appendChild(mk('eq-back', patURL(SHAPES.back[bk.shape], PAL[bk.pal]), bk.fx));
   const l = get('legs');
   if (l) {
     const [L, R] = SHAPES.legs[l.shape];
     [['left', L], ['right', R]].forEach(([side, rows]) => {
       const leg = root.querySelector('.leg.' + side); if (!leg) return;
-      const d = document.createElement('div'); d.className = 'eq-leg'; d.style.backgroundImage = 'url(' + patURL(rows, PAL[l.pal]) + ')';
+      const d = document.createElement('div'); d.className = 'eq-leg' + (l.fx ? ' fx-' + l.fx : ''); d.style.backgroundImage = 'url(' + patURL(rows, PAL[l.pal]) + ')';
       leg.appendChild(d);
     });
   }
@@ -3712,9 +3765,19 @@ function grantItem(id){
   setTimeout(checkMeta, 50);
   return true;
 }
+const CORE_SECRETS = ['rua_barril','rua_caixa','bib_livro','forja_bau','saloon_banco','cinema_cortina'];
 function checkMeta(){
-  if (Object.keys(GS.found).length >= SECRETS.length) grantItem('arm_dourada');
-  if ((GS.wins.pc || 0) + (GS.wins.ms || 0) >= 5) grantItem('espada_dourada');
+  if (CORE_SECRETS.every(k => GS.found[k])) grantItem('arm_dourada');
+  if (SECRETS.every(s => GS.found[s.key])) grantItem('tiara_arcoiris');
+  const w = (GS.wins.pc || 0) + (GS.wins.ms || 0);
+  if (w >= 3) grantItem('grevas_lava');
+  if (w >= 5) grantItem('espada_dourada');
+  if (w >= 10) grantItem('elmo_vazio');
+  const n = Object.keys(GS.owned).length;
+  if (n >= 20) grantItem('elmo_dragao');
+  if (n >= 35) grantItem('asas_fenix');
+  if (n >= 40) grantItem('lamina_arcoiris');
+  if (ITEMS.filter(i => i.rar === 'lendario').every(i => GS.owned[i.id])) grantItem('armadura_arcoiris');
 }
 function onceEvent(key, itemId){
   if (GS.events[key]) return;
@@ -4105,8 +4168,14 @@ showNewsPanel = function(){ onceEvent('noticia', 'capuz_floresta'); return _show
 const _tocarEpisodio = tocarEpisodio;
 tocarEpisodio = function(){ onceEvent('episodio', 'perneiras_floresta'); return _tocarEpisodio.apply(this, arguments); };
 const _showCinemaScreen = showCinemaScreen, _hideCinemaScreen = hideCinemaScreen;
-showCinemaScreen = function(){ const r = _showCinemaScreen.apply(this, arguments); updateDuck(); return r; };
-hideCinemaScreen = function(){ const r = _hideCinemaScreen.apply(this, arguments); updateDuck(); return r; };
+let liveWatchTimer = null;
+showCinemaScreen = function(ch){
+  const r = _showCinemaScreen.apply(this, arguments); updateDuck();
+  clearTimeout(liveWatchTimer);
+  if (ch && ch.live) liveWatchTimer = setTimeout(() => { if (cinemaScreenEl.classList.contains('show')) grantItem('espada_chamas'); }, 60000);
+  return r;
+};
+hideCinemaScreen = function(){ clearTimeout(liveWatchTimer); const r = _hideCinemaScreen.apply(this, arguments); updateDuck(); return r; };
 const _showMediaPanel = showMediaPanel, _hideMediaPanel = hideMediaPanel;
 showMediaPanel = function(){ const r = _showMediaPanel.apply(this, arguments); updateDuck(); return r; };
 hideMediaPanel = function(){ const r = _hideMediaPanel.apply(this, arguments); updateDuck(); return r; };
@@ -4132,9 +4201,16 @@ pcCheckVitoria = function(){
 };
 
 /* ---------- tempo no site: marcos de drop + save periódico ---------- */
+let sessT = 0;
 setInterval(() => {
   if (document.hidden) return;
-  GS.t++;
+  GS.t++; sessT++;
+  if (sessT >= 120 && sessT % 5 === 0) {
+    const hh = marianaHour();
+    if (hh < 5) grantItem('manto_noite');
+    if (hh === 11 || hh === 12) grantItem('armadura_solar');
+    if (stage.classList.contains('rainy')) grantItem('botas_tempestade');
+  }
   if (GS.t % 5 === 0) TIME_DROPS.forEach(([sec, id]) => { if (GS.t >= sec) grantItem(id); });
   if (GS.t % 10 === 0) gsSave();
 }, 1000);
