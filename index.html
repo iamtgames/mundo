@@ -1235,6 +1235,107 @@
   .fx-aurora{animation:fxAurora 4s ease-in-out infinite;}
   @keyframes fxAurora{0%,100%{filter:hue-rotate(-30deg) drop-shadow(0 0 4px #3ee0a0);}50%{filter:hue-rotate(70deg) drop-shadow(0 0 9px #b57bff);}}
   .inv-item.eq-on canvas, .inv-item canvas{image-rendering:pixelated;}
+
+  /* ===== extras 2: pets, bônus, progresso ===== */
+  .inv-slots{grid-template-columns:repeat(6,1fr) !important; gap:4px !important;}
+  .inv-slot{height:46px !important;}
+  .inv-slot canvas{width:30px !important; height:30px !important;}
+  .inv-slot .lbl{font-size:9px !important; letter-spacing:0 !important;}
+  .inv-stage{height:176px !important;}
+  .inv-stage .pv{transform:translate(-50%,-50%) scale(2.1) !important;}
+  .inv-stats{font-size:13px !important; line-height:1.2 !important; padding:5px 8px !important;}
+  .inv-bonus{display:flex; flex-wrap:wrap; gap:3px 8px; margin-top:4px; padding-top:4px; border-top:1px solid rgba(255,255,255,.1); color:#ffd24d;}
+  .inv-tools{display:flex; gap:6px;}
+  .inv-tools .inv-tab{font-size:14px; padding:5px 4px;}
+  .inv-note{grid-column:1/-1; font-size:13px; color:#bdb3d8; background:rgba(0,0,0,.25); border-radius:6px; padding:5px 8px;}
+  .inv-item .bn{font-size:11px; color:#ffd24d;}
+  .inv-item canvas{image-rendering:pixelated;}
+  .pet{position:absolute; width:40px; height:40px; pointer-events:none;}
+  .pet .pimg{position:absolute; inset:0; image-rendering:pixelated; background-size:100% 100%; background-repeat:no-repeat;}
+  .pet .psh{position:absolute; left:6px; right:6px; bottom:-3px; height:6px; border-radius:50%; background:rgba(0,0,0,.35);}
+  #saveBox{z-index:98;}
+  .sv-body{padding:12px 16px 16px; display:flex; flex-direction:column; gap:10px;}
+  .sv-p{margin:0; color:#d6cdea; font-size:15px; line-height:1.25;}
+  #svText{width:100%; box-sizing:border-box; background:#0d0816; color:#e9e1ff; border:2px solid #3a2a55; border-radius:6px; padding:8px; font:12px/1.2 monospace; resize:none;}
+  .sv-row{display:flex; gap:8px;} .sv-row .inv-tab{font-size:15px;}
+  .sv-msg{min-height:18px; font-size:14px; color:#ffd24d;}
+
+  /* ===== dungeons ===== */
+  #dgPanel{z-index:97;}
+  #dgBox{width:min(780px,96%); max-height:94%; display:flex; flex-direction:column;}
+  .dg-bar{display:flex; flex-wrap:wrap; align-items:center; gap:6px 14px; padding:6px 14px; background:rgba(0,0,0,.35); color:#ffd24d; font-size:15px;}
+  .dg-bar .dg-day{margin-left:auto; color:#9b8cb4; font-size:13px;}
+  .dg-hint,.dg-back{font-family:inherit; font-size:15px; padding:3px 10px; border-radius:6px; border:2px solid #6b4ca3; background:#2a1c45; color:#fff; cursor:pointer;}
+  .dg-hint:disabled{opacity:.4; cursor:default;}
+  .dg-back{margin-left:auto;}
+  #dgTimer{color:#ff9a5a;}
+  .dg-body{padding:12px 16px; overflow-y:auto; min-height:300px; color:#e9e1ff;}
+  .dg-desc{margin:0 0 10px; color:#cfc4ea; font-size:16px; line-height:1.25;}
+  .dg-list{display:flex; flex-direction:column; gap:6px;}
+  .dg-item{display:flex; align-items:center; gap:10px; text-align:left; font-family:inherit; font-size:17px; padding:8px 12px; border-radius:8px; border:2px solid #3a2a55; background:#150d24; color:#fff; cursor:pointer;}
+  .dg-item:hover:not(.locked){border-color:#ffd24d;}
+  .dg-item .n{width:26px; text-align:center; color:#ffd24d;} .dg-item .t{flex:1;} .dg-item .m{font-size:13px; color:#9b8cb4;}
+  .dg-item.done{background:#12261c; border-color:#2f7a4b;} .dg-item.locked{opacity:.45; cursor:default;}
+  .dg-rew{margin-top:12px; font-size:15px; color:#bdb3d8;}
+  .dg-foot{padding:7px 16px; min-height:22px; font-size:15px; background:rgba(0,0,0,.3); color:#bdb3d8;}
+  .dg-foot.good{color:#7ee59a;} .dg-foot.bad{color:#ff7a7a;}
+  .dg-result{display:flex; flex-direction:column; align-items:center; gap:10px; padding:40px 10px; text-align:center; font-size:17px;}
+  .dg-result .big{font-size:28px; color:#7ee59a;} .dg-result .big.gold{color:#ffd24d;}
+  .dg-resrow{display:flex; gap:10px;} .dg-resrow .inv-tab{padding:7px 14px; flex:none;}
+  .dg-next{color:#ffd24d; font-size:16px;}
+  .pz-host{display:flex; flex-direction:column; align-items:center; gap:10px;}
+  .pz-intro{font-size:15px; color:#cfc4ea; text-align:center; max-width:560px; line-height:1.25;}
+  .pz-info{font-size:15px; color:#bdb3d8;}
+  /* perguntas */
+  .qz-count{font-size:14px; color:#9b8cb4;} .qz-q{font-size:21px; text-align:center; max-width:600px; line-height:1.2;}
+  .qz-img{width:110px; height:150px; background-size:cover; background-position:center; border:3px solid #000; border-radius:4px;}
+  .qz-opts{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; width:min(560px,100%);}
+  .qz-opt{font-family:inherit; font-size:17px; padding:10px 8px; border-radius:8px; border:2px solid #3a2a55; background:#150d24; color:#fff; cursor:pointer; line-height:1.1;}
+  .qz-opt:hover:not(:disabled){border-color:#ffd24d;} .qz-opt.ok{background:#1d5a33; border-color:#7ee59a;} .qz-opt.bad{background:#5a1d1d; border-color:#ff7a7a;} .qz-opt.struck{opacity:.3; text-decoration:line-through;}
+  /* luzes */
+  .lt-grid{display:grid; gap:6px;}
+  .lt-cell{width:54px; height:54px; border-radius:8px; border:3px solid #000; background:#1a1230; cursor:pointer; position:relative;}
+  .lt-cell::after{content:''; position:absolute; left:50%; top:50%; width:16px; height:22px; transform:translate(-50%,-50%); background:#3a2a55; clip-path:polygon(50% 0,100% 55%,70% 100%,30% 100%,0 55%);}
+  .lt-cell.on{background:#4a2a10;} .lt-cell.on::after{background:#ffb347; filter:drop-shadow(0 0 6px #ff9a2e);}
+  .lt-cell.hint{outline:3px solid #7ee59a; outline-offset:2px;}
+  /* memória */
+  .mc-grid{display:grid; gap:7px;}
+  .mc-card{width:64px; height:64px; padding:0; border:3px solid #000; border-radius:8px; background:#2a1c45; cursor:pointer; position:relative; font-family:inherit;}
+  .mc-card .mc-back,.mc-card .mc-face{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:5px;}
+  .mc-card .mc-back{background:repeating-linear-gradient(45deg,#3d2570,#3d2570 6px,#2a1c45 6px,#2a1c45 12px); color:#ffd24d; font-size:24px;}
+  .mc-card .mc-face{background:#0d0816; display:none;} .mc-card .mc-face canvas{image-rendering:pixelated;}
+  .mc-card.open .mc-back,.mc-card.matched .mc-back,.mc-card.peek .mc-back{display:none;} .mc-card.open .mc-face,.mc-card.matched .mc-face,.mc-card.peek .mc-face{display:flex;}
+  .mc-card.matched{border-color:#7ee59a; opacity:.8;} .mc-card.peek{border-color:#ffd24d;}
+  /* código */
+  .cd-hist{display:flex; flex-direction:column; gap:4px; max-height:150px; overflow-y:auto; width:min(340px,100%);}
+  .cd-row{display:flex; align-items:center; gap:6px; justify-content:center;}
+  .cd-gem{display:inline-block; width:26px; height:26px; border-radius:50%; border:3px solid #000; box-shadow:inset -3px -3px 0 rgba(0,0,0,.25), inset 3px 3px 0 rgba(255,255,255,.35);}
+  .cd-gem.empty{background:transparent !important; border:3px dashed #5a4a7a; box-shadow:none;}
+  .cd-peg{margin-left:10px; font-size:18px; color:#fff; letter-spacing:2px; min-width:60px;} .cd-peg i{font-style:normal; color:#bdb3d8;}
+  .cd-pal{display:flex; gap:8px;} .cd-pb{background:#150d24; border:2px solid #3a2a55; border-radius:8px; padding:6px 8px; cursor:pointer;} .cd-pb:hover{border-color:#ffd24d;}
+  .cd-ctl{display:flex; gap:8px;} .cd-ctl .inv-tab{flex:none; padding:6px 14px;}
+  /* melodia */
+  .sm-pads{display:grid; grid-template-columns:repeat(2,110px); gap:10px;}
+  .sm-pad{height:110px; border-radius:14px; border:4px solid #000; background:var(--c); opacity:.45; cursor:pointer; font-family:inherit; font-size:30px; color:#fff; transition:opacity .08s, transform .08s;}
+  .sm-pad i{font-style:normal;} .sm-pad.lit{opacity:1; transform:scale(1.05); box-shadow:0 0 22px var(--c);}
+  /* deslizante */
+  .sl-grid{display:grid; gap:5px;}
+  .sl-tile{width:62px; height:62px; border-radius:8px; border:3px solid #000; color:#fff; font-family:inherit; font-size:26px; cursor:pointer; text-shadow:2px 2px 0 rgba(0,0,0,.5);}
+  .sl-tile.empty{background:transparent !important; border:3px dashed #3a2a55; cursor:default;} .sl-tile.hint{outline:3px solid #7ee59a;}
+  /* espinhos */
+  .pt-grid{display:grid; gap:4px;}
+  .pt-cell{width:50px; height:50px; border-radius:6px; border:3px solid #000; background:#2a1c45; color:#fff; font-family:inherit; font-size:22px; cursor:pointer;}
+  .pt-cell.vis{background:#1d4a2e;} .pt-cell.boom{background:#5a1d1d; color:#ff9a9a;} .pt-cell.here{background:#2e6a8a;}
+  .pt-cell.goal{border-color:#ffd24d;} .pt-cell.hintc{outline:3px solid #7ee59a; animation:fxGlow 1s infinite;}
+  /* sala das criptas */
+  .crypt-title{position:absolute; left:50%; top:46px; transform:translateX(-50%); font-size:30px; letter-spacing:4px; color:#b9a4ff; text-shadow:0 0 12px #6c3fa0, 3px 3px 0 #000; white-space:nowrap;}
+  .crypt-plate{position:absolute; top:322px; width:150px; text-align:center; font-size:14px; line-height:1.05; color:#e9e1ff; background:rgba(10,6,20,.85); border:2px solid #3a2a55; border-radius:5px; padding:3px 4px;}
+  .crypt-plate.locked{color:#8a7b9e;} .crypt-plate.open{border-color:#ffd24d;} .crypt-plate.cleared{border-color:#7ee59a; color:#aef5c2;}
+  .crypt-enter{position:absolute; width:90px; height:58px; cursor:pointer; z-index:3;}
+  .crypt-enter .td-grid{position:absolute; inset:0; background:repeating-linear-gradient(90deg,#3a2a1a 0 8px,#2a1c10 8px 10px); border:4px solid #1a1008; border-radius:4px; box-shadow:0 0 14px rgba(155,100,255,.55), inset 0 0 12px #000;}
+  .crypt-enter .td-lbl{position:absolute; left:-6px; right:-6px; bottom:-18px; text-align:center; font-size:13px; color:#d9c7ff; text-shadow:2px 2px 0 #000; white-space:nowrap;}
+  .crypt-enter:hover .td-grid{box-shadow:0 0 22px rgba(190,140,255,.95), inset 0 0 12px #000;}
+  @media(max-width:760px){ .qz-opts{grid-template-columns:1fr;} .dg-body{padding:8px 10px;} }
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3515,6 +3616,7 @@ world.addEventListener('click', (e) => {
 
 
 
+
 /*EXTRAS_JS_START*/
 /* =====================================================================
    iamT World — EXTRAS: save, áudio 8-bit medieval (máx 5%), inventário/equipamentos,
@@ -3561,6 +3663,7 @@ const PAL = {
   rainbow: {m:'#ff5fa8', d:'#7a2a9c', l:'#ffe94d', a:'#4fe0ff'},
   angel:   {m:'#f6f2ea', d:'#b8b0a0', l:'#ffffff', a:'#ffd24d'}
 };
+const EXTRA_C = { e:'#14101c', w:'#ffffff' };   // olho / branco fixos (pets)
 const SHAPES = {
   helm: {
     capuz:  ['............','............','............','...mmmmmm...','..mmmmmmmm..','..mmmmmmmm..','..d......d..','..d......d..'],
@@ -3674,9 +3777,9 @@ const SECRETS = [
 const _eqCache = {};
 function drawRows(ctx, rows, pal, ox, oy){
   for (let y = 0; y < rows.length; y++) for (let x = 0; x < rows[y].length; x++) {
-    const c = rows[y][x];
-    if (c === '.' || !pal[c]) continue;
-    ctx.fillStyle = pal[c]; ctx.fillRect(ox + x, oy + y, 1, 1);
+    const c = rows[y][x]; const col = pal[c] || EXTRA_C[c];
+    if (c === '.' || !col) continue;
+    ctx.fillStyle = col; ctx.fillRect(ox + x, oy + y, 1, 1);
   }
 }
 function patURL(rows, pal){
@@ -3777,7 +3880,7 @@ function checkMeta(){
   if (n >= 20) grantItem('elmo_dragao');
   if (n >= 35) grantItem('asas_fenix');
   if (n >= 40) grantItem('lamina_arcoiris');
-  if (ITEMS.filter(i => i.rar === 'lendario').every(i => GS.owned[i.id])) grantItem('armadura_arcoiris');
+  if (ITEMS.filter(i => i.rar === 'lendario' && i.slot !== 'pet').every(i => GS.owned[i.id])) grantItem('armadura_arcoiris');
 }
 function onceEvent(key, itemId){
   if (GS.events[key]) return;
@@ -4281,6 +4384,703 @@ audioPop.addEventListener('click', e => e.stopPropagation());
 stage.addEventListener('pointerdown', e => { if (!audioPop.contains(e.target) && e.target !== audioBtn) audioPop.classList.remove('show'); }, true);
 window.addEventListener('keydown', e => { if (e.key === 'Escape') audioPop.classList.remove('show'); });
 applyMusicVol();
+
+/* =====================================================================
+   EXTRAS 2 — pets companheiros (22), bônus reais dos itens (velocidade, dicas,
+   vidas, tempo, sorte), mais itens simples por tempo, segredos novos e
+   código de progresso (exportar/importar entre aparelhos).
+   ===================================================================== */
+
+GS.dg = GS.dg || {}; GS.puz = GS.puz || 0;
+function addItem(id, slot, nome, shape, pal, rar, hint, fx){ defItem(id, slot, nome, shape, pal, rar, hint, fx); const it = ITEMS[ITEMS.length - 1]; ITEM_BY_ID[id] = it; return it; }
+
+/* ---------- pets: pixel-art 8x8 ---------- */
+SHAPES.pet = {
+  gato:     ['.m....m.','.mm..mm.','.mmmmmm.','.memmem.','.mmaamm.','..mmmm..','.mmmmmmd','.d.dd.d.'],
+  cachorro: ['d......d','dmmmmmmd','.mmmmmm.','.memmem.','.mmllmm.','..mmmm..','.mmmmmm.','.d....d.'],
+  coruja:   ['.d....d.','.mmmmmm.','mmwmmwmm','mmemmemm','.mmaamm.','.mmllmm.','.mllllm.','..a..a..'],
+  slime:    ['........','..mmmm..','.mllmmm.','mlmmmmmm','memmmmem','mmmmmmmm','mdmmmmdm','.dddddd.'],
+  dragao:   ['.a....a.','.mm..mm.','lmmmmmml','lmemmeml','.mmaamm.','.mmmmmm.','mm.mm.mm','.d....d.'],
+  fantasma: ['..mmmm..','.mmmmmm.','mmemmemm','mmmmmmmm','mmmaammm','mmmmmmmm','mmmmmmmm','m.mm.mm.'],
+  cogumelo: ['..mmmm..','.mlmmmm.','mmmmmlmm','mmmmmmmm','..wwww..','.wewwew.','..wwww..','..d..d..'],
+  robo:     ['...aa...','..aaaa..','.mmmmmm.','.mewwem.','.mmmmmm.','.dmmmmd.','.dmaamd.','.dd..dd.'],
+  ave:      ['...mm...','..mmmm..','..memm..','.aammmm.','..mmmm..','.mmmmmm.','.mlmmlm.','..a..a..'],
+  estrela:  ['...mm...','...mm...','mmmllmmm','.memmem.','..mmmm..','..mmmm..','.mm..mm.','mm....mm'],
+  caveira:  ['.mmmmmm.','mmmmmmmm','maammaam','maammaam','mmmmmmmm','.mmddmm.','.mlmmlm.','.d.dd.d.']
+};
+SLOT_NOME.pet = 'Pet'; SLOT_ORDEM.push('pet');
+
+function addPet(id, nome, shape, pal, rar, hint, fx, stat){ const it = addItem(id, 'pet', nome, shape, pal, rar, hint, fx); it.pst = stat; return it; }
+addPet('gato_aldeao','Gatinho Aldeão','gato','cloth','comum','Fique 4 min no mundo','','vel');
+addPet('cao_guarda','Cão de Guarda','cachorro','leather','comum','Fique 25 min no mundo','','vida');
+addPet('slime_verde','Slime Verde','slime','forest','incomum','Vença o Campo Minado','','dica');
+addPet('coruja_biblio','Coruja da Biblioteca','coruja','cloth','incomum','Dorme no alto das estantes da Biblioteca','','dica');
+addPet('cogumelo','Cogumelo Saltitante','cogumelo','crimson','incomum','Escondido perto de uma placa da rua','','tempo');
+addPet('robo_ferro','Robozinho de Ferro','robo','iron','raro','Vença a Paciência','','sorte');
+addPet('pintinho_bronze','Pintinho de Bronze','ave','bronze','raro','Fique 2 horas no mundo','','vel');
+addPet('gato_real','Gato Real','gato','royal','raro','Esquecido num banco do Saloon','','sorte');
+addPet('lobo_gelo','Lobo de Gelo','cachorro','ice','epico','Conclua a Cripta do Arquivista','ice','vel');
+addPet('fantasma_anjo','Fantasminha','fantasma','angel','epico','Jogue à noite (22h às 5h)','glow','tempo');
+addPet('slime_lava','Slime de Lava','slime','fire','epico','Conclua a Forja Esquecida','fire','vida');
+addPet('estrela_solar','Estrelinha Solar','estrela','solar','epico','Jogue por volta do meio-dia','glow','sorte');
+addPet('caveira_vazio','Caveirinha do Vazio','caveira','void','epico','Conclua a Catacumba do Vazio','void','dica');
+addPet('coruja_meia_noite','Coruja da Meia-Noite','coruja','midnight','lendario','Reúna 25 itens','void','dica');
+addPet('dragao_fogo','Dragãozinho','dragao','fire','lendario','Venza 7 jogos no Saloon','fire','vida');
+addPet('robo_trovao','Robô Trovão','robo','storm','lendario','Jogue 10 min sob chuva real','glow','vel');
+addPet('fenix_filhote','Fênix Filhote','ave','fire','mitico','Fique 8 horas no mundo','fire','tempo');
+addPet('espectro_aurora','Espectro da Aurora','fantasma','aurora','mitico','Resolva 25 puzzles das dungeons','aurora','dica');
+addPet('dragao_gelo','Dragão do Gelo','dragao','ice','mitico','Conclua uma dungeon sem usar dicas','ice','vida');
+addPet('gato_arcoiris','Gato Arco-Íris','gato','rainbow','ultra','Conclua as 4 dungeons','rainbow','sorte');
+addPet('estrela_cosmica','Estrela Cósmica','estrela','rainbow','ultra','Conclua o Santuário Prisma','rainbow','tempo');
+addPet('dragao_vazio','Dragão do Vazio','dragao','void','ultra','Reúna todos os outros pets','void','vel');
+
+/* ---------- itens simples (drop por tempo) + prêmios de dungeon ---------- */
+addItem('capuz_couro','helm','Capuz de Couro','capuz','leather','comum','Fique 2 min no mundo');
+addItem('adaga','weapon','Adaga Velha','espada','leather','comum','Fique 3 min no mundo');
+addItem('tunica_azul','chest','Túnica Azul','tunica','royal','comum','Fique 4 min no mundo');
+addItem('botas_ferro','legs','Botas de Ferro','botas','iron','comum','Fique 7 min no mundo');
+addItem('capa_cinza','back','Capa Cinzenta','capa','cloth','comum','Fique 9 min no mundo');
+addItem('elmo_osso','helm','Elmo Simples','elmo','cloth','comum','Fique 11 min no mundo');
+addItem('cajado_madeira','weapon','Cajado de Madeira','cajado','cloth','comum','Fique 13 min no mundo');
+addItem('botas_verdes','legs','Botas Verdes','botas','forest','comum','Fique 17 min no mundo');
+addItem('colete_couro','chest','Colete de Caça','couro','forest','incomum','Fique 25 min no mundo');
+addItem('capa_verde','back','Capa da Floresta','capa','forest','incomum','Fique 35 min no mundo');
+addItem('machado_ferro','weapon','Machado de Ferro','machado','iron','incomum','Fique 40 min no mundo');
+addItem('capuz_real','helm','Capuz Real','capuz','royal','incomum','Fique 50 min no mundo');
+addItem('espada_bronze','weapon','Espada de Bronze','espada','bronze','raro','Fique 70 min no mundo');
+addItem('botas_bronze','legs','Botas de Bronze','botas','bronze','raro','Fique 105 min no mundo');
+addItem('tunica_gelo','chest','Túnica de Gelo','manto','ice','raro','Conclua a Cripta do Arquivista','ice');
+addItem('grevas_brasa','legs','Grevas de Brasa','grevas','fire','epico','Conclua a Forja Esquecida','fire');
+addItem('capa_vazio','back','Capa do Vazio','capa','void','epico','Conclua a Catacumba do Vazio','void');
+addItem('cetro_prisma','weapon','Cetro Prisma','cajado','rainbow','ultra','Conclua o Santuário Prisma','rainbow');
+[[120,'capuz_couro'],[180,'adaga'],[240,'tunica_azul'],[240,'gato_aldeao'],[420,'botas_ferro'],[540,'capa_cinza'],[660,'elmo_osso'],
+ [780,'cajado_madeira'],[1000,'botas_verdes'],[1500,'colete_couro'],[1500,'cao_guarda'],[2100,'capa_verde'],[2400,'machado_ferro'],
+ [3000,'capuz_real'],[4200,'espada_bronze'],[6300,'botas_bronze'],[7200,'pintinho_bronze'],[28800,'fenix_filhote']
+].forEach(p => TIME_DROPS.push(p));
+
+/* ---------- segredos novos ---------- */
+SECRETS.push(
+  { key:'bib_estante', room:'biblioteca', sel:'.shelf-tag',      idx:2, item:'coruja_biblio', msg:'Uma coruja dormia no alto da estante PS5!' },
+  { key:'rua_placa',   room:'rua',        sel:'.prop-signpost',  idx:0, item:'cogumelo',      msg:'Um cogumelo saltitante saiu de trás da placa!' },
+  { key:'saloon_gato', room:'salajogos',  sel:'.saloon-stool',   idx:1, item:'gato_real',     msg:'Um gato de coroa dormia debaixo do banco!' }
+);
+
+/* ---------- bônus reais ---------- */
+const RAR_PTS = { comum:1, incomum:2, raro:3, epico:5, lendario:7, mitico:10, ultra:14 };
+const SLOT_STAT = { helm:'dica', chest:'vida', legs:'vel', back:'tempo', weapon:'sorte' };
+const STAT_INFO = { vel:{ n:'Velocidade', ic:'👟' }, dica:{ n:'Dicas', ic:'💡' }, vida:{ n:'Vidas', ic:'❤️' }, tempo:{ n:'Tempo', ic:'⏳' }, sorte:{ n:'Sorte', ic:'🍀' } };
+function statOf(it){ return it.slot === 'pet' ? it.pst : SLOT_STAT[it.slot]; }
+function totals(){
+  const t = { vel:0, dica:0, vida:0, tempo:0, sorte:0 };
+  SLOT_ORDEM.forEach(s => { const id = GS.equip[s]; const it = id && ITEM_BY_ID[id]; if (it) t[statOf(it)] += RAR_PTS[it.rar]; });
+  return t;
+}
+function hasFx(fx){ return SLOT_ORDEM.some(s => { const id = GS.equip[s]; const it = id && ITEM_BY_ID[id]; return it && it.fx === fx; }); }
+function dicasPorPuzzle(){ return 1 + Math.floor(totals().dica / 4); }
+function vidasPorPuzzle(){ return 3 + Math.floor(totals().vida / 4); }
+function fatorTempo(){ return 1 + totals().tempo * 0.03; }
+function chanceSorte(){ return Math.min(0.6, 0.1 + totals().sorte * 0.02); }
+function applyStats(){ player.speed = 250 * (1 + Math.min(0.5, totals().vel * 0.012)); }
+/* sorte: chance de um item simples extra ao vencer um jogo ou puzzle */
+function bonusDrop(){
+  if (Math.random() > chanceSorte()) return false;
+  const pool = ITEMS.filter(i => i.slot !== 'pet' && !GS.owned[i.id] && (i.rar === 'comum' || i.rar === 'incomum' || i.rar === 'raro') && /^Fique|Equip/.test(i.hint));
+  if (!pool.length) return false;
+  const it = pool[Math.floor(Math.random() * pool.length)];
+  toastText('🍀 Sorte! Um item extra apareceu.'); grantItem(it.id); return true;
+}
+const _dfp = dropFromPool;
+dropFromPool = function(pool){
+  if (pool === MS_POOL) onceEvent('ms_win', 'slime_verde');
+  if (pool === PC_POOL) onceEvent('pc_win', 'robo_ferro');
+  const r = _dfp.apply(this, arguments); bonusDrop(); return r;
+};
+
+/* ---------- pet que segue o personagem ---------- */
+let petEl = null; const petPos = { x:0, y:0 }; let petT = 0, petLast = 0;
+function mkPet(){
+  if (petEl) { petEl.remove(); petEl = null; }
+  const id = GS.equip.pet; const it = id && ITEM_BY_ID[id]; if (!it || !roomlayer) return;
+  const d = mkEl('div', { className:'pet' });
+  d.innerHTML = '<div class="psh"></div><div class="pimg' + (it.fx ? ' fx-' + it.fx : '') + '" style="background-image:url(' + patURL(SHAPES.pet[it.shape], PAL[it.pal]) + ')"></div>';
+  roomlayer.appendChild(d); petEl = d; petPos.x = player.x - player.dir * 46; petPos.y = player.y + 2;
+}
+function petLoop(ts){
+  requestAnimationFrame(petLoop);
+  if (!petEl || !petEl.isConnected) return;
+  const dt = Math.min(0.05, (ts - petLast) / 1000) || 0.016; petLast = ts;
+  const tx = player.x - player.dir * 46, ty = player.y + 2;
+  const dx = tx - petPos.x, dy = ty - petPos.y;
+  if (Math.hypot(dx, dy) > 420) { petPos.x = tx; petPos.y = ty; }
+  else { const k = Math.min(1, dt * 4.5); petPos.x += dx * k; petPos.y += dy * k; }
+  petT += dt;
+  const moving = Math.hypot(dx, dy) > 7;
+  const bob = moving ? Math.abs(Math.sin(petT * 14)) * 6 : Math.sin(petT * 3) * 1.6 + 1.6;
+  const depthT = bounds.maxY > bounds.minY ? (petPos.y - bounds.minY) / (bounds.maxY - bounds.minY) : 1;
+  petEl.style.left = (petPos.x - 20) + 'px'; petEl.style.top = (petPos.y - 40 - bob) + 'px';
+  petEl.style.zIndex = String(39 + Math.round(Math.max(0, Math.min(1, depthT)) * 20));
+  if (moving && Math.abs(dx) > 3) petEl.firstChild.nextSibling.style.transform = 'scaleX(' + (dx < 0 ? -1 : 1) + ')';
+}
+requestAnimationFrame(petLoop);
+
+const _applyEquip = applyEquip;
+applyEquip = function(root, equip){ _applyEquip(root, equip); if (root === avatar) { applyStats(); mkPet(); } };
+const _renderRoom2 = renderRoom;
+renderRoom = function(id){ _renderRoom2(id); mkPet(); };
+
+/* ---------- inventário: bônus + progresso ---------- */
+const _renderInv = renderInv;
+renderInv = function(){
+  _renderInv();
+  const t = totals(); const st = document.getElementById('invStats');
+  st.innerHTML +=
+    '<div class="inv-bonus"><span>👟 +' + Math.round(Math.min(0.5, t.vel * 0.012) * 100) + '% vel.</span><span>💡 ' + dicasPorPuzzle() + ' dica(s)</span>' +
+    '<span>❤️ ' + vidasPorPuzzle() + ' vidas</span><span>⏳ +' + Math.round(t.tempo * 3) + '% tempo</span><span>🍀 ' + Math.round(chanceSorte() * 100) + '% sorte</span></div>';
+  const grid = document.getElementById('invGrid');
+  if (invTab === 'pet') grid.insertAdjacentHTML('afterbegin', '<div class="inv-note">🐾 O pet equipado segue você pelo mundo. Cada pet dá bônus em um atributo.</div>');
+  if (!document.getElementById('invTools')) {
+    const row = mkEl('div', { id:'invTools', className:'inv-tools' });
+    const b1 = mkEl('button', { className:'inv-tab' }, '💾 Exportar progresso'), b2 = mkEl('button', { className:'inv-tab' }, '📥 Importar progresso');
+    b1.addEventListener('click', openSaveBox); b2.addEventListener('click', () => openSaveBox(true));
+    row.appendChild(b1); row.appendChild(b2); document.querySelector('#invPanel .inv-right').appendChild(row);
+  }
+  document.querySelectorAll('#invSlots .inv-slot .lbl').forEach(l => { if (l.textContent === 'Capacete') l.textContent = 'Cabeça'; });
+};
+/* tooltip do bônus em cada item do inventário */
+const _renderInv2 = renderInv;
+renderInv = function(){
+  _renderInv2();
+  document.querySelectorAll('#invGrid .inv-item').forEach((el, i) => {
+    const lista = ITEMS.filter(x => x.slot === invTab).sort((a, b) => (!!GS.owned[b.id] - !!GS.owned[a.id]) || (RAR_ORD[a.rar] - RAR_ORD[b.rar]));
+    const it = lista[i]; if (!it || !GS.owned[it.id]) return;
+    const s = STAT_INFO[statOf(it)];
+    el.insertAdjacentHTML('beforeend', '<div class="bn">' + s.ic + ' +' + RAR_PTS[it.rar] + ' ' + s.n + '</div>');
+  });
+};
+
+/* ---------- código de progresso (entre aparelhos) ---------- */
+const _gsOrig = gsSave; window.removeEventListener('beforeunload', _gsOrig);
+gsSave = function(){ if (window.__importing) return; _gsOrig(); };
+window.addEventListener('beforeunload', () => gsSave());
+function exportCode(){ return 'IAMT1:' + btoa(unescape(encodeURIComponent(JSON.stringify(GS)))); }
+function importCode(str){
+  str = String(str || '').trim();
+  if (str.indexOf('IAMT1:') !== 0) throw new Error('Código inválido.');
+  const o = JSON.parse(decodeURIComponent(escape(atob(str.slice(6)))));
+  if (!o || typeof o !== 'object' || typeof o.owned !== 'object') throw new Error('Código inválido.');
+  window.__importing = true;
+  localStorage.setItem(GS_KEY, JSON.stringify(o)); location.reload();
+}
+const saveBox = mkEl('div', { id:'saveBox', className:'xpanel' },
+  '<div class="xback"></div><div class="xbox" style="width:min(560px,92%)"><button class="xclose" aria-label="Fechar">✕</button>' +
+  '<div class="xhead">💾 Seu progresso</div><div class="sv-body">' +
+  '<p class="sv-p">Seu progresso é salvo <b>automaticamente neste navegador</b>. Para levar para outro aparelho, copie o código abaixo e cole lá em "Importar".</p>' +
+  '<textarea id="svText" rows="5" spellcheck="false"></textarea>' +
+  '<div class="sv-row"><button class="inv-tab" id="svCopy">📋 Copiar código</button><button class="inv-tab" id="svLoad">📥 Carregar este código</button></div>' +
+  '<div class="sv-msg" id="svMsg"></div></div></div>');
+stage.appendChild(saveBox);
+let svArm = false;
+function openSaveBox(importMode){
+  const ta = document.getElementById('svText'); document.getElementById('svMsg').textContent = ''; svArm = false;
+  document.getElementById('svLoad').textContent = '📥 Carregar este código';
+  if (importMode === true) { ta.value = ''; ta.placeholder = 'Cole aqui o código IAMT1:...'; ta.focus(); }
+  else { ta.value = exportCode(); ta.select(); }
+  saveBox.classList.add('show');
+}
+document.getElementById('svCopy').addEventListener('click', () => {
+  const ta = document.getElementById('svText'); ta.value = exportCode(); ta.select();
+  const ok = () => { document.getElementById('svMsg').textContent = 'Código copiado!'; };
+  if (navigator.clipboard) navigator.clipboard.writeText(ta.value).then(ok, () => { document.execCommand('copy'); ok(); }); else { document.execCommand('copy'); ok(); }
+});
+document.getElementById('svLoad').addEventListener('click', () => {
+  const msg = document.getElementById('svMsg');
+  if (!svArm) { svArm = true; msg.textContent = 'Isto substitui o progresso atual deste navegador. Clique de novo para confirmar.'; document.getElementById('svLoad').textContent = '⚠️ Confirmar importação'; return; }
+  try { importCode(document.getElementById('svText').value); } catch (e) { msg.textContent = 'Não foi possível ler esse código.'; svArm = false; document.getElementById('svLoad').textContent = '📥 Carregar este código'; }
+});
+saveBox.addEventListener('click', e => { if (e.target.classList.contains('xback') || e.target.classList.contains('xclose')) saveBox.classList.remove('show'); });
+saveBox.addEventListener('keydown', e => e.stopPropagation());
+
+/* ---------- gatilhos por sessão (noite, meio-dia, chuva) para pets ---------- */
+let sess2 = 0, rainSec = 0;
+setInterval(() => {
+  if (document.hidden) return;
+  sess2++; if (stage.classList.contains('rainy')) rainSec++;
+  if (sess2 >= 120 && sess2 % 5 === 0) {
+    const hh = marianaHour();
+    if (hh >= 22 || hh < 5) grantItem('fantasma_anjo');
+    if (hh === 11 || hh === 12) grantItem('estrela_solar');
+  }
+  if (rainSec >= 600) grantItem('robo_trovao');
+}, 1000);
+
+applyStats(); mkPet();
+
+/* =====================================================================
+   EXTRAS 3 — Criptas do Arquivista: 4 dungeons de puzzles (sem combate).
+   Entrada: alçapão na Biblioteca (ou mapa). Cada dungeon tem 5 puzzles em
+   sequência, só abre depois da anterior e exige itens com efeito equipados.
+   Os puzzles de perguntas usam os dados reais do próprio site; o layout muda
+   a cada dia (semente diária). Dicas, vidas e tempo vêm dos bônus dos itens.
+   ===================================================================== */
+
+function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function hashStr(s){ let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function dayKey(){ return new Intl.DateTimeFormat('en-CA', { timeZone:'America/Sao_Paulo' }).format(new Date()); }
+const GEM_COL = ['#e8441a', '#3ee0a0', '#4f9bff', '#ffd24d', '#b57bff', '#ff5fa8'];
+function el(tag, cls, html){ const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+
+/* ---------- definição das 4 dungeons ---------- */
+const DUNGEONS = [
+  { id:'arquivista', nome:'Cripta do Arquivista', ic:'📜', gate:null,
+    desc:'Os arquivos antigos do mundo. Perguntas sobre a coleção real, tochas, relíquias e um cadeado de gemas.',
+    puz:[ { t:'quiz', n:3, tier:1, nome:'Perguntas do Arquivo' }, { t:'lights', n:3, nome:'Tochas Antigas' }, { t:'memory', c:4, r:3, time:55, nome:'Relíquias Gêmeas' },
+          { t:'code', len:3, colors:5, rep:false, tries:8, nome:'Cadeado de Gemas' }, { t:'slide', n:3, nome:'Mosaico do Piso' } ],
+    reward:['tunica_gelo', 'lobo_gelo'] },
+  { id:'forja', nome:'Forja Esquecida', ic:'🔥', gate:['ice'],
+    desc:'Corredores gelados que escondem uma forja apagada. Exige um item de GELO equipado.',
+    puz:[ { t:'quiz', n:4, tier:2, nome:'Registros da Forja' }, { t:'simon', len:5, nome:'Melodia das Bigornas' }, { t:'slide', n:3, nome:'Piso Rachado' },
+          { t:'lights', n:4, nome:'Fornalhas Alinhadas' }, { t:'memory', c:4, r:4, time:75, nome:'Moldes Antigos' } ],
+    reward:['grevas_brasa', 'slime_lava'] },
+  { id:'vazio', nome:'Catacumba do Vazio', ic:'🌌', gate:['fire'],
+    desc:'Escuridão total. Só quem carrega fogo atravessa. Exige um item de FOGO equipado.',
+    puz:[ { t:'path', c:5, r:5, nome:'Campo de Espinhos' }, { t:'code', len:4, colors:6, rep:true, tries:10, nome:'Cofre Sombrio' }, { t:'memory', c:6, r:4, time:110, nome:'Mural das Sombras' },
+          { t:'simon', len:7, nome:'Coro do Vazio' }, { t:'lights', n:4, nome:'Velas do Abismo' } ],
+    reward:['capa_vazio', 'caveira_vazio'] },
+  { id:'prisma', nome:'Santuário Prisma', ic:'🌈', gate:['ice', 'fire', 'void'],
+    desc:'O fim da jornada. Exige itens de GELO, FOGO e VAZIO equipados ao mesmo tempo.',
+    puz:[ { t:'quiz', n:5, tier:3, nome:'Provas do Arquivista' }, { t:'path', c:7, r:6, nome:'Trilha Prismática' }, { t:'lights', n:5, nome:'Cristais Sincronizados' },
+          { t:'simon', len:9, nome:'Hino das Cores' }, { t:'code', len:4, colors:6, rep:true, tries:9, nome:'Cofre Prisma' }, { t:'slide', n:4, nome:'Vitral Mestre' } ],
+    reward:['cetro_prisma', 'estrela_cosmica'] }
+];
+const FX_NOME = { ice:'GELO', fire:'FOGO', void:'VAZIO' };
+function dgRec(i){
+  const id = DUNGEONS[i].id; const r = GS.dg[id] = Object.assign({ done:{}, times:{}, daily:{}, clear:0, best:0, hu:0 }, GS.dg[id] || {});
+  ['done', 'times', 'daily'].forEach(k => { if (!r[k] || typeof r[k] !== 'object') r[k] = {}; });
+  return r;
+}
+function dgCleared(i){ return !!dgRec(i).clear; }
+function dgLockReason(i){
+  if (i > 0 && !dgCleared(i - 1)) return 'Conclua antes: ' + DUNGEONS[i - 1].nome + '.';
+  const falta = (DUNGEONS[i].gate || []).filter(f => !hasFx(f));
+  if (falta.length) return 'A porta exige itens com efeito de ' + falta.map(f => FX_NOME[f]).join(' + ') + ' equipados.';
+  return '';
+}
+
+/* ---------- painel ---------- */
+const dgPanel = el('div', 'xpanel',
+  '<div class="xback"></div><div class="xbox" id="dgBox"><button class="xclose" aria-label="Fechar">✕</button><div class="xhead" id="dgHead"></div>' +
+  '<div class="dg-bar" id="dgBar"></div><div class="dg-body" id="dgBody"></div><div class="dg-foot" id="dgFoot"></div></div>');
+dgPanel.id = 'dgPanel'; stage.appendChild(dgPanel);
+const dgHead = document.getElementById('dgHead'), dgBar = document.getElementById('dgBar'), dgBody = document.getElementById('dgBody'), dgFoot = document.getElementById('dgFoot');
+let DG = null;          // execução atual { d, p, hints, lives, resets, t0, cleanup }
+let dgOpenIdx = -1;
+function dgCleanup(){ if (DG && DG.cleanup) { try { DG.cleanup(); } catch (e) {} DG.cleanup = null; } }
+function closeDg(){ dgCleanup(); DG = null; dgOpenIdx = -1; dgPanel.classList.remove('show'); updateDuck && updateDuck(); }
+dgPanel.addEventListener('click', e => { if (e.target.classList.contains('xback') || e.target.classList.contains('xclose')) closeDg(); });
+window.addEventListener('keydown', e => { if (!dgPanel.classList.contains('show')) return; if (e.key === 'Escape') closeDg(); e.stopImmediatePropagation(); }, true);
+function dgFlash(msg, kind){ dgFoot.className = 'dg-foot ' + (kind || ''); dgFoot.textContent = msg || ''; }
+
+function openDungeon(i){
+  dgOpenIdx = i; dgPanel.classList.add('show'); hideInv(); hideMapPanel(); showDgList(i);
+}
+function showDgList(i){
+  dgCleanup(); DG = null; const dg = DUNGEONS[i], rec = dgRec(i);
+  dgHead.textContent = dg.ic + ' ' + dg.nome;
+  dgBar.innerHTML = '<span>💡 ' + dicasPorPuzzle() + ' dica(s) por puzzle</span><span>❤️ ' + vidasPorPuzzle() + ' vidas</span><span>⏳ +' + Math.round(totals().tempo * 3) + '% tempo</span><span class="dg-day">Layout de hoje: ' + dayKey() + '</span>';
+  dgBody.innerHTML = '';
+  dgBody.appendChild(el('p', 'dg-desc', esc(dg.desc)));
+  const list = el('div', 'dg-list');
+  dg.puz.forEach((p, k) => {
+    const done = !!rec.done[k], open = k === 0 || !!rec.done[k - 1];
+    const b = el('button', 'dg-item' + (done ? ' done' : '') + (open ? '' : ' locked'));
+    b.innerHTML = '<span class="n">' + (done ? '✔' : (open ? (k + 1) : '🔒')) + '</span><span class="t">' + esc(p.nome) + '</span><span class="m">' + PUZ_LABEL[p.t] + (rec.times[k] ? ' · melhor ' + rec.times[k] + 's' : '') + '</span>';
+    if (open) b.addEventListener('click', () => startPuzzle(i, k));
+    list.appendChild(b);
+  });
+  dgBody.appendChild(list);
+  const prem = dg.reward.map(id => ITEM_BY_ID[id]);
+  dgBody.appendChild(el('div', 'dg-rew', '<b>Prêmios ao concluir:</b> ' + prem.map(it => '<span style="color:' + RAR_COR[it.rar] + '">' + esc(it.nome) + (GS.owned[it.id] ? ' ✔' : '') + '</span>').join(' · ')));
+  dgFlash(rec.clear ? '✔ Dungeon concluída' + (rec.best ? ' — melhor tempo total: ' + rec.best + 's' : '') + '. Você pode rejogar os puzzles.' : 'Resolva os puzzles em ordem para abrir a câmara final.', rec.clear ? 'good' : '');
+}
+const PUZ_LABEL = { quiz:'Perguntas', lights:'Lógica de luzes', memory:'Memória', code:'Código', simon:'Melodia', slide:'Deslizante', path:'Caminho' };
+const PUZ_LIFE = { quiz:true, simon:true, path:true };
+
+function startPuzzle(d, p){
+  DG = { d, p, cfg:DUNGEONS[d].puz[p], hints:dicasPorPuzzle(), lives:vidasPorPuzzle(), resets:0, t0:Date.now(), cleanup:null };
+  renderPuzzle();
+}
+function updateBar(){
+  if (!DG) return;
+  const useLife = PUZ_LIFE[DG.cfg.t];
+  dgBar.innerHTML = (useLife ? '<span>❤️ ' + DG.lives + '</span>' : '') + '<button class="dg-hint" id="dgHint">💡 Dica (' + DG.hints + ')</button><span id="dgTimer"></span><button class="dg-back" id="dgBack">◀ Voltar</button>';
+  document.getElementById('dgHint').disabled = DG.hints <= 0;
+  document.getElementById('dgHint').addEventListener('click', () => DG.api && DG.api.useHint());
+  document.getElementById('dgBack').addEventListener('click', () => showDgList(DG.d));
+  if (DG.timerTxt) document.getElementById('dgTimer').textContent = DG.timerTxt;
+}
+function renderPuzzle(){
+  dgCleanup(); const cfg = DG.cfg; const dg = DUNGEONS[DG.d];
+  dgHead.textContent = dg.ic + ' ' + dg.nome + ' — ' + (DG.p + 1) + '/' + dg.puz.length + ': ' + cfg.nome;
+  dgBody.innerHTML = ''; const host = el('div', 'pz-host'); dgBody.appendChild(host);
+  DG.timerTxt = '';
+  const api = {
+    rng: mulberry32(hashStr(dayKey() + ':' + DG.d + ':' + DG.p + ':' + DG.resets)),
+    hintFn: null,
+    setHint(fn){ api.hintFn = fn; },
+    useHint(){ if (!DG || DG.hints <= 0 || !api.hintFn) return; DG.hints--; dgRec(DG.d).hu++; gsSave(); api.hintFn(); updateBar(); },
+    flash: dgFlash,
+    timer(txt){ DG.timerTxt = txt; const t = document.getElementById('dgTimer'); if (t) t.textContent = txt; },
+    loseLife(msg){ DG.lives--; updateBar(); dgFlash(msg || 'Errou!', 'bad'); if (DG.lives <= 0) { setTimeout(() => api.reset('Sem vidas! A sala foi reiniciada.'), 800); return true; } return false; },
+    reset(msg){ if (!DG) return; DG.lives = vidasPorPuzzle(); DG.resets++; dgFlash(msg, 'bad'); setTimeout(() => { if (DG) renderPuzzle(); }, 1000); },
+    win(){ winPuzzle(); }
+  };
+  DG.api = api; updateBar(); dgFlash('', '');
+  DG.cleanup = PUZ[cfg.t](host, cfg, api) || null;
+}
+
+function winPuzzle(){
+  if (!DG) return; dgCleanup();
+  const { d, p } = DG; const dg = DUNGEONS[d]; const rec = dgRec(d);
+  const dur = Math.max(1, Math.round((Date.now() - DG.t0) / 1000));
+  const first = !rec.done[p]; if (first) rec.done[p] = Date.now();
+  if (!rec.times[p] || dur < rec.times[p]) rec.times[p] = dur;
+  const hoje = dayKey(); let bonus = false;
+  if (rec.daily[p] !== hoje) { rec.daily[p] = hoje; GS.puz = (GS.puz || 0) + 1; bonus = true; }
+  gsSave(); sfxItem();
+  const todos = dg.puz.every((_, k) => rec.done[k]);
+  const novoClear = todos && !rec.clear;
+  dgBody.innerHTML = '';
+  const box = el('div', 'dg-result');
+  box.innerHTML = '<div class="big">✔ Puzzle resolvido!</div><div>Tempo: ' + dur + 's' + (first ? ' · primeira vez!' : '') + '</div>';
+  const nxt = el('div', 'dg-resrow'); box.appendChild(nxt);
+  if (!novoClear && p + 1 < dg.puz.length) { const b = el('button', 'inv-tab', 'Próximo puzzle ▶'); b.addEventListener('click', () => startPuzzle(d, p + 1)); nxt.appendChild(b); }
+  const bl = el('button', 'inv-tab', '◀ Lista da dungeon'); bl.addEventListener('click', () => showDgList(d)); nxt.appendChild(bl);
+  dgBody.appendChild(box); dgBar.innerHTML = ''; dgFlash('', '');
+  if (bonus) setTimeout(bonusDrop, 600);
+  if (novoClear) {
+    rec.clear = Date.now(); rec.best = dg.puz.reduce((s, _, k) => s + (rec.times[k] || 0), 0);
+    if (rec.hu === 0) GS.noHint = 1;
+    gsSave();
+    box.insertAdjacentHTML('afterbegin', '<div class="big gold">🏆 ' + esc(dg.nome) + ' concluída!</div>');
+    dg.reward.forEach((id, k) => setTimeout(() => grantItem(id), 700 + k * 900));
+    if (d + 1 < DUNGEONS.length) box.insertAdjacentHTML('beforeend', '<div class="dg-next">Nova dungeon liberada: <b>' + esc(DUNGEONS[d + 1].nome) + '</b>' + (DUNGEONS[d + 1].gate ? ' — exige itens de ' + DUNGEONS[d + 1].gate.map(f => FX_NOME[f]).join(' + ') + '.' : '.') + '</div>');
+    setTimeout(checkMeta, 2600);
+  } else setTimeout(checkMeta, 100);
+}
+
+/* ---------- puzzles ---------- */
+const PUZ = {};
+function shuf(a, rng){ for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+/* 1) perguntas com dados reais da coleção/cinema/locadora/tenda */
+PUZ.quiz = function(host, cfg, api){
+  const rng = api.rng, J = JOGOS_COLECAO;
+  const plats = [...new Set(J.map(j => j.plat))].sort(), cats = [...new Set(J.map(j => j.cat))].sort();
+  const rj = () => J[Math.floor(rng() * J.length)];
+  function numOpts(c){ const s = new Set([c]); let g = 0; while (s.size < 4 && g++ < 50) { const v = c + (rng() < 0.5 ? -1 : 1) * Math.ceil(rng() * 4); if (v >= 0) s.add(v); } return shuf([...s], rng).map(v => ({ label:String(v), ok:v === c })); }
+  const gens = [
+    () => { const j = rj(); return { q:'Em qual plataforma está <b>' + esc(j.n) + '</b>?', opts:plats.map(p => ({ label:p, ok:p === j.plat })) }; },
+    () => { const j = rj(); const out = shuf(cats.filter(c => c !== j.cat), rng).slice(0, 3); return { q:'Qual é a categoria de <b>' + esc(j.n) + '</b> na coleção?', opts:shuf([j.cat].concat(out), rng).map(c => ({ label:c, ok:c === j.cat })) }; },
+    () => { const p = plats[Math.floor(rng() * plats.length)]; return { q:'Quantos jogos de <b>' + esc(p) + '</b> há na coleção?', opts:numOpts(J.filter(j => j.plat === p).length) }; },
+    () => { const c = cats[Math.floor(rng() * cats.length)]; return { q:'Quantos jogos da categoria <b>' + esc(c) + '</b> há na coleção?', opts:numOpts(J.filter(j => j.cat === c).length) }; },
+    () => ({ q:'Quantos canais o <b>Cinema</b> monitora?', opts:numOpts(CANAIS_CINEMA.length) }),
+    () => ({ q:'Quantos animes dublados estão na <b>Locadora</b>?', opts:numOpts(LOCADORA_ANIME_TITULOS.length) }),
+    () => ({ q:'Quantos vendedores há na <b>Tenda</b>?', opts:numOpts(VENDEDORES_LOJA.length) }),
+    () => { const pool = J.filter(j => j.capa); const j = pool[Math.floor(rng() * pool.length)]; const out = shuf(pool.filter(x => x.n !== j.n), rng).slice(0, 3); return { q:'Qual jogo tem esta capa?', img:j.capa, opts:shuf([j].concat(out), rng).map(x => ({ label:x.n, ok:x.n === j.n })) }; },
+    () => { const c = J.filter(j => j.rar === 'raro' || j.rar === 'muito').length; return { q:'Quantos jogos da coleção têm raridade <b>raro</b> ou <b>muito raro</b>?', opts:numOpts(c) }; }
+  ];
+  const ativos = cfg.tier === 1 ? [0, 1, 2] : (cfg.tier === 2 ? [0, 1, 2, 3, 4, 5, 6] : [0, 1, 2, 3, 4, 5, 6, 7, 8]);
+  const qs = []; let last = -1;
+  for (let i = 0; i < cfg.n; i++) { let g; do { g = ativos[Math.floor(rng() * ativos.length)]; } while (g === last && ativos.length > 1); last = g; qs.push(gens[g]()); }
+  let qi = 0, travado = false; const timers = [];
+  function render(){
+    host.innerHTML = '';
+    const q = qs[qi];
+    host.appendChild(el('div', 'qz-count', 'Pergunta ' + (qi + 1) + ' de ' + qs.length));
+    host.appendChild(el('div', 'qz-q', q.q));
+    if (q.img) { const im = el('div', 'qz-img'); im.style.backgroundImage = 'url("' + q.img.replace(/"/g, '%22') + '")'; host.appendChild(im); }
+    const box = el('div', 'qz-opts');
+    q.opts.forEach(o => {
+      const b = el('button', 'qz-opt', esc(o.label)); b.dataset.ok = o.ok ? '1' : '0';
+      b.addEventListener('click', () => {
+        if (travado || b.disabled) return;
+        if (o.ok) { travado = true; b.classList.add('ok'); timers.push(setTimeout(() => { qi++; travado = false; if (qi >= qs.length) api.win(); else render(); }, 600)); }
+        else { b.classList.add('bad'); b.disabled = true; api.loseLife('Resposta errada!'); }
+      });
+      box.appendChild(b);
+    });
+    host.appendChild(box);
+  }
+  api.setHint(() => {
+    const errs = [...host.querySelectorAll('.qz-opt')].filter(b => b.dataset.ok === '0' && !b.disabled);
+    errs.slice(0, 2).forEach(b => { b.disabled = true; b.classList.add('struck'); });
+    api.flash('Duas opções erradas foram riscadas.', 'good');
+  });
+  render();
+  return () => timers.forEach(clearTimeout);
+};
+
+/* 2) luzes (Lights Out) — sempre solúvel */
+PUZ.lights = function(host, cfg, api){
+  const n = cfg.n, rng = api.rng, N = n * n; const g = Array(N).fill(0), need = Array(N).fill(0);
+  function press(i){ const r = Math.floor(i / n), c = i % n; [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([a, b]) => { const rr = r + a, cc = c + b; if (rr >= 0 && rr < n && cc >= 0 && cc < n) g[rr * n + cc] ^= 1; }); }
+  for (let i = 0; i < N; i++) if (rng() < 0.5) { press(i); need[i] ^= 1; }
+  while (g.every(v => !v)) { const i = Math.floor(rng() * N); press(i); need[i] ^= 1; }
+  let moves = 0;
+  host.innerHTML = '<div class="pz-intro">Apague todas as tochas. Cada clique inverte a tocha e as vizinhas.</div>';
+  const grid = el('div', 'lt-grid'); grid.style.gridTemplateColumns = 'repeat(' + n + ',54px)'; host.appendChild(grid);
+  const info = el('div', 'pz-info', 'Movimentos: 0'); host.appendChild(info);
+  const cells = [];
+  for (let i = 0; i < N; i++) { const b = el('button', 'lt-cell'); b.addEventListener('click', () => { press(i); need[i] ^= 1; moves++; info.textContent = 'Movimentos: ' + moves; draw(); if (g.every(v => !v)) setTimeout(() => api.win(), 450); }); cells.push(b); grid.appendChild(b); }
+  function draw(){ cells.forEach((b, i) => { b.classList.toggle('on', !!g[i]); b.classList.remove('hint'); }); }
+  api.setHint(() => { const i = need.findIndex(v => v); if (i >= 0) { cells[i].classList.add('hint'); setTimeout(() => cells[i] && cells[i].classList.remove('hint'), 2200); } api.flash('Clique na tocha destacada.', 'good'); });
+  draw();
+};
+
+/* 3) memória com os ícones dos itens do jogo */
+PUZ.memory = function(host, cfg, api){
+  const rng = api.rng, pares = cfg.c * cfg.r / 2;
+  const pool = shuf(ITEMS.slice(), rng).slice(0, pares);
+  const deck = shuf(pool.concat(pool), rng);
+  const limite = Math.round(cfg.time * fatorTempo()); let resto = limite, abertas = [], travado = false, achados = 0; const timers = [];
+  host.innerHTML = '<div class="pz-intro">Encontre todos os pares de relíquias antes do tempo acabar.</div>';
+  const grid = el('div', 'mc-grid'); grid.style.gridTemplateColumns = 'repeat(' + cfg.c + ',64px)'; host.appendChild(grid);
+  const cards = deck.map((it, i) => {
+    const c = el('button', 'mc-card'); c.innerHTML = '<div class="mc-back">?</div><div class="mc-face"></div>';
+    c.querySelector('.mc-face').appendChild(itemThumb(it, 44)); c.dataset.id = it.id; grid.appendChild(c);
+    c.addEventListener('click', () => {
+      if (travado || c.classList.contains('open') || c.classList.contains('matched')) return;
+      c.classList.add('open'); abertas.push(c);
+      if (abertas.length === 2) {
+        const [a, b] = abertas; abertas = [];
+        if (a.dataset.id === b.dataset.id) { a.classList.add('matched'); b.classList.add('matched'); achados++; if (achados === pares) { clearInterval(iv); timers.push(setTimeout(() => api.win(), 500)); } }
+        else { travado = true; timers.push(setTimeout(() => { a.classList.remove('open'); b.classList.remove('open'); travado = false; }, 700)); }
+      }
+    });
+    return c;
+  });
+  const iv = setInterval(() => { resto--; api.timer('⏳ ' + resto + 's'); if (resto <= 0) { clearInterval(iv); api.reset('Tempo esgotado! As cartas foram embaralhadas.'); } }, 1000);
+  api.timer('⏳ ' + resto + 's');
+  api.setHint(() => {
+    const livres = cards.filter(c => !c.classList.contains('matched') && !c.classList.contains('open'));
+    if (!livres.length) return; const alvo = livres[0]; const par = livres.find(c => c !== alvo && c.dataset.id === alvo.dataset.id);
+    [alvo, par].forEach(c => c && c.classList.add('peek')); timers.push(setTimeout(() => [alvo, par].forEach(c => c && c.classList.remove('peek')), 1600));
+  });
+  return () => { clearInterval(iv); timers.forEach(clearTimeout); };
+};
+
+/* 4) código (Mastermind com gemas) */
+PUZ.code = function(host, cfg, api){
+  const rng = api.rng, L = cfg.len, K = cfg.colors; let secret;
+  if (cfg.rep) secret = Array.from({ length:L }, () => Math.floor(rng() * K));
+  else secret = shuf(Array.from({ length:K }, (_, i) => i), rng).slice(0, L);
+  const tries = cfg.tries + Math.floor(totals().vida / 4);
+  let cur = [], hist = [], revelados = {};
+  host.innerHTML = '<div class="pz-intro">Descubra o código de ' + L + ' gemas' + (cfg.rep ? ' (cores podem repetir)' : ' (sem repetir cores)') + '. ● = cor e posição certas · ○ = cor certa, posição errada.</div>';
+  const histEl = el('div', 'cd-hist'), curEl = el('div', 'cd-cur'), palEl = el('div', 'cd-pal'), ctlEl = el('div', 'cd-ctl'), revEl = el('div', 'pz-info');
+  host.append(histEl, curEl, palEl, ctlEl, revEl);
+  const gem = (ci, cls) => '<span class="cd-gem ' + (cls || '') + '" style="background:' + (ci == null ? 'transparent' : GEM_COL[ci]) + '"></span>';
+  function fb(g){ let b = 0; const cs = Array(K).fill(0), cg = Array(K).fill(0); g.forEach((v, i) => { if (v === secret[i]) b++; else { cs[secret[i]]++; cg[v]++; } }); let w = 0; for (let k = 0; k < K; k++) w += Math.min(cs[k], cg[k]); return [b, w]; }
+  function draw(){
+    histEl.innerHTML = hist.map(h => '<div class="cd-row">' + h.g.map(v => gem(v)).join('') + '<span class="cd-peg">' + '●'.repeat(h.b) + '<i>' + '○'.repeat(h.w) + '</i></span></div>').join('');
+    curEl.innerHTML = '<div class="cd-row">' + Array.from({ length:L }, (_, i) => gem(cur[i] != null ? cur[i] : null, cur[i] == null ? 'empty' : '')).join('') + '</div><div class="pz-info">Tentativas restantes: ' + (tries - hist.length) + '</div>';
+    revEl.textContent = Object.keys(revelados).length ? 'Dica: ' + Object.keys(revelados).map(i => 'posição ' + (+i + 1) + ' = ').join('') : '';
+    revEl.innerHTML = Object.keys(revelados).length ? 'Dica: ' + Object.keys(revelados).map(i => 'posição ' + (+i + 1) + ' = ' + gem(secret[i])).join(' · ') : '';
+  }
+  for (let k = 0; k < K; k++) { const b = el('button', 'cd-pb'); b.innerHTML = gem(k); b.addEventListener('click', () => { if (cur.length < L) { cur.push(k); draw(); } }); palEl.appendChild(b); }
+  const bBack = el('button', 'inv-tab', '⌫ Apagar'), bOk = el('button', 'inv-tab', '✔ Testar');
+  bBack.addEventListener('click', () => { cur.pop(); draw(); });
+  bOk.addEventListener('click', () => {
+    if (cur.length < L) return api.flash('Preencha as ' + L + ' gemas.', 'bad');
+    const [b, w] = fb(cur); hist.push({ g:cur.slice(), b, w }); const g = cur; cur = [];
+    if (b === L) { draw(); return setTimeout(() => api.win(), 500); }
+    draw(); if (hist.length >= tries) api.reset('O cadeado travou! Um novo cadeado foi montado.');
+  });
+  ctlEl.append(bBack, bOk);
+  api.setHint(() => { const livres = [...Array(L).keys()].filter(i => revelados[i] == null); if (!livres.length) return; revelados[livres[Math.floor(rng() * livres.length)]] = 1; draw(); });
+  draw();
+};
+
+/* 5) melodia (Simon crescente com som) */
+PUZ.simon = function(host, cfg, api){
+  const rng = api.rng, N = cfg.len, seq = Array.from({ length:N }, () => Math.floor(rng() * 4));
+  const notas = [60, 64, 67, 72], cores = ['#e8441a', '#3ee0a0', '#4f9bff', '#ffd24d'];
+  let rodada = Math.min(3, N), idx = 0, aceita = false; const timers = [];
+  host.innerHTML = '<div class="pz-intro">Ouça a melodia e repita na mesma ordem. Ela cresce a cada rodada.</div>';
+  const status = el('div', 'pz-info', ''), pads = el('div', 'sm-pads'); host.append(pads, status);
+  const els = cores.map((c, i) => { const b = el('button', 'sm-pad'); b.style.setProperty('--c', c); b.innerHTML = '<i></i>'; b.addEventListener('click', () => toca(i)); pads.appendChild(b); return b; });
+  function tom(i){ if (muted) return; const ctx = audioInit(); if (!ctx) return; voice('square', mtof(notas[i]), ctx.currentTime, 0.3, 0.5, sfxGain); }
+  function pisca(i, ms, num){ els[i].classList.add('lit'); if (num) els[i].firstChild.textContent = num; tom(i); timers.push(setTimeout(() => { els[i].classList.remove('lit'); els[i].firstChild.textContent = ''; }, ms)); }
+  function toca(i){
+    if (!aceita) return;
+    pisca(i, 220);
+    if (i === seq[idx]) {
+      idx++;
+      if (idx === rodada) { aceita = false; if (rodada === N) { timers.push(setTimeout(() => api.win(), 500)); return; } rodada++; status.textContent = 'Muito bem!'; timers.push(setTimeout(() => ouvir(false), 900)); }
+    } else {
+      aceita = false; const fim = api.loseLife('Nota errada! Ouça de novo.'); if (!fim) timers.push(setTimeout(() => ouvir(false), 1200));
+    }
+  }
+  function ouvir(lento){
+    aceita = false; idx = 0; status.textContent = 'Observe...';
+    const passo = Math.round(640 * (1 + totals().tempo * 0.02)) * (lento ? 1.7 : 1);
+    for (let k = 0; k < rodada; k++) timers.push(setTimeout(() => pisca(seq[k], passo * 0.7, lento ? String(k + 1) : ''), 500 + k * passo));
+    timers.push(setTimeout(() => { aceita = true; idx = 0; status.textContent = 'Sua vez! (' + rodada + ' notas)'; }, 500 + rodada * passo));
+  }
+  api.setHint(() => { timers.forEach(clearTimeout); ouvir(true); });
+  timers.push(setTimeout(() => ouvir(false), 700));
+  return () => timers.forEach(clearTimeout);
+};
+
+/* 6) mosaico deslizante */
+PUZ.slide = function(host, cfg, api){
+  const n = cfg.n, N = n * n, rng = api.rng; const b = Array.from({ length:N }, (_, i) => (i + 1) % N);   // 0 = vazio no fim
+  let vazio = N - 1, ant = -1;
+  const viz = i => { const r = Math.floor(i / n), c = i % n, o = []; if (r > 0) o.push(i - n); if (r < n - 1) o.push(i + n); if (c > 0) o.push(i - 1); if (c < n - 1) o.push(i + 1); return o; };
+  for (let k = 0; k < N * 16; k++) { const op = viz(vazio).filter(x => x !== ant); const t = op[Math.floor(rng() * op.length)]; b[vazio] = b[t]; b[t] = 0; ant = vazio; vazio = t; }
+  const resolvido = () => b.every((v, i) => v === (i + 1) % N);
+  if (resolvido()) { const t = viz(vazio)[0]; b[vazio] = b[t]; b[t] = 0; vazio = t; }
+  let moves = 0;
+  host.innerHTML = '<div class="pz-intro">Ordene os blocos de 1 a ' + (N - 1) + ' deslizando-os para o espaço vazio.</div>';
+  const grid = el('div', 'sl-grid'); grid.style.gridTemplateColumns = 'repeat(' + n + ',62px)'; host.appendChild(grid);
+  const info = el('div', 'pz-info', 'Movimentos: 0'); host.appendChild(info);
+  let dica = -1;
+  function draw(){
+    grid.innerHTML = '';
+    b.forEach((v, i) => {
+      const t = el('button', 'sl-tile' + (v === 0 ? ' empty' : '') + (i === dica ? ' hint' : ''), v ? String(v) : '');
+      if (v) t.style.background = 'hsl(' + Math.round(v * 360 / N) + ',55%,38%)';
+      t.addEventListener('click', () => {
+        if (!v || !viz(i).includes(vazio)) return;
+        b[vazio] = v; b[i] = 0; vazio = i; moves++; dica = -1; info.textContent = 'Movimentos: ' + moves; draw();
+        if (resolvido()) setTimeout(() => api.win(), 450);
+      });
+      grid.appendChild(t);
+    });
+  }
+  const dist = (v, i) => { if (!v) return 0; const alvo = v - 1; return Math.abs(Math.floor(i / n) - Math.floor(alvo / n)) + Math.abs(i % n - alvo % n); };
+  api.setHint(() => {
+    let melhor = -1, gan = -99;
+    viz(vazio).forEach(i => { const v = b[i]; const g = dist(v, i) - dist(v, vazio); if (g > gan) { gan = g; melhor = i; } });
+    dica = melhor; draw(); api.flash('Mova o bloco destacado.', 'good');
+  });
+  draw();
+};
+
+/* 7) campo de espinhos (dedução com números) */
+PUZ.path = function(host, cfg, api){
+  const C = cfg.c, R = cfg.r, rng = api.rng; const trap = Array(R * C).fill(true);
+  let row = Math.floor(rng() * R);
+  for (let c = 0; c < C; c++) {
+    trap[row * C + c] = false;
+    if (c < C - 1) { while (rng() < 0.45) { const nr = row + (rng() < 0.5 ? -1 : 1); if (nr >= 0 && nr < R) { row = nr; trap[row * C + c] = false; } } }
+  }
+  for (let i = 0; i < R * C; i++) if (trap[i] && rng() < 0.28) trap[i] = false;
+  const viz8 = i => { const r = Math.floor(i / C), c = i % C, o = []; for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) { if (!a && !b) continue; const rr = r + a, cc = c + b; if (rr >= 0 && rr < R && cc >= 0 && cc < C) o.push(rr * C + cc); } return o; };
+  const viz4 = i => { const r = Math.floor(i / C), c = i % C, o = []; if (r > 0) o.push(i - C); if (r < R - 1) o.push(i + C); if (c > 0) o.push(i - 1); if (c < C - 1) o.push(i + 1); return o; };
+  let pos = -1, hintCell = -1; const vis = new Set(), boom = new Set();
+  host.innerHTML = '<div class="pz-intro">Atravesse da esquerda para a direita. Cada casa pisada mostra quantos espinhos existem ao redor (8 vizinhas). Pisar num espinho custa uma vida.</div>';
+  const grid = el('div', 'pt-grid'); grid.style.gridTemplateColumns = 'repeat(' + C + ',50px)'; host.appendChild(grid);
+  function draw(){
+    grid.innerHTML = '';
+    for (let i = 0; i < R * C; i++) {
+      const c = i % C; const b = el('button', 'pt-cell' + (vis.has(i) ? ' vis' : '') + (boom.has(i) ? ' boom' : '') + (i === pos ? ' here' : '') + (i === hintCell ? ' hintc' : '') + (c === C - 1 ? ' goal' : ''));
+      b.textContent = boom.has(i) ? '✖' : (vis.has(i) ? String(viz8(i).filter(x => trap[x]).length) : (i === pos ? '●' : ''));
+      if (i === pos) b.textContent = '●';
+      b.addEventListener('click', () => {
+        const ok = (pos < 0 && c === 0) || (pos >= 0 && viz4(pos).includes(i));
+        if (!ok) return api.flash(pos < 0 ? 'Comece pela coluna da esquerda.' : 'Só dá para andar para casas vizinhas (sem diagonal).', 'bad');
+        hintCell = -1;
+        if (trap[i]) { boom.add(i); pos = -1; draw(); api.loseLife('Espinho! Você voltou ao início.'); return; }
+        pos = i; vis.add(i); draw();
+        if (c === C - 1) setTimeout(() => api.win(), 450);
+      });
+      grid.appendChild(b);
+    }
+  }
+  api.setHint(() => {
+    const fonte = pos >= 0 ? [pos] : [...Array(R).keys()].map(r => r * C).filter(i => !trap[i]);
+    const ant = new Map(); const q = fonte.slice(); fonte.forEach(i => ant.set(i, -1)); let fim = -1;
+    while (q.length) { const i = q.shift(); if (i % C === C - 1) { fim = i; break; } viz4(i).forEach(j => { if (!trap[j] && !ant.has(j)) { ant.set(j, i); q.push(j); } }); }
+    if (fim < 0) return;
+    let k = fim; while (ant.get(k) !== -1 && !(pos >= 0 && ant.get(k) === pos)) k = ant.get(k);
+    hintCell = k; draw(); api.flash('A casa destacada é segura.', 'good');
+  });
+  draw();
+};
+
+/* ---------- sala das Criptas, alçapão e portais ---------- */
+const CRYPT_X = [150, 360, 570, 780];
+ROOMS.criptas = {
+  width:1000, name:'🗝️ Criptas do Arquivista',
+  vars:'--amb1:#0e0a1f; --wallgrade:brightness(0.5) saturate(0.7) hue-rotate(205deg) contrast(1.1); --floorgrade:brightness(0.45) saturate(0.6) hue-rotate(205deg);',
+  groundY:[0.61, 0.965], doors:{ out:{ to:'biblioteca', spawn:895 } },
+  html:'<div class="room-bg"></div><div class="wall"></div><div class="floor"></div><div class="skirting"></div><div class="crypt-title">CRIPTAS DO ARQUIVISTA</div>' +
+    CRYPT_X.map((x, i) => '<div class="hotspot door arch-stone crypt-portal" data-crypt="' + i + '" style="left:' + x + 'px; bottom:42%;"><div class="glow"></div><div class="arch-img"></div><div class="lbl">' + DUNGEONS[i].ic + '</div></div>' +
+      '<div class="crypt-plate" data-p="' + i + '" style="left:' + (x - 36) + 'px"></div>').join('') +
+    '<div class="hotspot door arch-stone" data-door="out" style="left:30px; bottom:42%;"><div class="glow"></div><div class="arch-img"></div><div class="lbl">◀ SUBIR</div></div>'
+};
+TRACKS.criptas = { bpm:62, root:43, scale:SC.phr, lead:'triangle', vol:0.55, hold:2.8, perc:'bell',
+  mel:[7,N,N,N, 8,N,N,7, 5,N,N,N, 3,N,N,N, 7,N,N,8, 10,N,N,8, 7,N,5,N, 3,N,N,N], bass:[0,N,N,N,3,N,N,N] };
+MAP_NODES.push({ id:'criptas', x:50, y:30, t:'🗝️ Criptas' });
+RESIDENTS.criptas = [{ x:520, yf:0.55, nome:'Arquivista Ptolomeu', look:{ helm:'chapeu_mago', chest:'manto_mago', legs:'botas_reais', weapon:'cajado_mago' },
+  falas: () => {
+    const feitas = DUNGEONS.filter((_, i) => dgCleared(i)).length;
+    const prox = DUNGEONS.findIndex((_, i) => !dgCleared(i));
+    return [
+      'Você concluiu ' + feitas + ' de ' + DUNGEONS.length + ' dungeons e resolveu ' + (GS.puz || 0) + ' puzzles.',
+      prox >= 0 ? 'Próxima: ' + DUNGEONS[prox].nome + '. ' + (dgLockReason(prox) || 'A porta está aberta!') : 'Você dominou todas as criptas, Arquivista!',
+      'Itens dão bônus: pernas = velocidade, cabeça = dicas, peito = vidas, costas = tempo, arma = sorte. Pets reforçam um deles.',
+      'Os puzzles mudam de layout a cada dia. Volte amanhã!'
+    ];
+  } }];
+
+function criptaState(i){ return dgCleared(i) ? 'cleared' : (dgLockReason(i) ? 'locked' : 'open'); }
+function refreshCrypts(){
+  document.querySelectorAll('#roomlayer .crypt-plate').forEach(p => {
+    const i = +p.dataset.p, s = criptaState(i);
+    p.className = 'crypt-plate ' + s; p.textContent = (s === 'locked' ? '🔒 ' : (s === 'cleared' ? '✔ ' : '')) + DUNGEONS[i].nome;
+  });
+}
+const _renderRoom3 = renderRoom;
+renderRoom = function(id){
+  _renderRoom3(id);
+  if (id === 'criptas') refreshCrypts();
+  if (id === 'biblioteca') roomlayer.insertAdjacentHTML('beforeend', '<div class="hotspot crypt-enter" style="left:850px; top:446px;"><div class="td-grid"></div><div class="td-lbl">▼ CRIPTAS</div></div>');
+};
+
+function aproxima(elm){
+  const sr = stage.getBoundingClientRect(), r = elm.getBoundingClientRect();
+  const lx = (r.left - sr.left) / viewScale, lt = (r.top - sr.top) / viewScale, lw = r.width / viewScale, lh = r.height / viewScale;
+  return { ax:lx + camX + lw / 2, ay:Math.max(bounds.minY, Math.min(bounds.maxY, lt + lh + 16)), bx:lx + lw / 2, by:lt - 4 };
+}
+world.addEventListener('click', e => {
+  const en = e.target.closest('.crypt-enter');
+  if (en) { e.stopPropagation(); const p = aproxima(en); hint.style.display = 'none'; walkTo(p.ax, p.ay, () => enterRoom('criptas', 90)); return; }
+  const po = e.target.closest('.crypt-portal'); if (!po) return;
+  e.stopPropagation(); const i = +po.dataset.crypt, p = aproxima(po); hint.style.display = 'none';
+  walkTo(p.ax, p.ay, () => {
+    const why = dgLockReason(i);
+    if (why) { showBubble(p.bx, p.by, '🔒 ' + why, 4200); return; }
+    openDungeon(i);
+  });
+});
+
+/* ---------- metas extras ---------- */
+const _checkMeta3 = checkMeta;
+checkMeta = function(){
+  _checkMeta3();
+  const w = (GS.wins.pc || 0) + (GS.wins.ms || 0);
+  if (w >= 7) grantItem('dragao_fogo');
+  if (Object.keys(GS.owned).length >= 25) grantItem('coruja_meia_noite');
+  if ((GS.puz || 0) >= 25) grantItem('espectro_aurora');
+  if (GS.noHint) grantItem('dragao_gelo');
+  if (DUNGEONS.every((_, i) => dgCleared(i))) grantItem('gato_arcoiris');
+  const pets = ITEMS.filter(i => i.slot === 'pet' && i.id !== 'dragao_vazio');
+  if (pets.every(i => GS.owned[i.id])) grantItem('dragao_vazio');
+};
+if (GS.room === 'criptas' && !ROOMS.criptas) GS.room = 'rua';
+checkMeta();
 
 /*EXTRAS_JS_END*/
 
