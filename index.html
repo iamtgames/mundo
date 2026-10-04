@@ -1329,7 +1329,9 @@
   .pt-cell.goal{border-color:#ffd24d;} .pt-cell.hintc{outline:3px solid #7ee59a; animation:fxGlow 1s infinite;}
   /* sala das criptas */
   .crypt-title{position:absolute; left:50%; top:46px; transform:translateX(-50%); font-size:30px; letter-spacing:4px; color:#b9a4ff; text-shadow:0 0 12px #6c3fa0, 3px 3px 0 #000; white-space:nowrap;}
-  .crypt-plate{position:absolute; top:322px; width:150px; text-align:center; font-size:14px; line-height:1.05; color:#e9e1ff; background:rgba(10,6,20,.85); border:2px solid #3a2a55; border-radius:5px; padding:3px 4px;}
+  .inv-grid{grid-auto-rows:max-content; align-content:start;}
+  .inv-item{min-height:96px;}
+  .crypt-plate{position:absolute; top:338px; width:150px; text-align:center; font-size:14px; line-height:1.05; color:#e9e1ff; background:rgba(10,6,20,.85); border:2px solid #3a2a55; border-radius:5px; padding:3px 4px;}
   .crypt-plate.locked{color:#8a7b9e;} .crypt-plate.open{border-color:#ffd24d;} .crypt-plate.cleared{border-color:#7ee59a; color:#aef5c2;}
   .crypt-enter{position:absolute; width:90px; height:58px; cursor:pointer; z-index:3;}
   .crypt-enter .td-grid{position:absolute; inset:0; background:repeating-linear-gradient(90deg,#3a2a1a 0 8px,#2a1c10 8px 10px); border:4px solid #1a1008; border-radius:4px; box-shadow:0 0 14px rgba(155,100,255,.55), inset 0 0 12px #000;}
@@ -3617,6 +3619,7 @@ world.addEventListener('click', (e) => {
 
 
 
+
 /*EXTRAS_JS_START*/
 /* =====================================================================
    iamT World — EXTRAS: save, áudio 8-bit medieval (máx 5%), inventário/equipamentos,
@@ -5010,14 +5013,14 @@ PUZ.path = function(host, cfg, api){
 };
 
 /* ---------- sala das Criptas, alçapão e portais ---------- */
-const CRYPT_X = [150, 360, 570, 780];
+const CRYPT_X = [200, 400, 600, 800];
 ROOMS.criptas = {
   width:1000, name:'🗝️ Criptas do Arquivista',
   vars:'--amb1:#0e0a1f; --wallgrade:brightness(0.5) saturate(0.7) hue-rotate(205deg) contrast(1.1); --floorgrade:brightness(0.45) saturate(0.6) hue-rotate(205deg);',
   groundY:[0.61, 0.965], doors:{ out:{ to:'biblioteca', spawn:895 } },
   html:'<div class="room-bg"></div><div class="wall"></div><div class="floor"></div><div class="skirting"></div><div class="crypt-title">CRIPTAS DO ARQUIVISTA</div>' +
     CRYPT_X.map((x, i) => '<div class="hotspot door arch-stone crypt-portal" data-crypt="' + i + '" style="left:' + x + 'px; bottom:42%;"><div class="glow"></div><div class="arch-img"></div><div class="lbl">' + DUNGEONS[i].ic + '</div></div>' +
-      '<div class="crypt-plate" data-p="' + i + '" style="left:' + (x - 36) + 'px"></div>').join('') +
+      '<div class="crypt-plate" data-p="' + i + '" style="left:' + (x - 19) + 'px"></div>').join('') +
     '<div class="hotspot door arch-stone" data-door="out" style="left:30px; bottom:42%;"><div class="glow"></div><div class="arch-img"></div><div class="lbl">◀ SUBIR</div></div>'
 };
 TRACKS.criptas = { bpm:62, root:43, scale:SC.phr, lead:'triangle', vol:0.55, hold:2.8, perc:'bell',
