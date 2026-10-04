@@ -872,6 +872,30 @@
     border-radius:6px; padding:8px 10px; margin-bottom:6px;}
   .forge-cal-item .data{color:#ffb366; font-size:14px; min-width:68px;}
   .forge-cal-item .titulo{color:#f1e0b8; font-size:15px;}
+  /* Media Player da Locadora: player real (iframe do YouTube) + lista de animes expansível,
+     mesmo padrão do mediaplayer.exe do site colecao (um player só, sem abas). */
+  #mediaPanel .forge-box{width:560px;}
+  #mediaPanel .forge-sub{padding:0 16px; margin:8px 0;}
+  .media-player-wrap{position:relative; width:calc(100% - 32px); margin:12px 16px 0; aspect-ratio:16/9;
+    background:#000; border-radius:4px; overflow:hidden; flex:none;}
+  .media-player-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+  .media-player-empty{display:flex; align-items:center; justify-content:center; height:100%;
+    color:#a9947f; font-size:13.5px; text-align:center; padding:0 24px; line-height:1.5;}
+  .media-player-anime-list{padding:4px 16px 16px; overflow-y:auto; max-height:34vh;
+    display:flex; flex-direction:column; gap:5px;}
+  .media-anime-group{border:1px solid #3a2a1e; border-radius:6px; background:#1d140e; overflow:hidden;}
+  .media-anime-group-header{display:flex; align-items:center; gap:8px; padding:6px 8px; cursor:pointer;}
+  .media-anime-group-header:hover{background:#2a1d14;}
+  .media-anime-thumb{width:52px; height:29px; object-fit:cover; border-radius:3px; flex:none; background:#000;}
+  .media-anime-group-title{font-size:13.5px; color:#f1e0b8; flex:1; min-width:0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .media-anime-group-hint{font-size:11px; color:#8a7b80; margin-left:6px;}
+  .media-anime-episodes{display:none; flex-wrap:wrap; gap:6px; padding:0 8px 8px 8px;}
+  .media-anime-group.aberto .media-anime-episodes{display:flex;}
+  .media-episode-btn{font-size:12px; padding:4px 9px; border:1px solid #4a3226; background:#2a1d14;
+    color:#f1e0b8; border-radius:4px; cursor:pointer; font-family:'VT323',monospace;}
+  .media-episode-btn:hover{background:#3a2a1e;}
+  .media-episode-btn.ativo{background:#e2731c; border-color:#e2731c; color:#fff;}
 
   /* ---------- balão de vendedor: cabeçalho colorido por plataforma, sprite em moldura, nome,
      horário (quando existe) e foco em linhas separadas, link como botão -- bem mais elaborado
@@ -1227,19 +1251,10 @@
     <div class="forge-backdrop"></div>
     <div class="forge-box">
       <button class="forge-close" aria-label="Fechar">✕</button>
-      <div class="forge-head">📺 Locadora Online — Media Player</div>
-      <div class="forge-tabs">
-        <button class="forge-tab active" data-mtab="semana">🎬 Filme da Semana</button>
-        <button class="forge-tab" data-mtab="anime">📺 Anime Dublado</button>
-      </div>
-      <div class="forge-pane active" id="mediaPaneSemana">
-        <div class="forge-sub">mesmo painel do site — o filme é escolhido manualmente, por isso pode ficar vazio por um tempo</div>
-        <div class="forge-result"><div class="nome" id="mediaSemanaTitulo"></div></div>
-      </div>
-      <div class="forge-pane" id="mediaPaneAnime">
-        <div class="forge-sub">playlist dublada via Crunchyroll — mesma lista real do site</div>
-        <div id="mediaAnimeList"></div>
-      </div>
+      <div class="forge-head" id="mediaPlayerTituloEl">📺 Locadora Online</div>
+      <div class="media-player-wrap" id="mediaPlayerBody"></div>
+      <div class="forge-sub">anime dublado via Crunchyroll — mesmos vídeos do site, clique num título pra ver os episódios e tocar de verdade</div>
+      <div class="media-player-anime-list" id="mediaPlayerAnimeList"></div>
     </div>
   </div>
   <div id="hint">&gt; <b>WASD</b> ou clique no chão para andar · ande até as portas pra mudar de cômodo</div>
@@ -1982,17 +1997,54 @@ function renderBookshelves(){
    "Filme da Semana" é escolhido manualmente no site e por isso pode ficar vazio por um tempo;
    quando isso acontece mostramos o mesmo estado honesto do site ("Nenhum filme selecionado
    no momento"), em vez de inventar um título. ---------- */
-const LOCADORA_FILME_SEMANA = { titulo: '' };
+const LOCADORA_FILME_SEMANA = { titulo: '', tipo: 'youtube', id: '' };
+/* mesmos 42 episódios reais (com videoId do YouTube) do animePlaylist[] do site colecao --
+   cada entrada toca de verdade no player abaixo, igual ao "tocarEpisodio" do site de origem. */
 const LOCADORA_ANIME = [
-  'A Couple of Cuckoos', 'Assassination Classroom', 'BLUE LOCK', 'Bye Bye Earth',
-  'Classroom of the Elite', 'DARK MOON THE BLOOD ALTAR', 'Death March to the Parallel World Rhapsody',
-  'Gachiakuta', "Gods' Games We Play", 'Hana-Kimi', 'Hanako-kun e os Mistérios do Colégio Kamome',
-  'In the Land of Leadale', 'Laid-Back Camp', 'May I Ask For One Final Thing?',
-  'My Dress-Up Darling', 'Nyaight of the Living Cat', 'ORIENT', 'Overlord IV',
-  'Pass the Monster Meat Milady!', 'ROLL OVER AND DIE', 'Sentenced to be a Hero',
-  'Shangri-La Frontier', 'The Quintessential Quintuplets', 'TO BE HERO X',
-  'TSUKIMICHI -Moonlit Fantasy-', 'VTuber Legend: How I Went Viral after Forgetting to Turn Off My Stream',
+  {anime:'A Couple of Cuckoos',ep:1,id:'B5lfRI6iDM0'},
+  {anime:'Assassination Classroom',ep:1,id:'6AAZFV9kVg4'},
+  {anime:'BLUE LOCK',ep:1,id:'nDgB6ln16Ko'},
+  {anime:'Bye Bye, Earth',ep:1,id:'dnYFH9uQC04'},
+  {anime:'Classroom of the Elite',ep:1,id:'kHVCAOIKhB4'},
+  {anime:'DARK MOON THE BLOOD ALTAR',ep:1,id:'PTuhFMve1gk'},
+  {anime:'DARK MOON THE BLOOD ALTAR',ep:2,id:'m81CnmTFyck'},
+  {anime:'DARK MOON THE BLOOD ALTAR',ep:3,id:'tSei1JiNEVw'},
+  {anime:'Death March to the Parallel World Rhapsody',ep:1,id:'mwd7TOOEfTE'},
+  {anime:'Gachiakuta',ep:1,id:'Cb3fhlr2U30'},
+  {anime:'Gachiakuta',ep:2,id:'BtdwFFfvv_8'},
+  {anime:'Gachiakuta',ep:3,id:'dmQRY0bvTpE'},
+  {anime:"Gods' Games We Play",ep:1,id:'A0_xg_T9XXw'},
+  {anime:'Hana-Kimi',ep:1,id:'-seAxviwepg'},
+  {anime:'Hana-Kimi',ep:2,id:'eztYGJtQMd4'},
+  {anime:'Hana-Kimi',ep:3,id:'QV-bcBANaek'},
+  {anime:'Hanako-kun e os Mistérios do Colégio Kamome',ep:1,id:'4o6M9GJHuSw'},
+  {anime:'In the Land of Leadale',ep:1,id:'z7aC2KMG564'},
+  {anime:'Laid-Back Camp',ep:1,id:'71VhQHYUnV8'},
+  {anime:'May I Ask For One Final Thing?',ep:1,id:'JVSGq3SPNvE'},
+  {anime:'My Dress-Up Darling',ep:1,id:'RwrRr3NJ4gs'},
+  {anime:'My Dress-Up Darling',ep:2,id:'9bEDfpWzkRk'},
+  {anime:'My Dress-Up Darling',ep:3,id:'SsEDKHpLCz0'},
+  {anime:'Nyaight of the Living Cat',ep:1,id:'tkfPN9tcaWQ'},
+  {anime:'ORIENT',ep:1,id:'iqYgrbDP09I'},
+  {anime:'Overlord IV',ep:1,id:'3D_W7VkGbQM'},
+  {anime:'Pass the Monster Meat, Milady!',ep:1,id:'1LnAC5ezYNs'},
+  {anime:'Pass the Monster Meat, Milady!',ep:2,id:'B2OZoY3isg8'},
+  {anime:'Pass the Monster Meat, Milady!',ep:3,id:'X1B2d2BNh8M'},
+  {anime:'ROLL OVER AND DIE',ep:1,id:'XbUzKCOEU7M'},
+  {anime:'ROLL OVER AND DIE',ep:2,id:'O_p-gEohAQY'},
+  {anime:'ROLL OVER AND DIE',ep:3,id:'6etFdaR15ao'},
+  {anime:'Sentenced to be a Hero',ep:1,id:'NpaSu8RoRaI'},
+  {anime:'Sentenced to be a Hero',ep:2,id:'ECN7l3_Z2Zw'},
+  {anime:'Sentenced to be a Hero',ep:3,id:'04ys3mEi60U'},
+  {anime:'Shangri-La Frontier',ep:1,id:'AczbVZSZBzU'},
+  {anime:'The Quintessential Quintuplets',ep:1,id:'0W-rt27ZbI0'},
+  {anime:'TO BE HERO X',ep:1,id:'7gXG3OZ1lRQ'},
+  {anime:'TO BE HERO X',ep:2,id:'MbTYpZj2SAw'},
+  {anime:'TO BE HERO X',ep:3,id:'UxbPMs3Oevo'},
+  {anime:'TSUKIMICHI -Moonlit Fantasy-',ep:1,id:'l_aQnlRzB70'},
+  {anime:'VTuber Legend: How I Went Viral after Forgetting to Turn Off My Stream',ep:1,id:'3QmjJ333poY'},
 ];
+const LOCADORA_ANIME_TITULOS = [...new Set(LOCADORA_ANIME.map(e => e.anime))].sort();
 function renderLocadora(){
   const semanaRow = document.querySelector('#roomlayer .video-shelf[data-cat="semana"] .book-row');
   if (semanaRow) {
@@ -2005,7 +2057,7 @@ function renderLocadora(){
   }
   const animeRows = document.querySelectorAll('#roomlayer .video-shelf[data-cat="anime"] .book-row');
   if (animeRows.length) {
-    LOCADORA_ANIME.forEach((titulo, i) => {
+    LOCADORA_ANIME_TITULOS.forEach((titulo, i) => {
       const tape = document.createElement('div');
       const material = (i % 2 === 0) ? 'mat-cloth' : 'mat-leather';
       tape.className = 'book ' + material;
@@ -2780,27 +2832,88 @@ forgePanelEl.addEventListener('click', (e) => {
   if (e.target.classList.contains('forge-backdrop') || e.target.classList.contains('forge-close')) hideForgePanel();
 });
 
-/* ---------- painel do Media Player (Locadora Online): mesma estrutura de abas do forgePanel,
-   reaproveitando as mesmas classes visuais (.forge-overlay/.forge-tabs/...) ---------- */
+/* ---------- painel do Media Player (Locadora Online): player real (iframe do YouTube), igual ao
+   mediaplayer.exe do site colecao -- um único player compartilhado (#mediaPlayerBody): mostra o
+   Filme da Semana por padrão (ou o estado vazio honesto se ninguém escolheu um ainda) e troca pra
+   qualquer episódio de anime quando a pessoa clica num botão "Ep. N" na lista abaixo. ---------- */
 const mediaPanelEl = document.getElementById('mediaPanel');
-function switchMediaTab(tab){
-  document.querySelectorAll('#mediaPanel .forge-tab').forEach(b => b.classList.toggle('active', b.dataset.mtab === tab));
-  document.getElementById('mediaPaneSemana').classList.toggle('active', tab === 'semana');
-  document.getElementById('mediaPaneAnime').classList.toggle('active', tab === 'anime');
+
+function tocarEpisodio(id, titulo){
+  const corpo = document.getElementById('mediaPlayerBody');
+  const tituloEl = document.getElementById('mediaPlayerTituloEl');
+  if (tituloEl) tituloEl.textContent = '🎬 ' + titulo;
+  corpo.innerHTML = '';
+  const fr = document.createElement('iframe');
+  fr.src = 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&cc_load_policy=1';
+  fr.title = titulo;
+  fr.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+  fr.allowFullscreen = true;
+  fr.referrerPolicy = 'strict-origin-when-cross-origin';
+  corpo.appendChild(fr);
 }
-function mediaRenderAnime(){
-  document.getElementById('mediaAnimeList').innerHTML = LOCADORA_ANIME.map(t =>
-    '<div class="forge-cal-item"><div class="data">📼</div><div class="titulo">' + t + ' — dublado</div></div>'
-  ).join('');
+
+function renderMediaPlayerInicial(){
+  const corpo = document.getElementById('mediaPlayerBody');
+  const tituloEl = document.getElementById('mediaPlayerTituloEl');
+  corpo.innerHTML = '';
+  if (tituloEl) tituloEl.textContent = '🎬 ' + (LOCADORA_FILME_SEMANA.titulo || 'Locadora Online');
+  if (!LOCADORA_FILME_SEMANA.id) {
+    const vazio = document.createElement('div');
+    vazio.className = 'media-player-empty';
+    vazio.textContent = 'Nenhum filme selecionado essa semana. Volte em breve! Enquanto isso, escolha um anime dublado aqui embaixo.';
+    corpo.appendChild(vazio);
+    return;
+  }
+  tocarEpisodio(LOCADORA_FILME_SEMANA.id, LOCADORA_FILME_SEMANA.titulo);
 }
-function showMediaPanel(tab){
+
+function renderAnimePlaylist(){
+  const cont = document.getElementById('mediaPlayerAnimeList');
+  const porAnime = {};
+  LOCADORA_ANIME.forEach(e => { (porAnime[e.anime] = porAnime[e.anime] || []).push(e); });
+  const animes = Object.keys(porAnime).sort();
+  cont.innerHTML = animes.map(nome => {
+    const lista = porAnime[nome].slice().sort((a, b) => a.ep - b.ep);
+    const thumbUrl = 'https://img.youtube.com/vi/' + encodeURIComponent(lista[0].id) + '/mqdefault.jpg';
+    const epsHtml = lista.map(e =>
+      '<button class="media-episode-btn" data-id="' + esc(e.id) + '" data-titulo="' + esc(nome + ' - Episódio ' + e.ep) + '">Ep. ' + e.ep + '</button>'
+    ).join('');
+    return '<div class="media-anime-group">' +
+      '<div class="media-anime-group-header">' +
+        '<img class="media-anime-thumb" loading="lazy" src="' + thumbUrl + '" alt="' + esc(nome) + '">' +
+        '<div class="media-anime-group-title">' + esc(nome) + '</div>' +
+        '<span class="media-anime-group-hint">ver episódios</span>' +
+      '</div>' +
+      '<div class="media-anime-episodes">' + epsHtml + '</div>' +
+    '</div>';
+  }).join('');
+  cont.querySelectorAll('.media-anime-group-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const grupo = header.closest('.media-anime-group');
+      const jaAberto = grupo.classList.contains('aberto');
+      cont.querySelectorAll('.media-anime-group.aberto').forEach(g => g.classList.remove('aberto'));
+      if (!jaAberto) grupo.classList.add('aberto');
+    });
+  });
+  cont.querySelectorAll('.media-episode-btn').forEach(btn => {
+    btn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
+      tocarEpisodio(btn.dataset.id, btn.dataset.titulo);
+      cont.querySelectorAll('.media-episode-btn.ativo').forEach(b => b.classList.remove('ativo'));
+      btn.classList.add('ativo');
+    });
+  });
+}
+
+function showMediaPanel(){
   mediaPanelEl.classList.add('show');
-  switchMediaTab(tab || 'semana');
-  document.getElementById('mediaSemanaTitulo').textContent = LOCADORA_FILME_SEMANA.titulo || 'Nenhum filme selecionado no momento';
-  mediaRenderAnime();
+  renderMediaPlayerInicial();
+  renderAnimePlaylist();
 }
-function hideMediaPanel(){ mediaPanelEl.classList.remove('show'); }
-document.querySelectorAll('#mediaPanel .forge-tab').forEach(b => b.addEventListener('click', () => switchMediaTab(b.dataset.mtab)));
+function hideMediaPanel(){
+  mediaPanelEl.classList.remove('show');
+  document.getElementById('mediaPlayerBody').innerHTML = ''; // para o vídeo de verdade ao fechar
+}
 mediaPanelEl.addEventListener('click', (e) => {
   if (e.target.classList.contains('forge-backdrop') || e.target.classList.contains('forge-close')) hideMediaPanel();
 });
@@ -3246,7 +3359,7 @@ world.addEventListener('click', (e) => {
   const key = tape.dataset.tape;
   const label = key === 'semana'
     ? '🎬 ' + (LOCADORA_FILME_SEMANA.titulo || 'Nenhum filme selecionado no momento')
-    : '📺 ' + LOCADORA_ANIME[parseInt(key.split(':')[1], 10)] + ' (dublado)';
+    : '📺 ' + LOCADORA_ANIME_TITULOS[parseInt(key.split(':')[1], 10)] + ' (dublado)';
   const sr = stage.getBoundingClientRect();
   const r = tape.getBoundingClientRect();
   const bx = (r.left - sr.left) / viewScale + (r.width / viewScale) / 2;
