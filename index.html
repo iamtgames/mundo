@@ -1341,6 +1341,11 @@
   .crypt-enter .td-lbl{position:absolute; left:-6px; right:-6px; bottom:-18px; text-align:center; font-size:13px; color:#d9c7ff; text-shadow:2px 2px 0 #000; white-space:nowrap;}
   .crypt-enter:hover .td-grid{box-shadow:0 0 22px rgba(190,140,255,.95), inset 0 0 12px #000;}
   @media(max-width:760px){ .qz-opts{grid-template-columns:1fr;} .dg-body{padding:8px 10px;} }
+
+  .nbub{position:absolute; transform:translateX(-50%); z-index:85; max-width:230px; min-width:60px; padding:3px 8px 4px; background:#f5e6c0; color:#2a1a10; border:2px solid #000; border-radius:7px; font-family:'VT323',monospace; font-size:17px; line-height:1.05; text-align:left; pointer-events:none; box-shadow:0 3px 0 rgba(0,0,0,.35); animation:nbubIn .18s ease-out;}
+  .nbub b{display:block; font-weight:normal; font-size:14px; color:#7a3b10; letter-spacing:.3px;}
+  .nbub::after{content:''; position:absolute; left:50%; bottom:-8px; width:10px; height:10px; background:#f5e6c0; border-right:2px solid #000; border-bottom:2px solid #000; transform:translateX(-50%) rotate(45deg);}
+  @keyframes nbubIn{from{opacity:0; transform:translateX(-50%) translateY(4px);}to{opacity:1; transform:translateX(-50%) translateY(0);}}
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3625,6 +3630,8 @@ world.addEventListener('click', (e) => {
 
 
 
+
+
 /*EXTRAS_JS_START*/
 /* =====================================================================
    iamT World — EXTRAS: save, áudio 8-bit medieval (máx 5%), inventário/equipamentos,
@@ -5131,6 +5138,619 @@ checkMeta = function(){
 };
 if (GS.room === 'criptas' && !ROOMS.criptas) GS.room = 'rua';
 checkMeta();
+
+/* =====================================================================
+   EXTRAS 4 — banco de falas dos moradores (12 NPCs, 100+ falas cada).
+   Cada fala é uma de: frase de personalidade, dado real do site (coleção,
+   Cinema, Tenda, Locadora, calendário da forja, clima, hora, progresso do
+   jogador), menção a outro morador, ou frase de hora/clima. Nada inventado.
+   ===================================================================== */
+function dt(s){ return String(s || '').split('-').reverse().join('/'); }
+const D = {
+  hora: () => marianaClock(),
+  dia: () => new Date().toLocaleDateString('pt-BR', { weekday:'long', timeZone:'America/Sao_Paulo' }),
+  clima: () => stage.classList.contains('rainy') ? 'chuva' : (stage.classList.contains('cloudy') ? 'nublado' : 'céu aberto'),
+  chove: () => stage.classList.contains('rainy'),
+  nJ: () => JOGOS_COLECAO.length,
+  plats: () => [...new Set(JOGOS_COLECAO.map(j => j.plat))].sort(),
+  nPlat: p => JOGOS_COLECAO.filter(j => j.plat === p).length,
+  cats: () => [...new Set(JOGOS_COLECAO.map(j => j.cat))].sort(),
+  nCat: c => JOGOS_COLECAO.filter(j => j.cat === c).length,
+  jogo: () => pick(JOGOS_COLECAO),
+  nRaros: () => JOGOS_COLECAO.filter(j => j.rar === 'raro' || j.rar === 'muito').length,
+  canais: () => CANAIS_CINEMA.length,
+  vivos: () => CANAIS_CINEMA.filter(c => c.live).map(c => c.n),
+  nVend: () => VENDEDORES_LOJA.length,
+  vend: () => pick(VENDEDORES_LOJA),
+  nAnime: () => LOCADORA_ANIME_TITULOS.length,
+  anime: () => pick(LOCADORA_ANIME_TITULOS),
+  eps: a => LOCADORA_ANIME.filter(e => e.anime === a).length,
+  filme: () => (typeof LOCADORA_FILME_SEMANA !== 'undefined' && LOCADORA_FILME_SEMANA) ? LOCADORA_FILME_SEMANA.titulo : '',
+  prox: i => (typeof forgeLancamentosCache !== 'undefined' && forgeLancamentosCache) ? forgeLancamentosCache[i] : null,
+  itens: () => Object.keys(GS.owned).length, totalItens: () => ITEMS.length,
+  pets: () => ITEMS.filter(i => i.slot === 'pet' && GS.owned[i.id]).length,
+  dungs: () => DUNGEONS.filter((_, i) => dgCleared(i)).length,
+  puz: () => GS.puz || 0, seg: () => Object.keys(GS.found).length, nSeg: () => SECRETS.length,
+  vit: () => (GS.wins.pc || 0) + (GS.wins.ms || 0), min: () => Math.floor(GS.t / 60),
+  salas: () => Object.keys(GS.rooms).length, nSalas: () => Object.keys(ROOMS).length,
+  nRuaPortas: () => Object.keys(ROOMS.rua.doors).length
+};
+/* 18 falas de dados reais, compartilhadas (cada morador as diz do seu jeito) */
+const G = [
+  () => 'A coleção tem ' + D.nJ() + ' jogos: ' + contaPlat() + '.',
+  () => { const p = pick(D.plats()); return 'Na estante ' + p + ' existem ' + D.nPlat(p) + ' jogos.'; },
+  () => { const j = D.jogo(); return 'Já jogou ' + j.n + ' (' + j.plat + ')?'; },
+  () => { const c = pick(D.cats()); return 'São ' + D.nCat(c) + ' jogos da categoria "' + c + '" na coleção.'; },
+  () => 'Entre os jogos, ' + D.nRaros() + ' são raros ou muito raros.',
+  () => 'O Cinema monitora ' + D.canais() + ' canais.',
+  () => { const v = D.vivos(); return v.length ? 'Ao vivo agora: ' + v.join(', ') + '.' : 'Nenhum canal está ao vivo neste momento.'; },
+  () => 'A Tenda tem ' + plural(D.nVend(), 'vendedor', 'vendedores') + '.',
+  () => { const v = D.vend(); return 'Já visitou ' + v.n + ' na Tenda?'; },
+  () => 'A Locadora tem ' + D.nAnime() + ' animes dublados.',
+  () => { const a = D.anime(); return 'Que tal ' + a + '? São ' + plural(D.eps(a), 'episódio', 'episódios') + '.'; },
+  () => D.filme() ? 'O filme da semana na Locadora é ' + D.filme() + '.' : null,
+  () => { const p = D.prox(0); return p ? 'Próximo lançamento: ' + p.n + ' (' + p.plat + ') em ' + dt(p.data) + '.' : null; },
+  () => { const p = D.prox(1); return p ? 'E depois dele vem ' + p.n + ' (' + p.plat + ') em ' + dt(p.data) + '.' : null; },
+  () => 'Em Mariana são ' + D.hora() + ' e o tempo está com ' + D.clima() + '.',
+  () => 'Você já juntou ' + D.itens() + ' de ' + D.totalItens() + ' itens.',
+  () => 'Você concluiu ' + D.dungs() + ' de ' + DUNGEONS.length + ' dungeons e resolveu ' + D.puz() + ' puzzles.',
+  () => 'Você tem ' + plural(D.pets(), 'pet', 'pets') + ' e achou ' + D.seg() + ' de ' + D.nSeg() + ' segredos.'
+];
+/* assunto das conversas entre moradores (dados reais) */
+const TOPICOS = {
+  hora: () => 'São ' + D.hora() + ' em Mariana.',
+  clima: () => 'Lá fora está com ' + D.clima() + '.',
+  live: () => { const v = D.vivos(); return v.length ? 'Dizem que ' + v.join(', ') + ' está ao vivo no Cinema.' : 'Nenhum canal ao vivo agora, pelo que ouvi.'; },
+  jogos: () => 'A coleção da biblioteca já tem ' + D.nJ() + ' jogos.',
+  lancamento: () => { const p = D.prox(0); return p ? 'O próximo lançamento do calendário é ' + p.n + ', em ' + dt(p.data) + '.' : 'Ainda não vi lançamentos no calendário.'; },
+  anime: () => 'A Locadora tem ' + D.nAnime() + ' animes dublados.',
+  loja: () => 'A Tenda tem ' + plural(D.nVend(), 'vendedor', 'vendedores') + '.',
+  aventureiro: () => 'Aquele aventureiro já tem ' + D.itens() + ' itens e ' + plural(D.pets(), 'pet', 'pets') + '.'
+};
+
+const NPC_TXT = {};
+
+NPC_TXT.tadeu = {
+  w: ['', 'Relatório da ronda: ', 'Anotado no caderno: ', 'Atenção, aventureiro: '],
+  f: [`Ronda tranquila hoje. Do jeito que eu gosto.`, `Meu trabalho é simples: manter a rua em ordem e os aventureiros em segurança.`, `Esta espada é de ferro, mas o que mais corta é a minha disciplina.`, `Já contei os paralelepípedos desta rua. Faltam três. Alguém levou, eu juro.`, `Se perder o caminho, siga as setas da placa de madeira.`, `Nunca baixe a guarda, aventureiro. Nem na hora do almoço.`, `Cada porta desta rua leva a um lugar diferente. Escolha com sabedoria.`, `O barril? Nada suspeito. Eu verifiquei duas vezes.`, `Quem ronda de dia dorme tranquilo à noite.`, `Ficar parado também é uma forma de vigiar.`, `Já enfrentei mais caixas suspeitas do que qualquer guarda da região.`, `Se ouvir um barulho estranho vindo de uma caixa, avise-me.`, `A rua é o coração da cidade. Eu cuido do coração.`, `Meu capacete é pesado, mas a responsabilidade pesa mais.`, `Um bom guarda conhece todos os moradores pelo nome.`, `Aqui ninguém passa fome nem frio enquanto eu estiver de ronda. Quase ninguém.`, `Respeite as placas, ajude os vizinhos e olhe sempre para os dois lados.`, `Prefiro uma rua silenciosa a uma rua cheia de problemas.`, `Já pensei em me aposentar, mas quem vigiaria a esquina?`, `Os pássaros me fazem companhia nas rondas.`, `Quer um conselho? Beba água e não confie em escadas bambas.`, `A lanterna do meu posto nunca apagou. Nem uma noite.`, `Tenho um caderno só para anotar ocorrências. A maioria é sobre gatos.`, `Se o mundo fosse perfeito, eu estaria pescando no lago.`, `Dizem que há criptas sob a biblioteca. Eu prefiro nem pensar.`, `Os viajantes vêm e vão, mas a rua fica.`, `Já ajudei um viajante perdido a achar o Saloon. Foi emocionante.`, `Meu lema: prevenir é melhor que correr atrás.`, `Cada manhã, a primeira coisa que faço é saudar o sol.`, `Um guarda feliz é um guarda atento.`, `Prestou atenção nos telhados? Cada prédio tem seu estilo.`, `Se encontrar um segredo escondido, guarde para você. Eu não vi nada.`, `A cidade parece pequena, mas esconde muita coisa.`, `Hoje a minha tarefa é caminhar. Amanhã também.`, `Gosto quando a rua tem movimento. Significa que está tudo bem.`, `Ajudo quem precisa e vigio quem não precisa. É a regra de ouro.`, `Já fui chamado de teimoso. Prefiro "persistente".`, `Boa caminhada, aventureiro. A rua é sua também.`],
+  d: [() => 'Ronda das ' + D.hora() + ': tudo em ordem.', () => 'Hoje é ' + D.dia() + '. Dia de ronda como qualquer outro.', () => 'A rua tem ' + D.nRuaPortas() + ' portas e eu vigio todas.', () => D.chove() ? 'Chuva lá fora. Capa de guarda não fura.' : 'Sem chuva por enquanto. Ronda tranquila.', () => 'Você visitou ' + D.salas() + ' de ' + D.nSalas() + ' lugares do mundo. Bom explorador.', () => D.vivos().length ? 'Muita gente entrando no Cinema: tem live rolando.' : 'O Cinema está calmo. Nenhuma live no momento.', () => 'Você ficou ' + D.min() + ' minutos por aqui. Bom ter você na cidade.', () => 'Contei ' + D.nVend() + ' vendedores na Tenda. Todos de ronda tranquila.', () => 'Vi o aventureiro com ' + D.itens() + ' itens. Dá gosto de ver.', () => 'Mais de ' + D.nJ() + ' jogos guardados na biblioteca. Um tesouro e tanto.', () => D.vit() ? 'Soube que você já venceu ' + plural(D.vit(), 'partida', 'partidas') + ' no Saloon.' : 'No Saloon rolam partidas. Dizem que dão prêmios.', () => 'Há ' + D.nAnime() + ' animes dublados na Locadora. Nenhuma ocorrência registrada.'],
+  r: { hora: `Anotado. Ronda em dia.`, clima: `Entendido. Capa de guarda a postos.`, live: `Cuide do movimento na porta do Cinema, então.`, jogos: `Uma coleção dessas merece vigilância.`, lancamento: `Vou reforçar a ronda nesse dia.`, anime: `Maratona vigiada é maratona segura.`, loja: `Vou passar na Tenda para conferir tudo.`, aventureiro: `Esse aventureiro tem futuro. E bom equipamento.` },
+  rg: [`Interessante. Vou anotar.`, `Obrigado pelo aviso.`, `Tudo em ordem, então.`, `Sem novidades graves, melhor assim.`],
+  s: [`Fico de olho em {n}. Figura ilustre da cidade.`, `Se encontrar {n} por aí, mande lembranças da guarda.`, `Sobre {n}: nunca deu trabalho. Quase nunca.`],
+  t: { dawn: `Amanhecer é a melhor hora da ronda.`, morn: `Manhã tranquila, rua limpa.`, noon: `Hora do almoço: a rua esvazia e eu aproveito o silêncio.`, aft: `Tarde calma, só um gato fugindo do sol.`, eve: `Entardecer: hora de acender os lampiões.`, night: `A noite é minha. Boa noite, aventureiro.`, mad: `Madrugada... só os guardas e as corujas.`, rain: `Chuva! Capa de guarda e botas firmes.`, cloud: `Céu nublado, bom para caminhar.`, clear: `Sol aberto. Meu capacete esquenta, mas a vigilância não.`, wk: `Fim de semana: o movimento aumenta e minha atenção também.` }
+};
+
+NPC_TXT.lucia = {
+  w: ['', 'Sussurrando: ', 'Veja só... ', 'Entre os livros, descobri que: '],
+  f: [`Shhh... aqui os jogos descansam entre as capas.`, `Cada lombada nesta estante guarda uma aventura diferente.`, `Organizo a coleção por plataforma: PS4, PS3 e PS5.`, `Uma biblioteca sem silêncio é só um depósito barulhento.`, `Tenho uma regra: ninguém sai sem ao menos ler a contracapa.`, `Já espanei estas prateleiras mais vezes do que consigo contar.`, `Os títulos mais antigos costumam ter as melhores histórias.`, `Ler é viajar sem sair do lugar. Jogar também.`, `Se procura algo, olhe com atenção: nem tudo está à vista.`, `Minha xícara de chá esfria toda vez que alguém me pergunta algo interessante.`, `O cheiro de papel antigo é o meu perfume favorito.`, `Uma boa estante é como um bom jardim: precisa de cuidado.`, `Há quem diga que há uma passagem secreta por aqui. Quem diria.`, `Não empreste sem anotar. A memória engana.`, `Aprendi que organizar é uma forma de carinho.`, `Quer uma recomendação? Escolha pela capa, depois pela curiosidade.`, `A luz da vela aqui é suave para não cansar os olhos.`, `Cada estante tem um segredo. A minha tem mais de um.`, `Eu catalogo, você descobre. Funciona bem para nós dois.`, `O silêncio é o melhor conselheiro de quem lê.`, `Às vezes uma pergunta vale mais que cem respostas.`, `Um dia ainda vou ler todos os títulos desta casa. Um dia.`, `As capas coloridas me lembram jardins de papel.`, `Se um livro cair, peça desculpa. Eles sentem.`, `Pergunte à vontade, mas sussurre.`, `Aqui a ordem é alfabética... exceto quando não é.`, `A coleção cresce devagar, como todo bom hábito.`, `Prefiro chá preto, mas aceito um bom mate.`, `Alguns títulos vêm de longe, outros nasceram aqui.`, `Tudo que se organiza com paciência dura mais.`, `Existe um jeito de alcançar o topo da estante PS5. Não me pergunte como sei.`, `Um livro bem cuidado atravessa gerações.`, `Gosto de ver os aventureiros folheando devagar.`, `Quando fecho a biblioteca, ouço as histórias sussurrando.`, `O mundo é grande, mas cabe numa estante.`, `Não subestime os títulos esquecidos no canto.`, `Todo jogador é um leitor que ainda não percebeu.`, `Volte sempre. A estante também sente saudade.`],
+  d: [() => 'Temos ' + D.nJ() + ' jogos catalogados: ' + contaPlat() + '.', () => { const p = pick(D.plats()); return 'A estante ' + p + ' é a minha favorita hoje, com ' + D.nPlat(p) + ' títulos.'; }, () => { const j = D.jogo(); return 'Procure ' + j.n + ' na estante ' + j.plat + '.'; }, () => { const c = pick(D.cats()); return 'Classifico ' + D.nCat(c) + ' jogos como "' + c + '".'; }, () => D.nRaros() + ' dos nossos títulos são raros ou muito raros. Cuide bem deles.', () => 'Você já abriu ' + D.seg() + ' segredos escondidos. Um leitor atento.', () => { const j = D.jogo(); return 'Lembra de ' + j.n + '? Está lá, esperando na prateleira.'; }, () => 'São ' + D.hora() + '. A biblioteca fecha quando o último leitor sai.', () => { const j = D.jogo(), k = D.jogo(); return 'Entre ' + j.n + ' e ' + k.n + ', qual vai escolher hoje?'; }, () => 'Tenho ' + D.nPlat('PS4') + ' títulos em PS4, ' + D.nPlat('PS5') + ' em PS5 e ' + D.nPlat('PS3') + ' em PS3.', () => D.pets() ? 'Vi seu pet farejando entre os livros. Educado.' : 'Um pet de companhia seria bem-vindo, desde que não derrube livros.', () => 'Você visitou ' + D.salas() + ' salas do mundo. A biblioteca é a mais calma, não acha?'],
+  r: { hora: `Já? O tempo passa entre as páginas.`, clima: `Bom clima para ler.`, live: `Prefiro as histórias em papel, mas respeito.`, jogos: `Todos catalogados, pode confiar.`, lancamento: `Vou reservar um espaço na estante.`, anime: `Dublagem também é uma forma de leitura.`, loja: `Se acharem algo raro, me avisem.`, aventureiro: `Um leitor atento! Que bom.` },
+  rg: [`Que interessante.`, `Fico feliz em saber.`, `Vamos manter isso em silêncio... mais ou menos.`, `Mais um assunto para o meu caderno.`],
+  s: [`Gostaria de ver {n} passar mais tempo entre os livros.`, `Já indiquei uma leitura a {n}. Nem sempre é seguida.`, `Dizem que {n} tem boas histórias. Anotei.`],
+  t: { dawn: `Antes do sol, o silêncio é perfeito para ler.`, morn: `A luz da manhã cai direto sobre a estante PS4.`, noon: `No almoço, a biblioteca respira.`, aft: `Tarde é hora de chá e organização.`, eve: `Entardece e as lombadas ganham tom dourado.`, night: `À noite, as velas fazem as capas brilharem.`, mad: `Madrugada é quando as histórias sussurram.`, rain: `Chuva batendo na janela é a trilha ideal de leitura.`, cloud: `Nublado combina com biblioteca.`, clear: `O sol entra pela janela e acorda as capas.`, wk: `No fim de semana, mais leitores aparecem.` }
+};
+
+NPC_TXT.ferreiro = {
+  w: ['', 'Escute bem: ', 'Entre uma martelada e outra: ', 'Olha, amigo: '],
+  f: [`Ferro só vira espada depois de apanhar bastante.`, `Martelada boa é a que acerta o prego e o humor do dia.`, `A forja nunca apaga, só dorme de olho aberto.`, `Quente, bate; frio, espera. Regra de ferreiro.`, `Minha bigorna tem mais histórias que muito livro.`, `Nada de pressa: aço apressado quebra.`, `O segredo de uma boa lâmina? Paciência e carvão bom.`, `Aqui tudo tem preço justo, até o meu mau humor.`, `Já forjei de tudo, menos paciência com mosca.`, `O som do martelo é a minha música favorita.`, `Cuide do seu equipamento e ele cuidará de você.`, `Se a armadura apertar, volte aqui que eu ajusto.`, `Machado bem afiado corta até conversa fiada.`, `O fogo ensina mais que qualquer professor.`, `Já derreti um caldeirão por distração. Foi uma tarde cara.`, `Metal não mente: ou aguenta ou quebra.`, `Gosto de gente que chega com as mãos sujas de trabalho.`, `Minha barba já pegou fogo duas vezes. Uma foi de propósito.`, `Nada se perde, tudo se transforma, principalmente em ferradura.`, `O baú do canto guarda mais do que ferramentas.`, `Uma forja organizada é uma forja segura.`, `Meu avô já dizia: bate hoje, tempera amanhã.`, `Prefiro conversar batendo. Ajuda a pensar.`, `Toda arma boa começa com um bom plano e um bom carvão.`, `Calor é ferramenta, não inimigo.`, `Quem tem pressa come cru. Quem tem paciência forja.`, `Já ouviu o som do metal esfriando? É quase uma canção.`, `Se o martelo caiu do prego, nunca foi culpa do martelo.`, `Respeito pelo fogo é o primeiro ensinamento da casa.`, `Uma boa ferramenta dura mais que o ferreiro.`, `O brilho de um aço recém-forjado ninguém esquece.`, `Não toque na brasa. Eu aviso uma vez só.`, `Cada marca na bigorna é uma lição aprendida.`, `O trabalho de hoje é o orgulho de amanhã.`, `Gosto de ver quem pergunta antes de pegar o martelo.`, `Cinza também é sinal de que houve fogo bom.`, `Bateu, esfriou, afiou. Simples assim.`, `Volte quando precisar de ferro e conversa.`],
+  d: [() => { const p = D.prox(0); return p ? 'Próximo lançamento no calendário da forja: ' + p.n + ' (' + p.plat + ') em ' + dt(p.data) + '.' : 'O calendário da forja ainda está esquentando.'; }, () => { const p = D.prox(1); return p ? 'Depois vem ' + p.n + ' em ' + dt(p.data) + '. Anotei na parede.' : null; }, () => { const p = D.prox(2); return p ? 'Terceiro da fila: ' + p.n + ' (' + p.plat + ').' : null; }, () => 'Você tem ' + D.itens() + ' itens. Alguns eu poderia ter forjado.', () => D.chove() ? 'Chuva é boa para esfriar o aço.' : 'Dia seco, forja a todo vapor.', () => 'Já são ' + D.hora() + ' e a forja não parou.', () => 'Já olhou dentro do baú? Dizem que tem machado escondido.', () => 'A forja mostra preços reais, estatísticas e calendário. Use as três estações.', () => 'Contei os ' + D.nJ() + ' jogos da coleção. Dá mais trabalho que contar pregos.', () => D.vit() ? 'Ouvi dizer que você venceu ' + plural(D.vit(), 'partida', 'partidas') + '. Merece uma armadura nova.' : 'Quem vence no Saloon leva armadura. Vá lá, aventureiro.', () => 'Você concluiu ' + D.dungs() + ' dungeons. Quem volta das criptas precisa de bom equipamento.', () => 'Hoje é ' + D.dia() + '. Dia bom para bater ferro.'],
+  r: { hora: `Hora de bater mais ferro!`, clima: `Tempo bom para forjar.`, live: `Quando a forja descansar, eu vou ver.`, jogos: `Dá para forjar uma vitrine para tudo isso.`, lancamento: `Já anotei na parede da forja.`, anime: `Eu gosto de ouvir martelo, não de assistir!`, loja: `Se tiver ferramenta boa, me chamem.`, aventureiro: `Se precisar de reparo, mande-o aqui.` },
+  rg: [`Hm. Bom saber.`, `Isso merece uma martelada de aprovação.`, `Volte quando tiver mais novidade.`, `Entendido, amigo.`],
+  s: [`Se {n} precisar de reparo, a forja está aberta.`, `Já fiz uma peça sob medida para {n}. Ficou boa.`, `Falando em {n}: bom papo, melhor ainda com o martelo parado.`],
+  t: { dawn: `Acendo a forja antes do sol nascer.`, morn: `Manhã é hora de ferro novo.`, noon: `Meio-dia: o carvão está no ponto.`, aft: `Tarde é de afiar e polir.`, eve: `No entardecer, o aço brilha mais.`, night: `À noite a forja é a única luz da oficina.`, mad: `Madrugada? Só se for urgente.`, rain: `Chuva ajuda a esfriar o metal. Bom sinal.`, cloud: `Nublado, forja mais quente. Trabalho rende.`, clear: `Dia aberto: porta da oficina escancarada.`, wk: `Fim de semana também tem ferro para bater.` }
+};
+
+NPC_TXT.bruno = {
+  w: ['', 'Fofoca fresca: ', 'Cá entre nós: ', 'Sabe o que me contaram? '],
+  f: [`Aqui, a cidra é gelada e a fofoca é quente!`, `Sentou? Então é cliente. Falou? Então é amigo.`, `Já ouvi mais histórias neste balcão do que uma biblioteca inteira.`, `Cada banco do Saloon tem um segredo. Alguns têm dois.`, `Jogo limpo, mesa limpa e copo cheio. Meu lema.`, `Quer saber de tudo? Escute mais e fale menos. Aprendi aqui.`, `O bom taverneiro serve a bebida e guarda o segredo.`, `Teve um dia que a mesa de Paciência quase pegou fogo de tanta emoção!`, `Campo Minado é bom para quem gosta de adrenalina sem perigo.`, `Brindar sozinho é triste. Brindar acompanhado é tradição.`, `Meu avental já viu mais batalhas que muita armadura.`, `Cada ficha deste Saloon já mudou de mão mil vezes.`, `Música boa, mesa cheia e piada ruim: o tripé do Saloon.`, `Já tentei contar uma piada boa. A plateia ainda está rindo da tentativa.`, `Quem perde na mesa ganha uma boa história para contar.`, `Aqui ninguém sai triste. No máximo, sai com mais sede.`, `O silêncio pesa. Por isso mantenho a taverna barulhenta.`, `Se a rua cansa, o Saloon abraça.`, `Eu lavo copos desde antes de você nascer. Quase.`, `A melhor mesa é aquela onde ninguém trapaceia. Nem eu.`, `Ouvi dizer que o Ferreiro faz as melhores canecas de ferro.`, `Tem sempre um banco vazio esperando por você.`, `Todo mundo tem uma história. Eu só sirvo o palco.`, `Paciência é o jogo; paciência também é o remédio.`, `O barulho das cartas é a minha trilha sonora.`, `Por aqui, vitória merece um brinde. Derrota também.`, `Gosto de gente que chega ao Saloon com vontade de rir.`, `Uma boa taverna é como um bom abraço: acolhe sem perguntar.`, `Sempre achei que o melhor lugar do mundo é o outro lado do balcão.`, `Mesa limpa, copo seco, coração leve.`, `Já vi gente ganhar e perder tudo na mesma rodada. Que espetáculo.`, `Aqui não tem lugar marcado, só lugar disputado.`, `Dizem que sou fofoqueiro. Eu prefiro "bem informado".`, `O Saloon é pequeno, mas a vida dentro dele é grande.`, `A noite aqui nunca termina cedo.`, `Pergunte pelo jogo da casa. Só não aposte seu chapéu.`, `Quem entra por curiosidade volta por saudade.`, `Saúde, aventureiro! Até a próxima rodada.`],
+  d: [() => 'Você venceu ' + plural(D.vit(), 'partida', 'partidas') + ' no meu Saloon. ' + (D.vit() ? 'Respeito!' : 'Que tal começar hoje?'), () => D.vivos().length ? 'Quem vem do Cinema diz que ' + D.vivos().join(', ') + ' está ao vivo!' : 'Hoje o povo do Cinema está sem live. Vêm todos para cá.', () => 'São ' + D.hora() + ' em Mariana. Hora de uma cidra!', () => D.chove() ? 'Com essa chuva, o Saloon enche.' : 'Dia bonito, mas o Saloon sempre acolhe.', () => 'Já são ' + D.itens() + ' itens no seu inventário. Impressionante.', () => 'Ouvi dizer que você tem ' + plural(D.pets(), 'pet', 'pets') + '. Aqui bicho de estimação bebe água.', () => 'Hoje é ' + D.dia() + '. Dia bom para uma partida.', () => { const j = D.jogo(); return 'O povo falava de ' + j.n + ' hoje. Já jogou?'; }, () => 'Aqui se fala de ' + D.nAnime() + ' animes dublados e ' + D.canais() + ' canais. O povo anda bem entretido.', () => D.puz() ? 'Diz a fofoca que você resolveu ' + D.puz() + ' puzzles nas criptas.' : 'Dizem que há criptas sob a biblioteca. Quem entrou nunca me contou.', () => 'Lá fora: ' + D.clima() + '. Aqui dentro: música e ' + plural(D.vit(), 'vitória sua', 'vitórias suas') + '.', () => { const p = D.prox(0); return p ? 'Ouvi do Ferreiro que ' + p.n + ' sai em ' + dt(p.data) + '. Vai ter comemoração!' : null; }],
+  r: { hora: `Já é essa hora? Mais uma rodada!`, clima: `Chuva ou sol, o Saloon está aberto.`, live: `Então o povo vai encher o Saloon depois!`, jogos: `Com tanto jogo, só falta mesa!`, lancamento: `Vai ter brinde nesse dia, pode apostar!`, anime: `Anime dublado e cidra, combinação perfeita.`, loja: `Vendedor bom enche meu balcão de fregueses.`, aventureiro: `Esse aí vai longe. Eu sinto!` },
+  rg: [`Boa essa!`, `Eita, não sabia!`, `Isso rende uma boa história.`, `Depois me conte mais!`],
+  s: [`{n} sempre dá um jeito de passar aqui para um papo.`, `Sobre {n}, só digo uma coisa: conta boas histórias.`, `Já servi uma rodada para {n}. Foi memorável.`],
+  t: { dawn: `Cedinho assim só o café está aberto.`, morn: `Manhã é hora de arrumar o Saloon.`, noon: `Meio-dia: primeira rodada de suco!`, aft: `Tarde é de partida lenta e conversa boa.`, eve: `Entardece e o Saloon começa a encher.`, night: `Noite é o horário nobre do Saloon!`, mad: `Madrugada? Os últimos clientes ainda estão aqui.`, rain: `Chuva é bom negócio para taverna.`, cloud: `Nublado traz freguês para dentro.`, clear: `Dia bonito, mas sempre tem lugar à sombra.`, wk: `Fim de semana: casa cheia!` }
+};
+
+NPC_TXT.caio = {
+  w: ['', 'Com a luz baixa: ', 'Na penumbra da sala: ', 'Bem baixinho: '],
+  f: [`Shh... o filme está quase começando.`, `Gosto da escuridão do cinema. Tudo parece possível.`, `Minha lanterna já guiou muita gente até a poltrona certa.`, `Cada tela aqui mostra um canal diferente. São vários mundos ao mesmo tempo.`, `Quando uma live começa, a tela acende sozinha. Parece mágica.`, `Pipoca fria é o terror dos cinéfilos.`, `Prefiro as cenas silenciosas. Dizem mais que mil falas.`, `Atrás das cortinas costuma haver surpresas.`, `Quem chega atrasado perde o começo. Quem chega cedo ganha a melhor poltrona.`, `A luz do projetor tem cheiro de nostalgia.`, `Já vi mais finais do que consigo lembrar.`, `Não existe filme ruim para quem sabe prestar atenção.`, `O som baixo é o respeito máximo no cinema.`, `Gosto de ficar no fundo da sala, olhando o brilho nos rostos.`, `Sabe o que é bonito? Quando todos riem juntos da mesma cena.`, `Cinema é a única casa onde o escuro acolhe.`, `Cada canal monitorado é uma janela para outro lugar.`, `Às vezes uma transmissão ao vivo vale mais que um clássico.`, `Eu cuido da sala. O resto é com a imaginação.`, `A melhor poltrona é a do meio, nem muito perto nem muito longe.`, `Já me emocionei com cena de desenho animado. Sem vergonha nenhuma.`, `Meu trabalho é discreto. Meu amor pelo cinema é barulhento.`, `Se a tela piscou, não é defeito: é suspense.`, `Existe um cheiro de começo quando a sala escurece.`, `Sempre fico até o último crédito. Por respeito.`, `Uma boa live é como um filme que ninguém sabe o final.`, `A cortina vermelha é a coisa mais teatral que existe.`, `Por aqui, o intervalo é sagrado.`, `Gosto de gente que sussurra dentro do cinema.`, `Dizem que há uma coisa brilhante atrás da cortina. Não olhe. Ou olhe.`, `Nunca confunda silêncio com tédio.`, `Quando a sala está cheia, eu quase aplaudo.`, `A melhor história é a que a gente assiste junto.`, `Meu sonho é ver o dia em que todos os canais estejam ao vivo.`, `O brilho da tela é o meu sol particular.`, `Cinema é paciência com recompensa.`, `Na dúvida, escolha a poltrona do canto.`, `Boa sessão, aventureiro. Aproveite a luz.`],
+  d: [() => { const v = D.vivos(); return v.length ? 'Telas acesas: ' + v.join(', ') + '.' : 'Todas as telas estão em repouso.'; }, () => 'Monitoramos ' + D.canais() + ' canais. Cada um com sua luz.', () => 'São ' + D.hora() + '. A sessão da noite começa sempre cedo.', () => D.vivos().length ? 'Tem ' + plural(D.vivos().length, 'canal', 'canais') + ' ao vivo agora. A sala está boa!' : 'Quando uma live começar, a tela acende sozinha.', () => D.chove() ? 'Chuva e cinema: combinação perfeita.' : 'Dia claro, mas a sala está sempre escura e aconchegante.', () => D.filme() ? 'Na Locadora, o filme da semana é ' + D.filme() + '. Boa pedida.' : null, () => 'A Locadora tem ' + D.nAnime() + ' animes dublados. Eu só tenho telas.', () => 'Hoje é ' + D.dia() + '. Sempre tem sessão.', () => 'Você ficou ' + D.min() + ' minutos no mundo. Dá para alguns episódios.', () => 'Vi você com ' + D.itens() + ' itens. Parece figurino de filme de aventura.', () => { const j = D.jogo(); return 'Será que ' + j.n + ' daria um bom filme? É só um palpite.'; }, () => 'Você visitou ' + D.salas() + ' salas. O Cinema é a melhor, claro.'],
+  r: { hora: `A sessão já vai começar.`, clima: `Bom clima para uma sessão.`, live: `Já fui conferir: a tela acendeu mesmo.`, jogos: `Dava um bom catálogo de filmes.`, lancamento: `Vou procurar na grade de sessões.`, anime: `Uma sessão dupla, quem sabe?`, loja: `Eu só entendo de telas.`, aventureiro: `Parece o herói de um filme de aventura.` },
+  rg: [`Entendi.`, `Interessante...`, `Shh, a sessão vai começar.`, `Prometo manter a sala silenciosa.`],
+  s: [`Quando {n} entra no Cinema, sempre há um silêncio respeitoso.`, `Já vi {n} rindo numa sessão. Foi bonito.`, `{n} merece uma poltrona reservada.`],
+  t: { dawn: `Antes do sol, ensaio a sessão no escuro.`, morn: `Manhã: sala vazia, perfeita para pensar.`, noon: `Meio-dia: a sessão da tarde se aproxima.`, aft: `Tarde é a sessão mais tranquila.`, eve: `Entardece e a sala começa a encher.`, night: `A noite é a melhor sessão.`, mad: `Madrugada: só os mais fiéis ficam.`, rain: `Chuva e cinema, combinação perfeita.`, cloud: `Nublado combina com sala escura.`, clear: `Dia claro? A sala continua escura. Gosto disso.`, wk: `Fim de semana: sala cheia de gente feliz.` }
+};
+
+NPC_TXT.ze = {
+  w: ['', 'Psiu, freguês: ', 'Olha a oportunidade: ', 'Vou te contar, amigo: '],
+  f: [`Olha só quem chegou! Meu melhor cliente do dia!`, `Aqui tem de tudo um pouco e um pouco de tudo.`, `Barganhar é uma arte, e eu sou o artista.`, `Dizem que eu falo demais. Eu digo que vendo bem.`, `Cada barraca tem uma história, e eu conheço todas.`, `Preço bom é o que agrada os dois lados.`, `Não existe produto ruim, só cliente mal informado.`, `Pesquise, compare e depois volte aqui.`, `Já negociei até com o vento. Perdi.`, `Meu balcão é pequeno, mas a vontade de ajudar é gigante.`, `Quem passa pela Tenda sempre leva uma boa conversa de brinde.`, `Sabe o que vale mais que ouro? Confiança.`, `Cliente satisfeito é anúncio que anda.`, `Todo comerciante honesto tem uma pilha de recibos e um coração leve.`, `Se o preço não agrada, a conversa continua.`, `Cada vendedor aqui tem seu jeito. Vale visitar todos.`, `Uma boa feira é aquela que cheira a novidade.`, `Embaixo do meu balcão sempre tem uma surpresa. Sempre.`, `A melhor oferta é a que você ainda não viu.`, `Não tenha pressa. Mercado é para ser passeado.`, `Quem compra com calma compra duas vezes.`, `A palavra vale mais que qualquer moeda.`, `Hoje o movimento está bom. Amanhã, quem sabe?`, `Já fui chamado de pão-duro. Prefiro "econômico".`, `Fiado só amanhã. E amanhã nunca chega.`, `Mercado bom é mercado que ri.`, `Gosto de gente curiosa. Curiosidade vende.`, `Sabe o que mais rende? Uma boa indicação.`, `Toda barraca começa com um sonho e uma lona.`, `Aprendi a ler cliente só pelo olhar.`, `Meu negócio é gente. O resto é consequência.`, `O segredo está no atendimento. E um pouquinho de teatro.`, `Faço o possível para você sair sorrindo.`, `Se não achar o que procura, pergunte. Eu acho.`, `A Tenda nunca fecha de verdade. Ela só cochila.`, `Mais vale um bom amigo que uma venda ruim.`, `Troca justa não é roubo, é arte.`, `Volte sempre! A casa é pequena, mas a porta é grande.`],
+  d: [() => 'A Tenda tem ' + plural(D.nVend(), 'vendedor', 'vendedores') + ' nas barracas. Clique neles para ver os detalhes.', () => { const v = D.vend(); return 'Já passou na barraca de ' + v.n + '? ' + (v.nota || 'Vale a visita!'); }, () => { const v = D.vend(), w = D.vend(); return 'Compare ' + v.n + ' com ' + w.n + ' antes de decidir.'; }, () => 'São ' + D.hora() + '. Boa hora para negócios!', () => D.chove() ? 'Chuva espanta cliente, mas aqui dentro está seco.' : 'Dia bom para feira, hein?', () => 'Tem ' + D.itens() + ' itens? Boa coleção. Mercador reconhece.', () => 'Hoje é ' + D.dia() + '. Dia de feira sempre.', () => D.vivos().length ? 'No Cinema o movimento hoje é por causa de ' + D.vivos().join(', ') + '.' : 'No Cinema, nenhuma live agora. O povo vem passear aqui.', () => { const j = D.jogo(); return 'Procurando ' + j.n + '? Dê uma olhada com os vendedores, quem sabe.'; }, () => 'A coleção tem ' + D.nJ() + ' jogos. Dá para montar uma loja inteira!', () => D.vit() ? 'Soube que você vence no Saloon. Cuidado: ganhar demais atrai amigo interesseiro.' : 'No Saloon, quem vence leva prêmio. Minha barraca só tem conversa.', () => 'A Locadora tem ' + D.nAnime() + ' animes dublados. Eu tenho ' + D.nVend() + ' vendedores. Cada um com seu tesouro.'],
+  r: { hora: `Boa hora para fechar um negócio!`, clima: `Com esse clima, a freguesia aparece.`, live: `Gente nas lives é gente passando pela Tenda depois.`, jogos: `Quantos jogos! Dá para montar uma loja.`, lancamento: `Vou ficar de olho nos preços nessa data.`, anime: `Anime e feira combinam, hein?`, loja: `Falou comigo! Vendedor bom é meu colega.`, aventureiro: `Aventureiro com itens bons sempre volta aqui.` },
+  rg: [`Boa, boa!`, `Negócio fechado, então.`, `Hm, vou pensar nisso.`, `Ótima informação!`],
+  s: [`{n} é freguês antigo da Tenda. Confio.`, `Se {n} quiser uma boa barganha, é só aparecer.`, `Sobre {n}: conversa boa, olho vivo.`],
+  t: { dawn: `Já arrumando as barracas antes da freguesia.`, morn: `Manhã é hora de feira acordando.`, noon: `No almoço o movimento sobe.`, aft: `Tarde é de barganha leve.`, eve: `No entardecer, conversa de fim de dia.`, night: `Noite é hora de contar a féria... e as moedas.`, mad: `Madrugada? Só se o negócio for bom.`, rain: `Chuva? A lona segura o rojão.`, cloud: `Nublado, mas o bom humor aqui é de sol.`, clear: `Dia de sol é dia de feira cheia.`, wk: `Fim de semana: a Tenda vira festa.` }
+};
+
+NPC_TXT.marina = {
+  w: ['', 'Spoiler leve: ', 'Entre uma fita e outra: ', 'Prepare a pipoca: '],
+  f: [`Bem-vindo à Locadora! Aqui tem fita para todo gosto.`, `Meu episódio favorito é sempre o próximo.`, `A dublagem faz toda a diferença numa boa história.`, `Nunca devolva uma fita sem rebobinar. Brincadeira... acho.`, `A TV da estação está sempre pronta para o próximo episódio.`, `Cada fita tem sua capa, cada capa tem um sonho.`, `Maratonar com os amigos é a melhor tradição.`, `A fita do Filme da Semana nunca fica parada.`, `Adoro quando alguém pergunta: "o que você recomenda?"`, `Anime dublado é abraço para os ouvidos.`, `Quem assiste junto ri junto.`, `A prateleira das fitas é o meu lugar favorito do mundo.`, `Tem fita com mais história fora da tela do que dentro.`, `Eu já assisti tanto que sonho em capítulos.`, `Uma boa locadora é feita de conversa e pipoca.`, `Se estiver em dúvida, comece pelo primeiro episódio.`, `Prefiro uma série longa a um filme curto. Mais tempo com os personagens.`, `Nada supera o suspense de um final de temporada.`, `Tenho uma fita secreta. Ou melhor, uma fita vazia com surpresa.`, `Olhe com calma: as capas contam coisas.`, `Dizem que umas botas estranhas nasceram numa fita. Será?`, `A locadora nunca é silenciosa. Sempre tem uma abertura tocando.`, `Quando começa a abertura, todo mundo para para ouvir.`, `Cada episódio é uma porta para outro mundo.`, `Eu juro que não estou fingindo trabalhar. Estou fazendo pesquisa.`, `Meu coração acelera nos finais de episódio.`, `Recomendo sempre assistir com um lanche por perto.`, `Gosto do barulho das caixas de fita encostando.`, `Quem escolhe devagar sempre acerta.`, `Um bom título merece uma boa maratona.`, `Eu guardo as melhores sugestões para quem pergunta.`, `O melhor momento é o instante antes de apertar o play.`, `Já fiz amizades inteiras por causa de uma série.`, `Gosto de ver os aventureiros descobrindo animes novos.`, `A TV da estação é minha janela favorita.`, `Cada fita devolvida vem com uma opinião diferente.`, `Se me perguntar o que assistir, vou te contar mais do que você queria.`, `Boa maratona, aventureiro! Volte para me contar.`],
+  d: [() => { const a = D.anime(); return 'Hoje indico ' + a + ': ' + plural(D.eps(a), 'episódio dublado', 'episódios dublados') + '.'; }, () => 'São ' + D.nAnime() + ' animes dublados na prateleira.', () => D.filme() ? 'O filme da semana é ' + D.filme() + '. Já assistiu?' : 'O filme da semana ainda está sendo escolhido.', () => { const a = D.anime(), b = D.anime(); return 'Entre ' + a + ' e ' + b + ', qual você começa hoje?'; }, () => 'São ' + D.hora() + '. Dá tempo de um episódio ou dois!', () => D.chove() ? 'Chuva é dia de maratona.' : 'Dia bonito, mas maratona é para qualquer clima.', () => D.vivos().length ? 'O Caio disse que ' + D.vivos().join(', ') + ' está ao vivo. Maratona de live?' : 'O Caio disse que não tem live agora. Bom momento para um anime!', () => 'Hoje é ' + D.dia() + '. Dia ótimo para uma série nova.', () => 'Vi que você tem ' + D.itens() + ' itens. Já pensou em assistir de armadura?', () => { const a = D.anime(); return 'Se gosta de aventura, vá de ' + a + '.'; }, () => { const j = D.jogo(); return 'Já imaginou ' + j.n + ' virando anime? Eu assistiria.'; }, () => 'Já são ' + D.min() + ' minutos de mundo. Que tal uma pausa com um episódio?'],
+  r: { hora: `Já? Dá tempo de mais um episódio!`, clima: `Dia ótimo para maratonar!`, live: `Live e anime juntos? Perfeito!`, jogos: `Já pensou em jogar e assistir anime em seguida?`, lancamento: `Quero ver se vira anime!`, anime: `Esse é o meu assunto favorito!`, loja: `Se tiver anime na Tenda, me avisem!`, aventureiro: `Aventureiro com pet é meu tipo de cliente!` },
+  rg: [`Que legal!`, `Nossa, não sabia!`, `Depois me conta mais!`, `Combinado!`],
+  s: [`Já indiquei um anime a {n}. Gostou!`, `Se {n} passar aqui, tem episódio esperando.`, `Falando em {n}: seria ótimo numa maratona.`],
+  t: { dawn: `Madrugadinha ideal para um episódio antes de abrir.`, morn: `Manhã: arrumo as fitas.`, noon: `Meio-dia é hora de um episódio rápido.`, aft: `Tarde é hora de maratona.`, eve: `Entardece e o povo chega para escolher fita.`, night: `Noite é de série nova.`, mad: `Madrugada é de final de temporada.`, rain: `Chuva pede maratona de anime.`, cloud: `Nublado combina com episódio duplo.`, clear: `Dia lindo, mas a TV ainda chama.`, wk: `Fim de semana é maratona certa.` }
+};
+
+NPC_TXT.ptolomeu = {
+  w: ['', 'Os arquivos dizem: ', 'Em voz baixa: ', 'Escute, viajante: '],
+  f: [`O que se esconde nas profundezas costuma esperar pacientemente.`, `Puzzles são portas que só abrem para a mente curiosa.`, `Bem-vindo às Criptas, viajante. Pise com cuidado.`, `Cada sala é uma pergunta. Cada resposta, uma chave.`, `A memória é a melhor lanterna destas galerias.`, `Nem toda porta é para ser aberta com força.`, `Mantenha a calma: a pressa é inimiga da lógica.`, `Registro cada passo de quem passa por aqui. Em silêncio.`, `Quem lê os sinais encontra o caminho.`, `Os efeitos de gelo, fogo e vazio guardam mais do que parecem.`, `Um objeto brilhante pode abrir uma porta antiga.`, `A melodia certa abre mais que qualquer chave.`, `Tochas acesas, mente apagada: cuidado com a pressa.`, `Não existem becos sem saída, apenas perguntas mal feitas.`, `Os pets farejam o que os olhos não veem.`, `Os arquivos antigos não esquecem. Nem eu.`, `Quem conclui a primeira cripta aprende que há mais por vir.`, `Muito se perde em quem conta os passos. Muito se ganha em quem os entende.`, `Desconfie do óbvio. Desconfie também do que parece complicado.`, `A cada dia as criptas trocam de rosto. Venha amanhã.`, `Todo código tem uma lógica. Todo cadeado tem uma resposta.`, `Não se preocupe com os erros. As criptas ensinam com paciência.`, `Já vi muitos entrarem com pressa e saírem sábios.`, `O silêncio daqui conta histórias.`, `Um bom equipamento é meio caminho andado.`, `A sabedoria começa quando se admite que não se sabe.`, `Respire. O enigma não foge.`, `Gosto de quem pergunta antes de agir.`, `Nada é impossível para quem tenta uma segunda vez.`, `As gemas guardam a ordem das coisas.`, `Um espinho avisa uma vez. Duas, ensina.`, `Aprenda com cada tentativa; é assim que se avança.`, `Os mapas mudam, mas a curiosidade permanece.`, `Quem resolve cedo pode descansar tarde.`, `Mesmo o mais velho enigma já foi resolvido por alguém.`, `As criptas só fecham para quem desiste.`, `Há tesouros que só aparecem para quem não os procura.`, `Vá em paz, viajante. A cripta aguarda.`],
+  d: [() => 'Você concluiu ' + D.dungs() + ' de ' + DUNGEONS.length + ' dungeons. ' + (D.dungs() < DUNGEONS.length ? 'A próxima aguarda.' : 'Impressionante.'), () => 'Já resolveu ' + D.puz() + ' puzzles. Cada um é um degrau.', () => { const p = DUNGEONS.findIndex((_, i) => !dgCleared(i)); return p >= 0 ? (dgLockReason(p) || 'A porta de ' + DUNGEONS[p].nome + ' está aberta.') : 'Todas as portas já foram abertas por você.'; }, () => 'Seus pets: ' + D.pets() + '. Bons companheiros ajudam a achar o caminho.', () => 'Você tem ' + D.itens() + ' itens. Os efeitos de gelo, fogo e vazio abrem as portas mais fundas.', () => 'São ' + D.hora() + '. As criptas nunca dormem, mas trocam de rosto à meia-noite.', () => D.chove() ? 'A chuva lá em cima ecoa nas galerias.' : 'Aqui embaixo o tempo não muda. Lá em cima, ' + D.clima() + '.', () => 'Hoje é ' + D.dia() + '. O layout de hoje é ' + dayKey() + '.', () => 'Segredos encontrados: ' + D.seg() + ' de ' + D.nSeg() + '. Falta pouco, ou muito.', () => 'Você passou ' + D.min() + ' minutos no mundo. O tempo é o melhor aprendiz.', () => 'A coleção tem ' + D.nJ() + ' jogos e as criptas fazem perguntas sobre ela. Estude.', () => 'Dicas por puzzle: ' + dicasPorPuzzle() + '. Vidas: ' + vidasPorPuzzle() + '. Equipe-se bem.'],
+  r: { hora: `O tempo é um enigma interessante.`, clima: `Lá em cima o clima muda. Aqui, nunca.`, live: `As transmissões me parecem enigmas luminosos.`, jogos: `Os arquivos agradecem tantos títulos.`, lancamento: `Mais um capítulo a ser registrado.`, anime: `Histórias dubladas também são arquivos.`, loja: `Mercado é sempre um bom enigma.`, aventureiro: `Esse aventureiro está aprendendo rápido.` },
+  rg: [`Hmm.`, `Isso explica muita coisa.`, `Registrado.`, `Curioso.`],
+  s: [`{n} é conhecido nos arquivos. Em boa hora.`, `Um dia {n} há de visitar as criptas.`, `Registrei uma anotação sobre {n}. Curiosa.`],
+  t: { dawn: `O amanhecer chega devagar às criptas.`, morn: `Pela manhã, os puzzles estão mais claros.`, noon: `Ao meio-dia a mente está afiada.`, aft: `À tarde, as perguntas ficam mais difíceis.`, eve: `Ao entardecer, as sombras se alongam entre as galerias.`, night: `À noite, as criptas sussurram mais alto.`, mad: `Na madrugada, os enigmas dormem... ou fingem.`, rain: `A chuva lá fora ecoa nas galerias.`, cloud: `Dias nublados, mentes concentradas.`, clear: `Sol lá fora, mas aqui embaixo é sempre o mesmo.`, wk: `Fim de semana: boa hora para uma cripta.` }
+};
+
+NPC_TXT.rosa = {
+  w: ['', 'Com perfume de lavanda: ', 'Colhendo novidade: ', 'Petalinhas de fofoca: '],
+  f: [`Flores não falam, mas dizem muito sem abrir a boca.`, `Cada pétala tem um jeito de agradecer o sol.`, `Hoje as margaridas acordaram de bom humor.`, `Uma rua sem flores é uma rua sem sorriso.`, `Regar de manhã é o segredo de tudo.`, `O cheiro de terra molhada é o meu perfume favorito.`, `Gosto de enfeitar as esquinas, mesmo as mais sérias.`, `Rosas têm espinhos para ensinar respeito.`, `Cada buquê tem uma história que só quem recebe conhece.`, `Já fiz coroa de flores para guarda e até para taverneiro.`, `Vento forte é inimigo das minhas pétalas.`, `Se uma flor murchar, converse com ela. Funciona.`, `Plantei um jardim inteiro dentro de um vaso.`, `As abelhas e eu temos um acordo de paz.`, `Quer ver a rua mais bonita? Plante algo.`, `Girassol sempre sabe onde está o sol.`, `Gosto de cores vivas: elas espantam a tristeza.`, `Tem flor que só abre à noite. Eu admiro a coragem.`, `Um vaso na janela muda o dia de quem passa.`, `Aprendi cedo: paciência é o adubo de tudo.`, `Meu avental vive sujo de terra e orgulhoso disso.`, `Tem dias que a rua inteira cheira a lavanda.`, `Flor de plástico não conta. Nem tente.`, `Ouvi dizer que o Ferreiro forjou uma pá de jardinagem. Preciso ver.`, `Sempre guardo uma flor para quem parece cansado.`, `Ninguém é tão rabugento que resista a um buquê.`, `A chuva faz meu trabalho pela metade.`, `Amo o momento em que o botão abre.`, `Nada como o primeiro raio de sol sobre as pétalas.`, `Leve uma flor no coração, aventureiro.`],
+  d: [() => 'Já são ' + D.hora() + '. Hora de regar.', () => D.chove() ? 'A chuva rega meu jardim de graça.' : 'Hoje o tempo está com ' + D.clima() + '. Bom para as flores.', () => 'Você juntou ' + D.itens() + ' itens. Que coleção florida!', () => 'Dizem que há ' + D.nSeg() + ' segredos escondidos pelo mundo. Você achou ' + D.seg() + '.', () => D.pets() ? 'Seu pet é fofo; só não deixe pisar nos canteiros.' : 'Um pet seria uma boa companhia para passear entre as flores.', () => 'Hoje é ' + D.dia() + '. Dia de flor fresca.', () => 'Você visitou ' + D.salas() + ' de ' + D.nSalas() + ' lugares. Algum deles tem jardim?', () => 'Você passou ' + D.min() + ' minutos por aqui. As flores agradecem a visita.'],
+  r: { hora: `Já? As flores nem perceberam.`, clima: `O clima é o patrão do jardim.`, live: `Só flores ao vivo para mim.`, jogos: `Quantos jogos! Um canteiro de aventuras.`, lancamento: `Vou preparar um buquê para essa data.`, anime: `Anime com jardim? Quero ver.`, loja: `Se algum vendedor tiver sementes, me avise.`, aventureiro: `Aventureiro que cuida do pet merece uma flor.` },
+  rg: [`Que bonito!`, `Gostei de saber.`, `Que notícia boa.`, `Vou guardar isso como um botão.`],
+  s: [`{n} merece um buquê. Ainda vou fazer.`, `Todo mundo cuida de algo. {n} cuida bem do que faz.`, `Sobre {n}: sempre sorri quando passo com flores.`],
+  t: { dawn: `Cedo assim, o orvalho ainda está nas pétalas.`, morn: `Manhã é hora de regar tudo.`, noon: `Meio-dia: sombra para as flores sensíveis.`, aft: `Tarde dourada: as cores ficam mais fortes.`, eve: `Entardecer: as flores fecham devagar.`, night: `A noite guarda o perfume das flores noturnas.`, mad: `Madrugada: só os vaga-lumes e eu.`, rain: `Chuva! O jardim agradece.`, cloud: `Nublado é bom para as flores. Menos sol, menos sede.`, clear: `Sol aberto: tudo desabrocha.`, wk: `Fim de semana: todo mundo quer um buquê.` }
+};
+
+NPC_TXT.nico = {
+  w: ['', 'Com a vara na mão: ', 'Olhando o lago: ', 'Devagar, sem pressa: '],
+  f: [`Pescar é a arte de esperar sem pressa.`, `O lago ensina mais que muita escola.`, `Hoje o lago está calmo. Bom sinal.`, `Peixe esperto sabe quando é hora de ir embora.`, `Minha vara é velha, mas conhece todos os cantos do lago.`, `Se o peixe não morde, o dia ainda rende uma boa conversa.`, `Linha firme, mão leve, coração calmo.`, `Já peguei um peixe tão grande que ninguém acredita. Nem eu.`, `As montanhas ao fundo são testemunhas das minhas histórias.`, `Aprendi a ficar em silêncio com o lago. Funciona com gente também.`, `Um bom pescador nunca conta o tamanho exato do peixe.`, `A isca importa, mas a paciência importa mais.`, `Cada onda traz uma notícia diferente.`, `A névoa da manhã é o melhor momento para pescar.`, `Peixe pega quem não tem pressa.`, `Quando o vento muda, o lago também muda de humor.`, `Gosto de companhia, mas gosto mais de silêncio.`, `Dizem que há criptas sob a cidade. Prefiro a água.`, `Já fisguei uma bota velha. Foi o meu melhor presente.`, `Tenho uma teoria: peixe gosta de música.`, `O Bardo toca perto do lago, e o peixe vem ouvir.`, `Um bom chapéu vale mais que um bom anzol.`, `De manhã, o lago parece um espelho.`, `O silêncio é a melhor isca.`, `Já pesquei, já esperei, já dormi. Tudo no mesmo dia.`, `Se vir um peixe dourado, finja que não viu.`, `A chuva espanta peixe, mas atrai pensamento.`, `Pescar não é sobre peixe. É sobre tempo.`, `Meu balde está vazio, mas meu dia está cheio.`, `Boa pescaria, aventureiro. Volte para me contar.`],
+  d: [() => 'Para o lago, ' + D.hora() + ' é só uma ideia. Mas anotei.', () => D.chove() ? 'Chuva é ruim para pesca, mas ótima para pensar.' : 'Tempo com ' + D.clima() + ': o lago está de bom humor.', () => 'Há ' + D.nJ() + ' jogos na biblioteca. Tem história para toda vida de pescador.', () => D.vivos().length ? 'Dizem que há live no Cinema. Eu prefiro a vara.' : 'Nenhuma live agora. O lago é mais calmo que a tela.', () => 'Você tem ' + D.itens() + ' itens. Dá para encher um balde grande.', () => 'Hoje é ' + D.dia() + '. Dia bom para esperar.', () => 'Faz ' + D.min() + ' minutos que você está por aqui. Bom tempo de espera.', () => 'Você viu ' + D.salas() + ' lugares. O lago é o mais calmo.'],
+  r: { hora: `Para o lago, a hora é só uma ideia.`, clima: `O lago sente o clima antes de todo mundo.`, live: `Ao vivo é rápido demais para mim.`, jogos: `Muito jogo. Eu prefiro uma vara.`, lancamento: `Boa data. Vou pescar nesse dia.`, anime: `Peixe também aparece em anime.`, loja: `Vendedor bom vende isca.`, aventureiro: `Aventureiro paciente chega longe.` },
+  rg: [`Hmm.`, `Entendi, sem pressa.`, `Faz sentido.`, `Vou pensar com a vara na mão.`],
+  s: [`{n} passa aqui às vezes. Conversa boa, silêncio melhor.`, `Se {n} quiser pescar, eu empresto a vara.`, `Sobre {n}: nunca me apressou. Respeito.`],
+  t: { dawn: `A névoa do amanhecer é a melhor hora do lago.`, morn: `Manhã é hora de preparar a isca.`, noon: `Meio-dia: peixe descansa, eu também.`, aft: `Tarde calma: ideal para esperar.`, eve: `Entardecer pinta o lago de laranja.`, night: `À noite o lago guarda os segredos.`, mad: `Madrugada: só o lago e eu.`, rain: `Chuva no lago faz a melhor música.`, cloud: `Dia nublado, peixe desatento.`, clear: `Sol alto: o lago brilha como moeda.`, wk: `Fim de semana: mais gente tenta pescar. Poucos conseguem.` }
+};
+
+NPC_TXT.orfeu = {
+  w: ['', 'Cantarolando: ', 'Em forma de verso: ', 'Dedilhando: '],
+  f: [`Toda melodia começa com um silêncio corajoso.`, `Minha flauta conta histórias que as palavras esqueceram.`, `Cada rua tem seu ritmo, basta escutar.`, `Cordas afinadas, coração afinado.`, `Uma canção boa dura mais que um castelo.`, `Já compus uma balada para cada porta desta rua.`, `A música medieval é feita de poucas notas e muita alma.`, `Tocar baixo é uma arte. Quase ninguém percebe.`, `O vento é meu melhor acompanhante.`, `Sem plateia, eu toco para os pássaros.`, `Cada tom tem uma cor, se você prestar atenção.`, `Já toquei para reis, ferreiros e um gato muito exigente.`, `A melodia da biblioteca é lenta como página virando.`, `A do Saloon é rápida como passo de dança.`, `Há música no martelo do Ferreiro, se ouvir bem.`, `A Locadora tem uma abertura que me emociona.`, `As criptas têm uma melodia sombria, quase um suspiro.`, `Dizem que a melodia certa abre portas. Eu acredito.`, `Compor é pescar notas no ar.`, `Um bardo sem história não é bardo.`, `Já errei uma nota em público. A plateia aplaudiu.`, `Tocar de dia aquece, tocar de noite acolhe.`, `O compasso da rua é feito de passos.`, `Nenhuma música é pequena demais para ser bonita.`, `Uma canção é uma conversa sem pressa.`, `Se o dia estiver feio, cante. Se estiver lindo, cante também.`, `Aprendi a tocar com um velho de barba longa e paciência infinita.`, `Minha lira tem uma corda rebelde. Combinamos bem.`, `Quando a música acaba, o silêncio fica mais bonito.`, `Assobie uma melodia, aventureiro. O mundo agradece.`],
+  d: [() => 'São ' + D.hora() + '. Hora de afinar para a próxima canção.', () => D.chove() ? 'Chuva é um bom tambor.' : 'Com ' + D.clima() + ', a melodia sai leve.', () => 'Você já tem ' + D.itens() + ' itens. Dá para compor uma balada.', () => 'A coleção de ' + D.nJ() + ' jogos também tem trilha sonora.', () => D.vivos().length ? 'Há ' + plural(D.vivos().length, 'canal', 'canais') + ' ao vivo. Lives também têm trilha.' : 'Sem lives agora. O silêncio também é música.', () => 'Hoje é ' + D.dia() + '. Dia de cantiga.', () => 'Você visitou ' + D.salas() + ' salas. Cada uma tem sua melodia.', () => 'Você resolveu ' + D.puz() + ' puzzles. A melodia das criptas deve ter sido difícil.'],
+  r: { hora: `O tempo é compasso, só isso.`, clima: `O clima muda o tom da canção.`, live: `Live sem trilha é triste.`, jogos: `Tantos jogos, tantas melodias.`, lancamento: `Vou compor algo para essa data.`, anime: `Abertura de anime é minha paixão.`, loja: `Se algum vendedor tiver cordas, me avise.`, aventureiro: `Esse aventureiro ainda vira lenda de canção.` },
+  rg: [`Bela história!`, `Que interessante.`, `Isso rende uma canção.`, `Vou guardar isso para uma estrofe.`],
+  s: [`Vou escrever uma balada sobre {n}.`, `{n} tem um ritmo próprio. Dá para ouvir de longe.`, `Sobre {n}: a melhor plateia que já tive.`],
+  t: { dawn: `Ao amanhecer, os pássaros são meus parceiros.`, morn: `Manhã pede flauta e café.`, noon: `Meio-dia: pausa para a cantiga.`, aft: `Tarde pede cordas suaves.`, eve: `O entardecer pede balada.`, night: `À noite, a melodia é mais honesta.`, mad: `Madrugada é hora de compor.`, rain: `Chuva é o melhor tambor.`, cloud: `Nublado combina com uma canção melancólica.`, clear: `Sol alto pede uma música alegre.`, wk: `Fim de semana é festa de cantiga.` }
+};
+
+NPC_TXT.pedrinho = {
+  w: ['', 'Psiu, escuta: ', 'Adivinha só: ', 'Eu ouvi dizer: '],
+  f: [`Você sabia que a rua é enorme? Dá para correr o dia todo!`, `Meu galho é uma espada. Só que de galho.`, `Eu vou ser guarda quando crescer. Ou pirata.`, `Pega-pega é o melhor jogo do mundo!`, `Já contei todos os barris da rua. São muitos!`, `Quando ninguém olha, eu tento entrar na caixa.`, `O Guarda Tadeu diz que eu sou o futuro da cidade!`, `Quer brincar de esconde-esconde? Eu conto até dez.`, `Os prédios são tão altos! Parece que tocam as nuvens.`, `Eu já vi um gato fantasma. Ou foi um lençol.`, `Minha mãe disse para não falar com estranhos, mas você parece legal.`, `Tem formiga no meu sapato? Não, só meu pé coçando.`, `Eu pulei uma poça gigante hoje!`, `Sabe por que o lago é azul? Porque o céu tem inveja.`, `Tem um segredo atrás do barril. Não conta que fui eu!`, `Eu quero um pet. Pode ser um dragão pequeno.`, `Amo quando chove: dá para pisar nas poças.`, `Na biblioteca tem uma moça que manda eu fazer silêncio.`, `Eu descobri que a lua me segue. Sempre!`, `Meu sorvete derreteu. Era de morango.`, `Tem um cheiro de pão vindo de algum lugar!`, `Eu sei assobiar! Quer ouvir? Ah, esqueci.`, `Uma vez eu corri tanto que perdi o chapéu.`, `O Ferreiro deixa eu olhar a forja de longe.`, `Você já tentou pular a calçada sem pisar nas linhas?`, `Quando eu crescer vou ter uma loja só de doces!`, `Eu gosto das poças, dos gatos e de você!`, `Hoje eu não quero dormir. Ainda não.`, `Cada porta é uma aventura diferente!`, `Corre, aventureiro! A rua é nossa!`],
+  d: [() => 'Já são ' + D.hora() + '? O tempo voa quando eu brinco!', () => D.chove() ? 'Está chovendo! Posso pisar na poça?' : 'Hoje o tempo está com ' + D.clima() + '. Bom para correr!', () => 'Você tem ' + D.itens() + ' itens! Posso ver? Posso?', () => 'Tem ' + D.nJ() + ' jogos na biblioteca! Eu queria jogar todos.', () => 'Você tem ' + plural(D.pets(), 'pet', 'pets') + '! Que sorte!', () => 'Hoje é ' + D.dia() + '! Dia de brincar!', () => 'Você já visitou ' + D.salas() + ' lugares? Eu só conheço a rua.', () => D.vivos().length ? 'Dizem que tem live no Cinema! Posso assistir?' : 'Nenhuma live agora. Que chato!'],
+  r: { hora: `Ah, já é tarde? Quero brincar mais!`, clima: `Posso pisar na poça?`, live: `Eu quero ver a live!`, jogos: `Quantos jogos! Posso jogar um?`, lancamento: `Eu quero ser o primeiro a jogar!`, anime: `Anime! Eu adoro anime!`, loja: `Tem doce na Tenda?`, aventureiro: `Eu quero ser aventureiro também!` },
+  rg: [`Nossa!`, `Que legal!`, `Hehe!`, `Conta mais!`],
+  s: [`{n} é muito legal! Sempre me deixa fazer perguntas.`, `Eu quero brincar com {n}!`, `Sobre {n}: me deu bronca uma vez. Só uma.`],
+  t: { dawn: `Eu acordei cedo! O sol ainda está sonolento.`, morn: `Manhã é a melhor hora de correr!`, noon: `Já é meio-dia? Estou com fome!`, aft: `Tarde é hora de pega-pega!`, eve: `Já está escurecendo? Só mais um pouquinho!`, night: `Já é de noite e eu ainda quero brincar.`, mad: `Madrugada?! Eu devia estar dormindo...`, rain: `Chuva! Poça! Poça!`, cloud: `Nuvens com formato de dragão!`, clear: `Dia lindo! Vamos correr!`, wk: `Fim de semana! Zero lição!` }
+};
+
+NPC_TXT.rosa.f.push(`Já tentou cheirar uma flor de olhos fechados? Muda tudo.`, `Cada cor de flor tem um recado diferente.`, `Cravos são teimosos; margaridas, simpáticas.`, `Ontem uma abelha me seguiu o dia inteiro. Acho que gostou de mim.`, `Plantar é acreditar no amanhã.`, `Um buquê simples vale mais que um jardim esquecido.`, `Não existe flor feia, só vaso mal escolhido.`, `Trago sementes no bolso para qualquer emergência.`, `A Bibliotecária Lúcia gosta de lavanda na estante. Ajuda a espantar traças.`, `O Ferreiro finge que não gosta de flor, mas guarda uma no balcão.`, `Quando alguém sorri para uma flor, o dia melhora.`, `Se a flor virar para o sol, ela está agradecendo.`);
+NPC_TXT.nico.f.push(`Peixe bom se reconhece pelo brilho no olho. O dele, não o meu.`, `Um dia desses eu pesquei uma nuvem refletida. Quase desmaiei.`, `A água sempre sabe o que está pensando, só não conta.`, `Tenho três varas: uma para peixe, uma para esperar, uma para conversar.`, `Quem pesca com pressa acaba com o balde cheio de ar.`, `As montanhas guardam o lago como um segredo bem escondido.`, `Já vi o sol se pôr dentro do lago. Foi o melhor espetáculo.`, `Não se preocupe com as horas. O lago não se preocupa.`, `Pescador conta peixe e história com o mesmo capricho.`, `Um chapéu velho e uma vara boa: o resto é detalhe.`, `O Guarda Tadeu passa por aqui e finge que não vê meu balde vazio.`, `Se o vento soprar do norte, o peixe come melhor. Ou é só impressão.`);
+NPC_TXT.orfeu.f.push(`Uma estrofe por manhã mantém o mau humor longe.`, `Gosto de improvisar. Erros viram refrão.`, `Há sons que só a rua faz: passos, portas e sinos distantes.`, `Cantei para o Guarda Tadeu e ele marchou no ritmo. Sem querer.`, `A Florista Rosa me inspirou uma valsa. Ainda falta o final.`, `Minha lira é herança de um tio que nunca soube tocar. Eu aprendi por ele.`, `Quando o Pescador Nico escuta, até o lago parece afinar.`, `Toda taverna precisa de uma boa cantiga. O Saloon que o diga.`, `Dizem que cantar espanta o medo. Experimente nas criptas.`, `Ritmo é a respiração da música.`, `Um bom refrão gruda como cola de ferreiro.`, `O silêncio entre duas notas também é música.`);
+NPC_TXT.pedrinho.f.push(`Eu já corri a rua inteira sem parar! Quase.`, `Se eu fosse mágico, transformava todo barril em doce.`, `A Florista Rosa me deu uma flor. Eu comi. Era de enfeite.`, `O Bardo Orfeu toca e eu danço. Ele diz que eu danço mal, mas é com carinho.`, `Eu tenho um segredo: sei onde fica o melhor lugar para se esconder.`, `Você sabia que a lua também brinca de esconde-esconde com o sol?`, `Eu sou muito rápido. Ninguém me pega! Só a hora do banho.`, `Um dia eu vou ver as criptas. Só por fora, prometo.`, `Queria um cavalo. Ou uma vaca. Qualquer bicho grande!`, `O Pescador Nico não conversa muito, mas me deixa segurar a vara!`, `Eu desenhei um mapa do mundo na terra. A rua é do tamanho de um dedo.`, `Tem uma nuvem com cara de coelho ali. Olha lá!`);
+
+/* ---------- monta o conjunto de falas de um morador ---------- */
+const NPC_RECENT = {};
+function safeCall(fn){ try { return fn(); } catch (e) { return null; } }
+function W(wr, txt){ return pick(wr) + txt; }
+function condTempo(k){
+  const h = marianaHour(); const dia = new Date().toLocaleDateString('en-US', { weekday:'short', timeZone:'America/Sao_Paulo' });
+  switch (k) {
+    case 'dawn': return h >= 5 && h < 7; case 'morn': return h >= 7 && h < 12; case 'noon': return h >= 12 && h < 14;
+    case 'aft': return h >= 14 && h < 18; case 'eve': return h >= 18 && h < 20; case 'night': return h >= 20 && h < 24; case 'mad': return h < 5;
+    case 'rain': return D.chove(); case 'cloud': return stage.classList.contains('cloudy') && !D.chove();
+    case 'clear': return !D.chove() && !stage.classList.contains('cloudy') && h >= 6 && h < 18;
+    case 'wk': return dia === 'Sat' || dia === 'Sun';
+  }
+  return false;
+}
+function poolCapacity(id){ const T = NPC_TXT[id]; return T.f.length + T.d.length + G.length + 3 * (NPC_TXT_IDS.length - 1) + Object.keys(T.t).length; }
+let NPC_TXT_IDS = Object.keys(NPC_TXT);
+const NPC_NOME = {};   // preenchido pelo motor (extras5)
+function buildPool(id){
+  const T = NPC_TXT[id]; const out = [];
+  T.f.forEach(s => out.push(s));
+  T.d.forEach(fn => { const s = safeCall(fn); if (s) out.push(s); });
+  G.forEach(fn => { const s = safeCall(fn); if (s) out.push(W(T.w, s)); });
+  NPC_TXT_IDS.filter(o => o !== id).forEach(o => T.s.forEach(t => out.push(t.replace('{n}', NPC_NOME[o] || o))));
+  Object.keys(T.t).forEach(k => { if (condTempo(k)) out.push(T.t[k]); });
+  return out;
+}
+/* fala sem repetir as últimas 25 */
+function falaDe(id){
+  const pool = buildPool(id); const rec = NPC_RECENT[id] = NPC_RECENT[id] || [];
+  let livres = pool.filter(s => rec.indexOf(s) < 0); if (!livres.length) livres = pool;
+  const s = pick(livres); rec.push(s); if (rec.length > 25) rec.shift(); return s;
+}
+
+/* =====================================================================
+   EXTRAS 5 — vida dos moradores: andam pela rua, saem e voltam das casas,
+   visitam uns aos outros e conversam (balões). 12 moradores, simulação
+   contínua mesmo com o jogador em outra sala. Falas vêm de extras4.js.
+   ===================================================================== */
+RESIDENTS.rua.push(
+  { x:700, yf:0.45, nome:'Florista Rosa', gift:'coroa_flores', giftMsg:'Fiz esta coroa de flores para você. Use com orgulho!',
+    look:{ helm:'coroa_flores', chest:'tunica', legs:'perneiras_floresta' } },
+  { x:2000, yf:0.5, nome:'Pescador Nico', gift:'vara_pesca', giftMsg:'Esta vara já pescou muita história. É sua agora.',
+    look:{ helm:'capuz_floresta', chest:'couro', legs:'botas_couro', weapon:'cajado_madeira' } },
+  { x:1150, yf:0.4, nome:'Bardo Orfeu', gift:'lira_bardo', giftMsg:'Aceite minha lira. Toque e o mundo ouvirá.',
+    look:{ helm:'chapeu_mago', chest:'tunica', legs:'botas_reais' } },
+  { x:1500, yf:0.7, nome:'Pedrinho', gift:'chapeu_menino', giftMsg:'É meu chapéu da sorte! Pode ficar, eu tenho outro!', small:true,
+    look:{ helm:'capuz_couro', chest:'tunica', legs:'botas_couro' } }
+);
+
+const HOME_ENTRY_X = 90;
+const NPC_DEF = {
+  tadeu:    { room:'rua', idx:0, street:true, range:[180, 2380], speed:46 },
+  rosa:     { room:'rua', idx:1, street:true, range:[260, 2300], speed:40, off:[19, 6] },
+  nico:     { room:'rua', idx:2, street:true, range:[1550, 2420], speed:34, off:[21, 5] },
+  orfeu:    { room:'rua', idx:3, street:true, range:[300, 2300], speed:42, off:[0, 7] },
+  pedrinho: { room:'rua', idx:4, street:true, range:[120, 2440], speed:78, off:[20, 7] },
+  lucia:    { room:'biblioteca', idx:0, door:238, speed:44 },
+  ferreiro: { room:'office', idx:0, door:618, speed:44 },
+  bruno:    { room:'salajogos', idx:0, door:998, speed:46 },
+  caio:     { room:'cinema', idx:0, door:1378, speed:40 },
+  ze:       { room:'tenda', idx:0, door:1758, speed:50 },
+  marina:   { room:'locadora', idx:0, door:2138, speed:48 },
+  ptolomeu: { room:'criptas', idx:0, fixed:true, speed:26 }
+};
+const NP = {}, NPC_LIST = [];
+const CHATS = [];
+
+function rnd(a, b){ return a + Math.random() * (b - a); }
+function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+function gFrac(loc){ return (ROOMS[loc] && ROOMS[loc].groundY) || [0.61, 0.965]; }
+function yOf(n){ const g = gFrac(n.loc); return Math.round(STAGE_H * (g[0] + (g[1] - g[0]) * n.yf)); }
+function isOff(n){
+  const o = n.def.off; if (!o) return false; const h = marianaHour();
+  return o[0] < o[1] ? (h >= o[0] && h < o[1]) : (h >= o[0] || h < o[1]);
+}
+function sleepHour(){ const h = marianaHour(); return h >= 23 || h < 6; }
+
+Object.keys(NPC_DEF).forEach(id => {
+  const def = NPC_DEF[id], r = RESIDENTS[def.room][def.idx];
+  const n = { id, def, r, loc:def.room, x:r.x, yf:r.yf, q:[], mode:'free', until:Date.now() + rnd(4000, 30000), cool:0,
+              el:null, bubEl:null, bub:'', bubUntil:0, nextAmb:Date.now() + rnd(8000, 25000), phase:Math.random() * 6, moving:false, flip:!!r.flip };
+  r.id = id; r._n = n; r.x0 = r.x; r.yf0 = r.yf; r.falas = () => [falaDe(id)];
+  NPC_NOME[id] = r.nome;
+  NP[id] = n; NPC_LIST.push(n);
+  r._y = yOf(n);
+});
+NPC_TXT_IDS = Object.keys(NPC_TXT);
+/* quem está em horário de folga começa fora da cena */
+NPC_LIST.forEach(n => { if (isOff(n)) { n.loc = 'off'; } });
+/* os moradores de casa começam, em parte, passeando pela rua (depende do horário real) */
+(function seed(){
+  const h = marianaHour();
+  NPC_LIST.forEach(n => {
+    if (!n.def.door || h < 8 || h >= 21 || Math.random() > 0.45) return;
+    n.loc = 'rua'; n.x = rnd(260, 2300); n.yf = rnd(0.15, 0.85);
+    n.q = [{ t:'wait', s:rnd(2, 8) }]; n.q.push(...streetActivity(n)); n.q.push(...returnHome(n));
+  });
+})();
+
+/* ---------- planejamento ---------- */
+function streetActivity(n){
+  const q = [], d = n.def, rr = Math.random();
+  if (rr < 0.45) {
+    const lo = d.range ? d.range[0] : 160, hi = d.range ? d.range[1] : 2400;
+    q.push({ t:'go', x:rnd(lo, hi), yf:rnd(0.1, 0.9) }, { t:'wait', s:rnd(3, 10) });
+    if (Math.random() < 0.4) q.push({ t:'go', x:rnd(lo, hi), yf:rnd(0.1, 0.9) }, { t:'wait', s:rnd(2, 6) });
+  } else if (rr < 0.78) {
+    q.push({ t:'chatwith', who:'*' }, { t:'wait', s:rnd(2, 5) });
+  } else {
+    const casas = NPC_LIST.filter(o => o.def.door && o !== n);
+    const h = pick(casas);
+    q.push({ t:'go', x:h.def.door, yf:0.08 }, { t:'warp', loc:h.def.room, x:HOME_ENTRY_X, yf:h.r.yf0 });
+    q.push({ t:'chatwith', who:h.id, here:true }, { t:'wait', s:rnd(5, 12) });
+    q.push({ t:'go', x:HOME_ENTRY_X, yf:h.r.yf0 }, { t:'warp', loc:'rua', x:h.def.door, yf:0.08 });
+  }
+  return q;
+}
+function returnHome(n){
+  const d = n.def;
+  return [{ t:'go', x:d.door, yf:0.08 }, { t:'warp', loc:d.room, x:HOME_ENTRY_X, yf:n.r.yf0 }, { t:'go', x:n.r.x0, yf:n.r.yf0 }];
+}
+function plan(n){
+  const d = n.def, h = marianaHour();
+  if (n.loc === 'off') {
+    if (!isOff(n)) { const lado = Math.random() < 0.5; n.q = [{ t:'warp', loc:'rua', x:lado ? 70 : 2480, yf:rnd(0.2, 0.8) }]; }
+    else n.until = Date.now() + 30000;
+    return;
+  }
+  if (isOff(n)) {
+    if (n.loc !== 'rua') { n.until = Date.now() + 20000; return; }
+    const lado = n.x < 1280;
+    n.q = [{ t:'go', x:lado ? 40 : 2500, yf:n.yf }, { t:'warp', loc:'off', x:0, yf:0.5 }]; return;
+  }
+  if (d.fixed) {
+    n.q = [{ t:'wait', s:rnd(25, 70) }, { t:'go', x:n.r.x0 + rnd(-80, 80), yf:clamp01(n.r.yf0 + rnd(-0.18, 0.18)) }];
+    return;
+  }
+  if (d.street) {
+    n.q = streetActivity(n);
+    if (!n.q.length) n.q = [{ t:'wait', s:5 }];
+    return;
+  }
+  /* morador de casa */
+  if (n.loc === d.room) {
+    if (n.x !== n.r.x0 || n.yf !== n.r.yf0) { n.q = [{ t:'go', x:n.r.x0, yf:n.r.yf0 }]; return; }
+    if (sleepHour() || h < 8 || h >= 21 || Math.random() < 0.35) { n.until = Date.now() + rnd(25000, 80000); return; }
+    n.q = [{ t:'wait', s:rnd(1, 4) }, { t:'go', x:HOME_ENTRY_X, yf:n.r.yf0 }, { t:'warp', loc:'rua', x:d.door, yf:0.08 }];
+    const legs = 1 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < legs; i++) n.q.push(...streetActivity(n));
+    n.q.push(...returnHome(n));
+    return;
+  }
+  /* em outra sala sem plano: volta para casa */
+  n.q = n.loc === 'rua' ? returnHome(n) : [{ t:'go', x:HOME_ENTRY_X, yf:0.5 }, { t:'warp', loc:'rua', x:d.door, yf:0.08 }].concat(returnHome(n));
+}
+
+/* ---------- conversa ---------- */
+function isFree(o){ return o.mode === 'free' && o.loc !== 'off' && Date.now() >= o.cool; }
+function pickPartner(a){
+  const c = NPC_LIST.filter(o => o !== a && o.loc === a.loc && isFree(o) && o.id !== 'ptolomeu');
+  if (!c.length) return null;
+  c.sort((x, y) => Math.abs(x.x - a.x) - Math.abs(y.x - a.x));
+  return Math.random() < 0.6 ? c[0] : pick(c);
+}
+function buildScript(a, b){
+  const A = NPC_TXT[a.id], B = NPC_TXT[b.id], ks = Object.keys(TOPICOS), k = pick(ks), L = [];
+  L.push([a, safeCall(TOPICOS[k]) || falaDe(a.id)]);
+  L.push([b, B.r[k] || pick(B.rg)]);
+  L.push([b, falaDe(b.id)]);
+  L.push([a, pick(A.rg)]);
+  if (Math.random() < 0.65) {
+    const c = pick(NPC_LIST.filter(o => o !== a && o !== b));
+    L.push([a, pick(A.s).replace('{n}', NPC_NOME[c.id])]);
+    L.push([b, pick(B.rg)]);
+  }
+  return L;
+}
+function faceTo(n, other){ n.flip = other.x < n.x; }
+function releaseChat(c){
+  c.a.mode = c.b.mode = 'free'; c.a.cool = c.b.cool = Date.now() + 35000;
+  c.a.bub = c.b.bub = ''; const i = CHATS.indexOf(c); if (i >= 0) CHATS.splice(i, 1);
+}
+function abortChatOf(n){ const c = CHATS.find(x => x.a === n || x.b === n); if (c) releaseChat(c); }
+function startChat(a, s){
+  let b = (s.who && s.who !== '*') ? NP[s.who] : pickPartner(a);
+  if (!b || b === a || b.loc !== a.loc || !(b.mode === 'free' || s.here)) return;
+  if (b.mode !== 'free') return;
+  b.mode = 'wait'; b.waitFor = a; b.waitUntil = Date.now() + 30000; b.moving = false;
+  a.q.unshift({ t:'approach', to:b, until:Date.now() + 28000 }, { t:'talk', to:b });
+}
+function beginTalk(a, b){
+  b.mode = 'chat'; a.mode = 'chat'; a.moving = b.moving = false; faceTo(a, b); faceTo(b, a);
+  const c = { a, b, L:buildScript(a, b), i:0, next:Date.now() + 300 };
+  CHATS.push(c);
+  if (a.loc === currentRoomId) { GS.chats = (GS.chats || 0) + 1; gsSave(); setTimeout(() => { if (typeof checkExtras6 === 'function') checkExtras6(); }, 60); }
+}
+function tickChats(now){
+  for (let i = CHATS.length - 1; i >= 0; i--) {
+    const c = CHATS[i];
+    if (now < c.next) continue;
+    if (c.i >= c.L.length) { releaseChat(c); continue; }
+    const [who, txt] = c.L[c.i++];
+    who.bub = txt; const dur = Math.min(6800, 2000 + txt.length * 55); who.bubUntil = now + dur;
+    c.next = now + dur + 350;
+  }
+}
+
+/* ---------- execução de passos ---------- */
+function setLoc(n, loc, x, yf){
+  const antes = n.loc; n.loc = loc; n.x = x; n.yf = yf; n.moving = false;
+  if (antes === currentRoomId || loc === currentRoomId) syncRoomEls();
+  n.r.x = n.x; n.r._y = loc === 'off' ? 0 : yOf(n);
+}
+function stepNPC(n, dt, now){
+  n.moving = false;
+  if (n.loc === 'off') { if (!n.q.length && now >= n.until) plan(n); else if (n.q.length) runStep(n, dt, now); return; }
+  if (n.mode === 'hold') { if (now > n.holdUntil) n.mode = 'free'; return; }
+  if (n.mode === 'wait') { if (now > n.waitUntil) n.mode = 'free'; else if (n.waitFor) faceTo(n, n.waitFor); return; }
+  if (n.mode === 'chat') return;
+  if (!n.q.length) { if (now >= n.until) { plan(n); n.until = now + rnd(1500, 6000); } return; }
+  runStep(n, dt, now);
+}
+function runStep(n, dt, now){
+  const s = n.q[0]; if (!s) return;
+  if (s.t === 'wait') { if (!s.at) s.at = now + s.s * 1000; if (now >= s.at) n.q.shift(); return; }
+  if (s.t === 'warp') { setLoc(n, s.loc, s.x, s.yf); n.q.shift(); return; }
+  if (s.t === 'chatwith') { n.q.shift(); startChat(n, s); return; }
+  if (s.t === 'approach') {
+    const b = s.to;
+    if (b.loc !== n.loc || b.mode !== 'wait' || now > s.until) { if (b.mode === 'wait') b.mode = 'free'; n.q.shift(); if (n.q[0] && n.q[0].t === 'talk') n.q.shift(); return; }
+    const tx = b.x + (n.x < b.x ? -46 : 46);
+    if (moveToward(n, tx, b.yf, dt)) { n.q.shift(); }
+    return;
+  }
+  if (s.t === 'talk') { n.q.shift(); beginTalk(n, s.to); return; }
+  if (s.t === 'go') {
+    if (moveToward(n, s.x, s.yf, dt)) n.q.shift();
+  }
+}
+function moveToward(n, tx, tyf, dt){
+  const g = gFrac(n.loc), yr = STAGE_H * (g[1] - g[0]);
+  const dx = tx - n.x, dy = (tyf - n.yf) * yr, dist = Math.hypot(dx, dy);
+  if (dist < 3) { n.x = tx; n.yf = tyf; return true; }
+  const step = Math.min(dist, n.def.speed * dt);
+  n.x += dx / dist * step; n.yf = clamp01(n.yf + (dy / dist * step) / yr);
+  if (Math.abs(dx) > 1) n.flip = dx < 0;
+  n.moving = true; n.phase += dt * 9;
+  return false;
+}
+
+/* ---------- DOM ---------- */
+function mkNpcEl(n){
+  const r = n.r, d = mkEl('div', { className:'resident' });
+  d.dataset.res = n.def.room + ':' + n.def.idx;
+  d.style.transformOrigin = '50% 100%';
+  d.innerHTML = '<div class="shadow"></div><div class="facing"><div class="bodywrap"><div class="leg left"></div><div class="leg right"></div><div class="av-body"></div></div></div><div class="nametag">' + esc(r.nome) + '</div>';
+  roomlayer.appendChild(d); applyEquip(d, r.look);
+  n.el = d; n.lastKey = ''; placeEl(n);
+}
+function placeEl(n){
+  if (!n.el) return;
+  const y = yOf(n), g = gFrac(n.loc), depthT = (y - STAGE_H * g[0]) / (STAGE_H * (g[1] - g[0]));
+  const key = Math.round(n.x) + ',' + y + ',' + n.flip + ',' + n.moving;
+  if (key === n.lastKey) return; n.lastKey = key;
+  const sc = (0.88 + depthT * 0.18) * (n.r.small ? 0.78 : 1);
+  n.el.style.left = (n.x - 36) + 'px'; n.el.style.top = (y - 78) + 'px';
+  n.el.style.zIndex = String(40 + Math.round(depthT * 20));
+  n.el.style.transform = 'scale(' + sc.toFixed(3) + ')';
+  const f = n.el.querySelector('.facing'); if (f) f.classList.toggle('flip', !!n.flip);
+  const ll = n.el.querySelector('.leg.left'), lr = n.el.querySelector('.leg.right');
+  if (ll && lr && typeof setFootStep === 'function') {
+    if (n.moving) { setFootStep(ll, n.phase); setFootStep(lr, n.phase + Math.PI); } else { setFootStep(ll, 0); setFootStep(lr, 0); }
+  }
+}
+function syncRoomEls(){
+  NPC_LIST.forEach(n => {
+    const aqui = n.loc === currentRoomId;
+    if (aqui && !n.el) mkNpcEl(n);
+    else if (!aqui && n.el) { n.el.remove(); n.el = null; if (n.bubEl) { n.bubEl.remove(); n.bubEl = null; } }
+  });
+}
+buildResidents = function(id){
+  NPC_LIST.forEach(n => { n.el = null; n.bubEl = null; });
+  NPC_LIST.forEach(n => { n.r.x = n.x; n.r._y = n.loc === 'off' ? 0 : yOf(n); });
+  NPC_LIST.filter(n => n.loc === id).forEach(mkNpcEl);
+};
+function drawBubbles(now){
+  NPC_LIST.forEach(n => {
+    const ativo = n.el && n.bub && now < n.bubUntil;
+    if (!ativo) { if (n.bubEl) { n.bubEl.remove(); n.bubEl = null; } if (n.bub && now >= n.bubUntil) n.bub = ''; return; }
+    if (!n.bubEl) { n.bubEl = mkEl('div', { className:'nbub' }); n.bubEl.innerHTML = '<b></b><span></span>'; roomlayer.appendChild(n.bubEl); n.bubTxt = ''; }
+    if (n.bubTxt !== n.bub) { n.bubTxt = n.bub; n.bubEl.firstChild.textContent = n.r.nome; n.bubEl.lastChild.textContent = n.bub; }
+    n.bubEl.style.left = Math.round(n.x) + 'px'; n.bubEl.style.top = (yOf(n) - 96) + 'px';
+  });
+}
+
+/* ---------- cliques do jogador ---------- */
+world.addEventListener('click', e => {
+  const el = e.target.closest('.resident'); if (!el) return;
+  const n = NPC_LIST.find(o => o.el === el); if (!n) return;
+  abortChatOf(n); n.mode = 'hold'; n.holdUntil = Date.now() + 9000; n.moving = false; n.bub = ''; n.nextAmb = Date.now() + 20000;
+  GS.talked = GS.talked || {}; GS.talked[n.id] = 1; GS.talks = (GS.talks || 0) + 1; gsSave();
+  setTimeout(() => { if (typeof checkExtras6 === 'function') checkExtras6(); }, 400);
+}, true);
+
+/* ---------- laço principal ---------- */
+let lastFrame = performance.now(), lastRun = Date.now();
+function frame(){ simulate(); requestAnimationFrame(frame); }
+function simulate(){
+  const t = performance.now(); let dt = (t - lastFrame) / 1000; lastFrame = t; lastRun = Date.now();
+  dt = Math.min(dt, 0.25); const now = Date.now();
+  NPC_LIST.forEach(n => {
+    stepNPC(n, dt, now);
+    n.r.x = n.x; n.r._y = n.loc === 'off' ? 0 : yOf(n);
+    if (n.loc === currentRoomId) {
+      if (!n.el) mkNpcEl(n);
+      placeEl(n);
+      if (!n.bub && n.mode === 'free' && now > n.nextAmb) {
+        if (n.x > camX - 40 && n.x < camX + STAGE_W + 40) { n.bub = falaDe(n.id); n.bubUntil = now + Math.min(6000, 2200 + n.bub.length * 50); n.nextAmb = now + rnd(22000, 55000); }
+        else n.nextAmb = now + 4000;
+      }
+    }
+  });
+  tickChats(now); drawBubbles(now);
+}
+requestAnimationFrame(frame);
+setInterval(() => { if (Date.now() - lastRun > 1500) simulate(); }, 1000);
+if (typeof fetchLancamentosFuturos === 'function') setTimeout(() => { fetchLancamentosFuturos().catch(() => {}); }, 2500);
+window.__npc = { NP, NPC_LIST, CHATS, plan, NPC_TXT, buildPool, falaDe };
+
+/* =====================================================================
+   EXTRAS 6 — 40 itens novos. Fontes reais de drop: tempo no mundo, presentes
+   dos 4 novos moradores, conversas testemunhadas, falar com moradores,
+   horários/dias reais, puzzles, vitórias, coleção, segredos.
+   ===================================================================== */
+/* tempo no mundo (12) */
+addItem('gorro_la','helm','Gorro de Lã','capuz','cloth','comum','Fique 5 min no mundo');
+addItem('calcas_linho','legs','Calças de Linho','cuff','cloth','comum','Fique 6 min no mundo');
+addItem('estilingue','weapon','Estilingue','cajado','leather','comum','Fique 8 min no mundo');
+addItem('machado_pedra','weapon','Machado de Pedra','machado','iron','comum','Fique 20 min no mundo');
+addItem('capa_chuva','back','Capa de Chuva','capa','forest','comum','Fique 14 min no mundo');
+addItem('elmo_cobre','helm','Elmo de Cobre','elmo','bronze','incomum','Fique 40 min no mundo');
+addItem('cota_cobre','chest','Cota de Cobre','malha','bronze','incomum','Fique 55 min no mundo');
+addItem('grevas_cobre','legs','Grevas de Cobre','grevas','bronze','incomum','Fique 65 min no mundo');
+addItem('manto_viajante2','chest','Manto do Peregrino','manto','leather','incomum','Fique 80 min no mundo');
+addItem('diadema_prata','helm','Diadema de Prata','coroa','iron','raro','Fique 150 min no mundo');
+addItem('asas_corvo','back','Asas de Corvo','asas','midnight','epico','Fique 6 horas no mundo','void');
+addItem('martelo_runico','weapon','Martelo Rúnico','martelo','royal','epico','Fique 10 horas no mundo','glow');
+[[300,'gorro_la'],[360,'calcas_linho'],[480,'estilingue'],[840,'capa_chuva'],[1200,'machado_pedra'],[2400,'elmo_cobre'],[3300,'cota_cobre'],
+ [3900,'grevas_cobre'],[4800,'manto_viajante2'],[9000,'diadema_prata'],[21600,'asas_corvo'],[36000,'martelo_runico']
+].forEach(p => TIME_DROPS.push(p));
+/* presentes dos novos moradores (4) */
+addItem('coroa_flores','helm','Coroa de Flores','coroa','forest','incomum','Presente da Florista Rosa');
+addItem('vara_pesca','weapon','Vara de Pesca','cajado','leather','incomum','Presente do Pescador Nico');
+addItem('lira_bardo','weapon','Lira do Bardo','cajado','gold','raro','Presente do Bardo Orfeu','glow');
+addItem('chapeu_menino','helm','Chapéu do Pedrinho','capuz','crimson','comum','Presente do Pedrinho');
+/* conversas entre moradores (3) */
+addItem('capa_fofoqueiro','back','Capa do Fofoqueiro','capa','crimson','raro','Presencie 5 conversas entre moradores');
+addItem('manto_orador','chest','Manto do Orador','manto','royal','epico','Presencie 25 conversas entre moradores');
+addItem('coroa_diplomata','helm','Coroa do Diplomata','coroa','gold','lendario','Presencie 60 conversas entre moradores','glow');
+/* falar com os moradores (3) */
+addItem('botas_mensageiro','legs','Botas do Mensageiro','botas','leather','raro','Converse com 6 moradores diferentes');
+addItem('armadura_cidadao','chest','Armadura do Cidadão','placa','gold','epico','Converse com os 12 moradores');
+addItem('cetro_prefeito','weapon','Cetro do Prefeito','cajado','gold','lendario','Converse 100 vezes com moradores','glow');
+/* horários e dias reais (4) */
+addItem('capa_alvorada','back','Capa da Alvorada','capa','solar','raro','Jogue entre 5h e 6h (Mariana)','glow');
+addItem('elmo_luar','helm','Elmo do Luar','mago','midnight','raro','Jogue entre 3h e 4h (Mariana)','void');
+addItem('botas_domingo','legs','Botas de Domingo','botas','royal','incomum','Jogue num domingo');
+addItem('elmo_festa','helm','Elmo da Festa','crista','crimson','incomum','Jogue num sábado');
+/* puzzles (6) */
+addItem('tunica_enigma','chest','Túnica do Enigma','manto','royal','raro','Resolva 5 puzzles das dungeons');
+addItem('capuz_sabio','helm','Capuz do Sábio','mago','ice','raro','Resolva 10 puzzles das dungeons','ice');
+addItem('botas_enigma','legs','Botas do Enigma','grevas','fire','epico','Resolva 15 puzzles das dungeons','fire');
+addItem('capa_labirinto','back','Capa do Labirinto','capa','void','epico','Resolva 20 puzzles das dungeons','void');
+addItem('cajado_enigma','weapon','Cajado do Enigma','cajado','aurora','lendario','Resolva 35 puzzles das dungeons','aurora');
+addItem('coroa_mestre','helm','Coroa do Mestre dos Enigmas','coroa','rainbow','ultra','Resolva 60 puzzles das dungeons','rainbow');
+/* vitórias no Saloon (3) */
+addItem('espada_vitoria','weapon','Espada da Vitória','espada','gold','epico','Vença 15 jogos no Saloon');
+addItem('grevas_campeao','legs','Grevas do Campeão','grevas','gold','epico','Vença 20 jogos no Saloon');
+addItem('elmo_campeao','helm','Elmo do Campeão','crista','gold','lendario','Vença 25 jogos no Saloon','glow');
+/* coleção e exploração (5) */
+addItem('capa_colecionador','back','Capa do Colecionador','capa','gold','epico','Reúna 50 itens');
+addItem('armadura_mestre','chest','Armadura do Mestre Colecionador','placa','rainbow','mitico','Reúna 70 itens','rainbow');
+addItem('asas_cristal','back','Asas de Cristal','asas','ice','mitico','Reúna 15 pets','ice');
+addItem('capuz_neblina','helm','Capuz da Neblina','capuz','cloth','incomum','Visite todos os lugares do mundo');
+addItem('bastao_explorador','weapon','Bastão do Explorador','tocha','iron','raro','Encontre 9 segredos escondidos');
+
+/* ---------- verificação ---------- */
+function checkExtras6(){
+  const g = GS, chats = g.chats || 0, talks = g.talks || 0, talked = Object.keys(g.talked || {}).length;
+  if (chats >= 5) grantItem('capa_fofoqueiro');
+  if (chats >= 25) grantItem('manto_orador');
+  if (chats >= 60) grantItem('coroa_diplomata');
+  if (talked >= 6) grantItem('botas_mensageiro');
+  if (talked >= Object.keys(NP).length) grantItem('armadura_cidadao');
+  if (talks >= 100) grantItem('cetro_prefeito');
+  const h = marianaHour(), dow = new Date().toLocaleDateString('en-US', { weekday:'short', timeZone:'America/Sao_Paulo' });
+  if (h === 5) grantItem('capa_alvorada');
+  if (h === 3) grantItem('elmo_luar');
+  if (dow === 'Sun') grantItem('botas_domingo');
+  if (dow === 'Sat') grantItem('elmo_festa');
+  const pz = g.puz || 0;
+  [[5,'tunica_enigma'],[10,'capuz_sabio'],[15,'botas_enigma'],[20,'capa_labirinto'],[35,'cajado_enigma'],[60,'coroa_mestre']].forEach(([n, id]) => { if (pz >= n) grantItem(id); });
+  const w = (g.wins.pc || 0) + (g.wins.ms || 0);
+  [[15,'espada_vitoria'],[20,'grevas_campeao'],[25,'elmo_campeao']].forEach(([n, id]) => { if (w >= n) grantItem(id); });
+  const own = Object.keys(g.owned).length;
+  if (own >= 50) grantItem('capa_colecionador');
+  if (own >= 70) grantItem('armadura_mestre');
+  if (ITEMS.filter(i => i.slot === 'pet' && g.owned[i.id]).length >= 15) grantItem('asas_cristal');
+  if (Object.keys(ROOMS).every(r => g.rooms[r])) grantItem('capuz_neblina');
+  if (Object.keys(g.found).length >= 9) grantItem('bastao_explorador');
+}
+const _checkMeta6 = checkMeta;
+checkMeta = function(){ _checkMeta6.apply(this, arguments); checkExtras6(); };
+setInterval(checkExtras6, 20000);
 
 /*EXTRAS_JS_END*/
 
