@@ -3487,6 +3487,7 @@ world.addEventListener('click', (e) => {
 });
 
 
+
 /*EXTRAS_JS_START*/
 /* =====================================================================
    iamT World — EXTRAS: save, áudio 8-bit medieval (máx 5%), inventário/equipamentos,
@@ -3720,13 +3721,14 @@ function equipToggle(id){
 }
 
 /* ---------- áudio: volume máximo 5% ---------- */
-const MASTER_VOL = 0.01;           // teto absoluto de tudo (música + efeitos): 1%
-let masterGain = null, musicBus = null, noiseBuf = null;
+const MASTER_VOL = 0.01;           // teto da MÚSICA: 1% (efeitos usam sfxGain, volume normal do site)
+let masterGain = null, sfxGain = null, musicBus = null, noiseBuf = null;
 let musicRoom = null, musicStep = 0, musicNext = 0, musicDucked = false, audioStarted = false;
 function audioInit(){
   const ctx = ensureAudio(); if (!ctx) return null;
   if (!masterGain) {
     masterGain = ctx.createGain(); masterGain.gain.value = MASTER_VOL; masterGain.connect(ctx.destination);
+    sfxGain = ctx.createGain(); sfxGain.gain.value = 0.1; sfxGain.connect(ctx.destination);   // efeitos (passos, item): volume normal do site
     musicBus = ctx.createGain(); musicBus.gain.value = 1; musicBus.connect(masterGain);
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.4, ctx.sampleRate);
     const ch = noiseBuf.getChannelData(0); for (let i = 0; i < ch.length; i++) ch[i] = Math.random() * 2 - 1;
@@ -3817,12 +3819,12 @@ footstepSound = function(){
   const t0 = ctx.currentTime; const o = ctx.createOscillator(), g = ctx.createGain();
   o.type = 'sine'; o.frequency.setValueAtTime(95 + Math.random() * 10, t0); o.frequency.exponentialRampToValueAtTime(55, t0 + 0.07);
   g.gain.setValueAtTime(0.5, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.08);
-  o.connect(g).connect(masterGain); o.start(t0); o.stop(t0 + 0.09);
+  o.connect(g).connect(sfxGain); o.start(t0); o.stop(t0 + 0.09);
 };
 function sfxItem(){
   if (muted) return; const ctx = audioInit(); if (!ctx) return;
   const t = ctx.currentTime;
-  [0, 4, 7, 12].forEach((s, i) => voice('square', mtof(69 + s), t + i * 0.09, 0.22, 0.4, masterGain));
+  [0, 4, 7, 12].forEach((s, i) => voice('square', mtof(69 + s), t + i * 0.09, 0.22, 0.4, sfxGain));
 }
 muted = !!GS.muted;
 document.getElementById('soundtoggle').textContent = muted ? '🔇' : '🔈';
