@@ -3486,6 +3486,7 @@ world.addEventListener('click', (e) => {
   walkTo(x, y);
 });
 
+
 /*EXTRAS_JS_START*/
 /* =====================================================================
    iamT World — EXTRAS: save, áudio 8-bit medieval (máx 5%), inventário/equipamentos,
@@ -3719,7 +3720,7 @@ function equipToggle(id){
 }
 
 /* ---------- áudio: volume máximo 5% ---------- */
-const MASTER_VOL = 0.05;           // teto absoluto de tudo (música + efeitos)
+const MASTER_VOL = 0.01;           // teto absoluto de tudo (música + efeitos): 1%
 let masterGain = null, musicBus = null, noiseBuf = null;
 let musicRoom = null, musicStep = 0, musicNext = 0, musicDucked = false, audioStarted = false;
 function audioInit(){
