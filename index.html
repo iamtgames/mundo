@@ -1346,6 +1346,50 @@
   .nbub b{display:block; font-weight:normal; font-size:14px; color:#7a3b10; letter-spacing:.3px;}
   .nbub::after{content:''; position:absolute; left:50%; bottom:-8px; width:10px; height:10px; background:#f5e6c0; border-right:2px solid #000; border-bottom:2px solid #000; transform:translateX(-50%) rotate(45deg);}
   @keyframes nbubIn{from{opacity:0; transform:translateX(-50%) translateY(4px);}to{opacity:1; transform:translateX(-50%) translateY(0);}}
+
+  #diaryBtn{right:158px;} #clockTag{right:194px !important;}
+  .dgate{position:absolute; width:78px; height:62px; cursor:pointer; z-index:5;}
+  .dgate .dg-glow{position:absolute; inset:0; border-radius:6px 6px 2px 2px; border:4px solid #120a14;}
+  .dgate .dg-lbl{position:absolute; left:-28px; right:-28px; bottom:-20px; text-align:center; font-size:13px; color:#e9dcff; text-shadow:2px 2px 0 #000; white-space:nowrap; letter-spacing:.3px;}
+  .dgate.hatch .dg-glow{background:repeating-linear-gradient(90deg,#4a3320 0 8px,#33220f 8px 10px); box-shadow:0 0 14px rgba(255,150,60,.55), inset 0 0 12px #000;}
+  .dgate.hatch.key .dg-glow{box-shadow:0 0 18px rgba(255,220,90,.85), inset 0 0 12px #000; animation:dgPulse 2.2s ease-in-out infinite;}
+  .dgate.cave{width:96px; height:84px;}
+  .dgate.cave .dg-glow{border-radius:50% 50% 4px 4px; background:radial-gradient(ellipse at 50% 80%,#000 0 45%,#1a0f2a 70%,#3a2a4a 100%); box-shadow:0 0 18px rgba(120,80,200,.65), inset 0 0 16px #000;}
+  .dgate.sealed{width:70px; height:96px;}
+  .dgate.sealed .dg-glow{background:linear-gradient(90deg,#2a2a40,#44446a 50%,#2a2a40); box-shadow:0 0 16px rgba(120,220,255,.55), inset 0 0 10px #000; border-radius:34px 34px 3px 3px;}
+  .dgate.moon{width:80px; height:100px;}
+  .dgate.moon .dg-glow{border-radius:40px 40px 4px 4px; border-color:#b8d8ff; background:radial-gradient(ellipse at 50% 55%,#fff 0%,#bfe0ff 30%,#4a6ad8 68%,#101040 100%); box-shadow:0 0 26px rgba(170,215,255,.95), 0 0 60px rgba(120,160,255,.6); animation:dgPulse 2.4s ease-in-out infinite;}
+  .dgate:hover .dg-glow{filter:brightness(1.25);}
+  @keyframes dgPulse{0%,100%{filter:brightness(1);}50%{filter:brightness(1.35);}}
+  .shootstar{position:absolute; z-index:90; width:26px; height:26px; cursor:pointer; background:radial-gradient(circle,#fff 0 25%,#ffe9a0 45%,rgba(255,200,80,0) 70%); border-radius:50%; box-shadow:-60px -24px 40px 4px rgba(255,220,130,.35); animation:starFly 6.5s linear forwards;}
+  @keyframes starFly{from{transform:translate(0,0);}to{transform:translate(380px,180px);}}
+  .evt-chest{position:absolute; width:46px; height:36px; cursor:pointer; z-index:8; animation:chestBob 1.6s ease-in-out infinite;}
+  .evt-chest .ec-body{position:absolute; left:0; right:0; bottom:0; height:22px; background:repeating-linear-gradient(90deg,#8a5a2a 0 6px,#6b4420 6px 8px); border:3px solid #1a0f06; box-shadow:0 0 14px rgba(255,220,100,.8);}
+  .evt-chest .ec-lid{position:absolute; left:0; right:0; top:2px; height:14px; background:#a8702f; border:3px solid #1a0f06; border-radius:12px 12px 0 0;}
+  @keyframes chestBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+  .mkt-merchant{position:absolute; width:72px; height:78px; cursor:pointer;}
+  .mkt-merchant .shadow{position:absolute; bottom:-4px; left:50%; width:50px; height:13px; background:radial-gradient(ellipse,rgba(0,0,0,.5),transparent 72%); transform:translateX(-50%);}
+  .mkt-merchant .nametag{position:absolute; left:50%; top:-34px; transform:translateX(-50%); white-space:nowrap; font-size:14px; background:rgba(15,10,26,.85); color:#ffe08a; padding:1px 7px; border-radius:4px; border:1px solid rgba(255,224,138,.5);}
+  .mkt-merchant::after{content:'🛒'; position:absolute; left:50%; top:-58px; transform:translateX(-50%); font-size:20px; animation:chestBob 1.4s ease-in-out infinite;}
+  #mktBox{width:min(520px,94%);}
+  .mkt-body{padding:12px 16px 16px;}
+  .mkt-intro{margin:0 0 8px; font-size:17px; color:#cdbde8;}
+  .mkt-coins{margin-bottom:10px; font-size:19px; color:#ffe08a;}
+  .mkt-row{display:flex; align-items:center; gap:12px; padding:8px 10px; margin-bottom:8px; background:#0d0816; border:2px solid #3a2a55; border-radius:8px;}
+  .mkt-info{flex:1; display:flex; flex-direction:column; font-size:18px;}
+  .mkt-info small{font-size:13px; color:#9d90bd;}
+  #diaryBox{width:min(820px,96%);}
+  .dy-stats{display:flex; flex-wrap:wrap; gap:6px 16px; padding:8px 14px; background:rgba(0,0,0,.28); font-size:15px; color:#e9dcff;}
+  .dy-body{display:flex; gap:12px; padding:10px 14px 14px; min-height:260px;}
+  .dy-list{flex:0 0 250px; display:flex; flex-direction:column; gap:5px; max-height:330px; overflow:auto;}
+  .dy-item{font-family:inherit; font-size:16px; text-align:left; padding:6px 10px; border-radius:6px; border:2px solid #3a2a55; background:#150d22; color:#e9dcff; cursor:pointer;}
+  .dy-item.on{border-color:#c9a24a; background:#251a3a;}
+  .dy-item.locked{color:#7a6f96;}
+  .dy-prog{font-size:14px; color:#9d90bd; padding:4px 2px;}
+  .dy-text{flex:1; padding:6px 10px; font-size:18px; line-height:1.25; color:#ead9de;}
+  .dy-text h3{margin:0 0 8px; font-size:22px; color:#ffe08a; font-weight:normal;}
+  .dy-text p{margin:0;}
+  .dy-hint{color:#9d90bd;}
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3632,6 +3676,7 @@ world.addEventListener('click', (e) => {
 
 
 
+
 /*EXTRAS_JS_START*/
 /* =====================================================================
    iamT World — EXTRAS: save, áudio 8-bit medieval (máx 5%), inventário/equipamentos,
@@ -4323,12 +4368,6 @@ let sessT = 0;
 setInterval(() => {
   if (document.hidden) return;
   GS.t++; sessT++;
-  if (sessT >= 120 && sessT % 5 === 0) {
-    const hh = marianaHour();
-    if (hh < 5) grantItem('manto_noite');
-    if (hh === 11 || hh === 12) grantItem('armadura_solar');
-    if (stage.classList.contains('rainy')) grantItem('botas_tempestade');
-  }
   if (GS.t % 5 === 0) TIME_DROPS.forEach(([sec, id]) => { if (GS.t >= sec) grantItem(id); });
   if (GS.t % 10 === 0) gsSave();
 }, 1000);
@@ -4657,19 +4696,7 @@ document.getElementById('svLoad').addEventListener('click', () => {
 saveBox.addEventListener('click', e => { if (e.target.classList.contains('xback') || e.target.classList.contains('xclose')) saveBox.classList.remove('show'); });
 saveBox.addEventListener('keydown', e => e.stopPropagation());
 
-/* ---------- gatilhos por sessão (noite, meio-dia, chuva) para pets ---------- */
-let sess2 = 0, rainSec = 0;
-setInterval(() => {
-  if (document.hidden) return;
-  sess2++; if (stage.classList.contains('rainy')) rainSec++;
-  if (sess2 >= 120 && sess2 % 5 === 0) {
-    const hh = marianaHour();
-    if (hh >= 22 || hh < 5) grantItem('fantasma_anjo');
-    if (hh === 11 || hh === 12) grantItem('estrela_solar');
-  }
-  if (rainSec >= 600) grantItem('robo_trovao');
-}, 1000);
-
+/* gatilhos passivos removidos: agora dependem de ações (ver extras7) */
 applyStats(); mkPet();
 
 /* =====================================================================
@@ -4709,6 +4736,7 @@ const DUNGEONS = [
           { t:'simon', len:9, nome:'Hino das Cores' }, { t:'code', len:4, colors:6, rep:true, tries:9, nome:'Cofre Prisma' }, { t:'slide', n:4, nome:'Vitral Mestre' } ],
     reward:['cetro_prisma', 'estrela_cosmica'] }
 ];
+const MAIN_DG = DUNGEONS.slice();
 const FX_NOME = { ice:'GELO', fire:'FOGO', void:'VAZIO' };
 function dgRec(i){
   const id = DUNGEONS[i].id; const r = GS.dg[id] = Object.assign({ done:{}, times:{}, daily:{}, clear:0, best:0, hu:0 }, GS.dg[id] || {});
@@ -4820,7 +4848,7 @@ function winPuzzle(){
     gsSave();
     box.insertAdjacentHTML('afterbegin', '<div class="big gold">🏆 ' + esc(dg.nome) + ' concluída!</div>');
     dg.reward.forEach((id, k) => setTimeout(() => grantItem(id), 700 + k * 900));
-    if (d + 1 < DUNGEONS.length) box.insertAdjacentHTML('beforeend', '<div class="dg-next">Nova dungeon liberada: <b>' + esc(DUNGEONS[d + 1].nome) + '</b>' + (DUNGEONS[d + 1].gate ? ' — exige itens de ' + DUNGEONS[d + 1].gate.map(f => FX_NOME[f]).join(' + ') + '.' : '.') + '</div>');
+    if (d + 1 < MAIN_DG.length) box.insertAdjacentHTML('beforeend', '<div class="dg-next">Nova dungeon liberada: <b>' + esc(DUNGEONS[d + 1].nome) + '</b>' + (DUNGEONS[d + 1].gate ? ' — exige itens de ' + DUNGEONS[d + 1].gate.map(f => FX_NOME[f]).join(' + ') + '.' : '.') + '</div>');
     setTimeout(checkMeta, 2600);
   } else setTimeout(checkMeta, 100);
 }
@@ -5082,10 +5110,10 @@ TRACKS.criptas = { bpm:62, root:43, scale:SC.phr, lead:'triangle', vol:0.55, hol
 MAP_NODES.push({ id:'criptas', x:50, y:30, t:'🗝️ Criptas' });
 RESIDENTS.criptas = [{ x:520, yf:0.55, nome:'Arquivista Ptolomeu', look:{ helm:'chapeu_mago', chest:'manto_mago', legs:'botas_reais', weapon:'cajado_mago' },
   falas: () => {
-    const feitas = DUNGEONS.filter((_, i) => dgCleared(i)).length;
-    const prox = DUNGEONS.findIndex((_, i) => !dgCleared(i));
+    const feitas = MAIN_DG.filter((_, i) => dgCleared(i)).length;
+    const prox = MAIN_DG.findIndex((_, i) => !dgCleared(i));
     return [
-      'Você concluiu ' + feitas + ' de ' + DUNGEONS.length + ' dungeons e resolveu ' + (GS.puz || 0) + ' puzzles.',
+      'Você concluiu ' + feitas + ' de ' + MAIN_DG.length + ' dungeons e resolveu ' + (GS.puz || 0) + ' puzzles.',
       prox >= 0 ? 'Próxima: ' + DUNGEONS[prox].nome + '. ' + (dgLockReason(prox) || 'A porta está aberta!') : 'Você dominou todas as criptas, Arquivista!',
       'Itens dão bônus: pernas = velocidade, cabeça = dicas, peito = vidas, costas = tempo, arma = sorte. Pets reforçam um deles.',
       'Os puzzles mudam de layout a cada dia. Volte amanhã!'
@@ -5132,7 +5160,7 @@ checkMeta = function(){
   if (Object.keys(GS.owned).length >= 25) grantItem('coruja_meia_noite');
   if ((GS.puz || 0) >= 25) grantItem('espectro_aurora');
   if (GS.noHint) grantItem('dragao_gelo');
-  if (DUNGEONS.every((_, i) => dgCleared(i))) grantItem('gato_arcoiris');
+  if (MAIN_DG.every((_, i) => dgCleared(i))) grantItem('gato_arcoiris');
   const pets = ITEMS.filter(i => i.slot === 'pet' && i.id !== 'dragao_vazio');
   if (pets.every(i => GS.owned[i.id])) grantItem('dragao_vazio');
 };
@@ -5169,7 +5197,7 @@ const D = {
   prox: i => (typeof forgeLancamentosCache !== 'undefined' && forgeLancamentosCache) ? forgeLancamentosCache[i] : null,
   itens: () => Object.keys(GS.owned).length, totalItens: () => ITEMS.length,
   pets: () => ITEMS.filter(i => i.slot === 'pet' && GS.owned[i.id]).length,
-  dungs: () => DUNGEONS.filter((_, i) => dgCleared(i)).length,
+  dungs: () => MAIN_DG.filter((_, i) => dgCleared(i)).length,
   puz: () => GS.puz || 0, seg: () => Object.keys(GS.found).length, nSeg: () => SECRETS.length,
   vit: () => (GS.wins.pc || 0) + (GS.wins.ms || 0), min: () => Math.floor(GS.t / 60),
   salas: () => Object.keys(GS.rooms).length, nSalas: () => Object.keys(ROOMS).length,
@@ -5193,7 +5221,7 @@ const G = [
   () => { const p = D.prox(1); return p ? 'E depois dele vem ' + p.n + ' (' + p.plat + ') em ' + dt(p.data) + '.' : null; },
   () => 'Em Mariana são ' + D.hora() + ' e o tempo está com ' + D.clima() + '.',
   () => 'Você já juntou ' + D.itens() + ' de ' + D.totalItens() + ' itens.',
-  () => 'Você concluiu ' + D.dungs() + ' de ' + DUNGEONS.length + ' dungeons e resolveu ' + D.puz() + ' puzzles.',
+  () => 'Você concluiu ' + D.dungs() + ' de ' + MAIN_DG.length + ' dungeons e resolveu ' + D.puz() + ' puzzles.',
   () => 'Você tem ' + plural(D.pets(), 'pet', 'pets') + ' e achou ' + D.seg() + ' de ' + D.nSeg() + ' segredos.'
 ];
 /* assunto das conversas entre moradores (dados reais) */
@@ -5283,7 +5311,7 @@ NPC_TXT.marina = {
 NPC_TXT.ptolomeu = {
   w: ['', 'Os arquivos dizem: ', 'Em voz baixa: ', 'Escute, viajante: '],
   f: [`O que se esconde nas profundezas costuma esperar pacientemente.`, `Puzzles são portas que só abrem para a mente curiosa.`, `Bem-vindo às Criptas, viajante. Pise com cuidado.`, `Cada sala é uma pergunta. Cada resposta, uma chave.`, `A memória é a melhor lanterna destas galerias.`, `Nem toda porta é para ser aberta com força.`, `Mantenha a calma: a pressa é inimiga da lógica.`, `Registro cada passo de quem passa por aqui. Em silêncio.`, `Quem lê os sinais encontra o caminho.`, `Os efeitos de gelo, fogo e vazio guardam mais do que parecem.`, `Um objeto brilhante pode abrir uma porta antiga.`, `A melodia certa abre mais que qualquer chave.`, `Tochas acesas, mente apagada: cuidado com a pressa.`, `Não existem becos sem saída, apenas perguntas mal feitas.`, `Os pets farejam o que os olhos não veem.`, `Os arquivos antigos não esquecem. Nem eu.`, `Quem conclui a primeira cripta aprende que há mais por vir.`, `Muito se perde em quem conta os passos. Muito se ganha em quem os entende.`, `Desconfie do óbvio. Desconfie também do que parece complicado.`, `A cada dia as criptas trocam de rosto. Venha amanhã.`, `Todo código tem uma lógica. Todo cadeado tem uma resposta.`, `Não se preocupe com os erros. As criptas ensinam com paciência.`, `Já vi muitos entrarem com pressa e saírem sábios.`, `O silêncio daqui conta histórias.`, `Um bom equipamento é meio caminho andado.`, `A sabedoria começa quando se admite que não se sabe.`, `Respire. O enigma não foge.`, `Gosto de quem pergunta antes de agir.`, `Nada é impossível para quem tenta uma segunda vez.`, `As gemas guardam a ordem das coisas.`, `Um espinho avisa uma vez. Duas, ensina.`, `Aprenda com cada tentativa; é assim que se avança.`, `Os mapas mudam, mas a curiosidade permanece.`, `Quem resolve cedo pode descansar tarde.`, `Mesmo o mais velho enigma já foi resolvido por alguém.`, `As criptas só fecham para quem desiste.`, `Há tesouros que só aparecem para quem não os procura.`, `Vá em paz, viajante. A cripta aguarda.`],
-  d: [() => 'Você concluiu ' + D.dungs() + ' de ' + DUNGEONS.length + ' dungeons. ' + (D.dungs() < DUNGEONS.length ? 'A próxima aguarda.' : 'Impressionante.'), () => 'Já resolveu ' + D.puz() + ' puzzles. Cada um é um degrau.', () => { const p = DUNGEONS.findIndex((_, i) => !dgCleared(i)); return p >= 0 ? (dgLockReason(p) || 'A porta de ' + DUNGEONS[p].nome + ' está aberta.') : 'Todas as portas já foram abertas por você.'; }, () => 'Seus pets: ' + D.pets() + '. Bons companheiros ajudam a achar o caminho.', () => 'Você tem ' + D.itens() + ' itens. Os efeitos de gelo, fogo e vazio abrem as portas mais fundas.', () => 'São ' + D.hora() + '. As criptas nunca dormem, mas trocam de rosto à meia-noite.', () => D.chove() ? 'A chuva lá em cima ecoa nas galerias.' : 'Aqui embaixo o tempo não muda. Lá em cima, ' + D.clima() + '.', () => 'Hoje é ' + D.dia() + '. O layout de hoje é ' + dayKey() + '.', () => 'Segredos encontrados: ' + D.seg() + ' de ' + D.nSeg() + '. Falta pouco, ou muito.', () => 'Você passou ' + D.min() + ' minutos no mundo. O tempo é o melhor aprendiz.', () => 'A coleção tem ' + D.nJ() + ' jogos e as criptas fazem perguntas sobre ela. Estude.', () => 'Dicas por puzzle: ' + dicasPorPuzzle() + '. Vidas: ' + vidasPorPuzzle() + '. Equipe-se bem.'],
+  d: [() => 'Você concluiu ' + D.dungs() + ' de ' + MAIN_DG.length + ' dungeons. ' + (D.dungs() < MAIN_DG.length ? 'A próxima aguarda.' : 'Impressionante.'), () => 'Já resolveu ' + D.puz() + ' puzzles. Cada um é um degrau.', () => { const p = DUNGEONS.findIndex((_, i) => !dgCleared(i)); return p >= 0 ? (dgLockReason(p) || 'A porta de ' + DUNGEONS[p].nome + ' está aberta.') : 'Todas as portas já foram abertas por você.'; }, () => 'Seus pets: ' + D.pets() + '. Bons companheiros ajudam a achar o caminho.', () => 'Você tem ' + D.itens() + ' itens. Os efeitos de gelo, fogo e vazio abrem as portas mais fundas.', () => 'São ' + D.hora() + '. As criptas nunca dormem, mas trocam de rosto à meia-noite.', () => D.chove() ? 'A chuva lá em cima ecoa nas galerias.' : 'Aqui embaixo o tempo não muda. Lá em cima, ' + D.clima() + '.', () => 'Hoje é ' + D.dia() + '. O layout de hoje é ' + dayKey() + '.', () => 'Segredos encontrados: ' + D.seg() + ' de ' + D.nSeg() + '. Falta pouco, ou muito.', () => 'Você passou ' + D.min() + ' minutos no mundo. O tempo é o melhor aprendiz.', () => 'A coleção tem ' + D.nJ() + ' jogos e as criptas fazem perguntas sobre ela. Estude.', () => 'Dicas por puzzle: ' + dicasPorPuzzle() + '. Vidas: ' + vidasPorPuzzle() + '. Equipe-se bem.'],
   r: { hora: `O tempo é um enigma interessante.`, clima: `Lá em cima o clima muda. Aqui, nunca.`, live: `As transmissões me parecem enigmas luminosos.`, jogos: `Os arquivos agradecem tantos títulos.`, lancamento: `Mais um capítulo a ser registrado.`, anime: `Histórias dubladas também são arquivos.`, loja: `Mercado é sempre um bom enigma.`, aventureiro: `Esse aventureiro está aprendendo rápido.` },
   rg: [`Hmm.`, `Isso explica muita coisa.`, `Registrado.`, `Curioso.`],
   s: [`{n} é conhecido nos arquivos. Em boa hora.`, `Um dia {n} há de visitar as criptas.`, `Registrei uma anotação sobre {n}. Curiosa.`],
@@ -5501,7 +5529,7 @@ function pickPartner(a){
   return Math.random() < 0.6 ? c[0] : pick(c);
 }
 function buildScript(a, b){
-  const A = NPC_TXT[a.id], B = NPC_TXT[b.id], ks = Object.keys(TOPICOS), k = pick(ks), L = [];
+  const A = NPC_TXT[a.id], B = NPC_TXT[b.id], ks = Object.keys(TOPICOS), k = (typeof estadoMercado === 'function' && estadoMercado().vespera && Math.random() < 0.5) ? 'mercado' : pick(ks), L = [];
   L.push([a, safeCall(TOPICOS[k]) || falaDe(a.id)]);
   L.push([b, B.r[k] || pick(B.rg)]);
   L.push([b, falaDe(b.id)]);
@@ -5684,18 +5712,15 @@ addItem('manto_viajante2','chest','Manto do Peregrino','manto','leather','incomu
 addItem('diadema_prata','helm','Diadema de Prata','coroa','iron','raro','Fique 150 min no mundo');
 addItem('asas_corvo','back','Asas de Corvo','asas','midnight','epico','Fique 6 horas no mundo','void');
 addItem('martelo_runico','weapon','Martelo Rúnico','martelo','royal','epico','Fique 10 horas no mundo','glow');
-[[300,'gorro_la'],[360,'calcas_linho'],[480,'estilingue'],[840,'capa_chuva'],[1200,'machado_pedra'],[2400,'elmo_cobre'],[3300,'cota_cobre'],
- [3900,'grevas_cobre'],[4800,'manto_viajante2'],[9000,'diadema_prata'],[21600,'asas_corvo'],[36000,'martelo_runico']
-].forEach(p => TIME_DROPS.push(p));
 /* presentes dos novos moradores (4) */
 addItem('coroa_flores','helm','Coroa de Flores','coroa','forest','incomum','Presente da Florista Rosa');
 addItem('vara_pesca','weapon','Vara de Pesca','cajado','leather','incomum','Presente do Pescador Nico');
 addItem('lira_bardo','weapon','Lira do Bardo','cajado','gold','raro','Presente do Bardo Orfeu','glow');
 addItem('chapeu_menino','helm','Chapéu do Pedrinho','capuz','crimson','comum','Presente do Pedrinho');
 /* conversas entre moradores (3) */
-addItem('capa_fofoqueiro','back','Capa do Fofoqueiro','capa','crimson','raro','Presencie 5 conversas entre moradores');
-addItem('manto_orador','chest','Manto do Orador','manto','royal','epico','Presencie 25 conversas entre moradores');
-addItem('coroa_diplomata','helm','Coroa do Diplomata','coroa','gold','lendario','Presencie 60 conversas entre moradores','glow');
+addItem('capa_fofoqueiro','back','Capa do Fofoqueiro','capa','crimson','comum','Presencie 5 conversas entre moradores');
+addItem('manto_orador','chest','Manto do Orador','manto','royal','comum','Presencie 25 conversas entre moradores');
+addItem('coroa_diplomata','helm','Coroa do Diplomata','coroa','gold','comum','Presencie 60 conversas entre moradores','glow');
 /* falar com os moradores (3) */
 addItem('botas_mensageiro','legs','Botas do Mensageiro','botas','leather','raro','Converse com 6 moradores diferentes');
 addItem('armadura_cidadao','chest','Armadura do Cidadão','placa','gold','epico','Converse com os 12 moradores');
@@ -5732,11 +5757,6 @@ function checkExtras6(){
   if (talked >= 6) grantItem('botas_mensageiro');
   if (talked >= Object.keys(NP).length) grantItem('armadura_cidadao');
   if (talks >= 100) grantItem('cetro_prefeito');
-  const h = marianaHour(), dow = new Date().toLocaleDateString('en-US', { weekday:'short', timeZone:'America/Sao_Paulo' });
-  if (h === 5) grantItem('capa_alvorada');
-  if (h === 3) grantItem('elmo_luar');
-  if (dow === 'Sun') grantItem('botas_domingo');
-  if (dow === 'Sat') grantItem('elmo_festa');
   const pz = g.puz || 0;
   [[5,'tunica_enigma'],[10,'capuz_sabio'],[15,'botas_enigma'],[20,'capa_labirinto'],[35,'cajado_enigma'],[60,'coroa_mestre']].forEach(([n, id]) => { if (pz >= n) grantItem(id); });
   const w = (g.wins.pc || 0) + (g.wins.ms || 0);
@@ -5751,6 +5771,436 @@ function checkExtras6(){
 const _checkMeta6 = checkMeta;
 checkMeta = function(){ _checkMeta6.apply(this, arguments); checkExtras6(); };
 setInterval(checkExtras6, 20000);
+
+/* =====================================================================
+   EXTRAS 7 — regras de drop (tempo = só comuns, 5 em 5 horas), pontos de
+   aventura/moedas por ação, lua cheia real + dungeons noturnas, dungeons
+   espalhadas pela cidade, chaves secretas (Paciência/Campo Minado), Mercado
+   Misterioso semanal, segredos de ação, eventos e o Diário do Mundo (lore).
+   ===================================================================== */
+GS.ap = GS.ap || 0; GS.coins = GS.coins || 0; GS.keys = GS.keys || {}; GS.moves = GS.moves || { pc:0, ms:0 };
+GS.hid = GS.hid || {}; GS.cnt = GS.cnt || {}; GS.market = GS.market || {}; GS.mktSeen = GS.mktSeen || {}; GS.talkAt = GS.talkAt || {};
+GS.talkDay = GS.talkDay || { d:'', ids:{} }; GS.lastEv = GS.lastEv || 0;
+
+/* ---------- itens novos ---------- */
+/* cosméticos comuns (drop por tempo, 5 em 5 horas) */
+addItem('boina_verde','helm','Boina Verde','capuz','forest','comum','');
+addItem('laco_festa','helm','Laço de Festa','capuz','crimson','comum','');
+addItem('chapeu_palha','helm','Chapéu de Palha','capuz','gold','comum','');
+addItem('calca_xadrez','legs','Calça Xadrez','cuff','royal','comum','');
+addItem('botinas_lama','legs','Botinas de Lama','botas','forest','comum','');
+addItem('capa_remendada','back','Capa Remendada','capa','leather','comum','');
+addItem('colete_feltro','chest','Colete de Feltro','tunica','forest','comum','');
+addItem('tunica_festiva','chest','Túnica Festiva','tunica','crimson','comum','');
+addItem('bengala_madeira','weapon','Bengala de Madeira','cajado','leather','comum','');
+addItem('lanterna_papel','weapon','Lanterna de Papel','tocha','torch','comum','');
+/* segredos de ação */
+addItem('capa_horizonte','back','Capa do Horizonte','capa','solar','raro','Caminhe até a borda oeste da rua');
+addItem('capuz_horizonte','helm','Capuz do Horizonte','capuz','midnight','raro','Caminhe até a borda leste da rua');
+addItem('elmo_ampulheta','helm','Elmo da Ampulheta','elmo','gold','epico','Há algo estranho no relógio do mundo','glow');
+addItem('manto_silencio','chest','Manto do Silêncio','manto','cloth','epico','Fique em silêncio absoluto na Biblioteca');
+addPet('gatinho_estelar','Gatinho Estelar','gato','midnight','epico','Faça carinho no seu pet','glow','sorte');
+addItem('faixa_embaixador','back','Faixa do Embaixador','capa','royal','epico','Converse com todos os moradores no mesmo dia');
+addItem('botas_veloz','legs','Botas do Maratonista','botas','aurora','epico','Visite todos os lugares da cidade em poucos minutos','aurora');
+/* dungeons da lua */
+addItem('elmo_lunar','helm','Elmo Lunar','mago','angel','lendario','Conclua a Gruta da Lua','glow');
+addPet('coruja_lunar','Coruja Lunar','coruja','angel','epico','Conclua a Gruta da Lua','glow','dica');
+addItem('cota_lunar','chest','Cota Lunar','placa','angel','lendario','Conclua a Adega Lunar','glow');
+addPet('raposa_lunar','Raposa Lunar','cachorro','angel','epico','Conclua a Adega Lunar','glow','vel');
+addItem('cetro_lunar','weapon','Cetro Lunar','cajado','angel','lendario','Conclua a Sala Escarlate','glow');
+addPet('fantasma_lunar','Fantasma Lunar','fantasma','angel','epico','Conclua a Sala Escarlate','glow','tempo');
+/* dungeons de chave */
+addItem('espada_naipes','weapon','Espada dos Naipes','espada','crimson','epico','Conclua a Câmara do Baralho');
+addPet('carta_viva','Carta Viva','estrela','crimson','raro','Conclua a Câmara do Baralho','','sorte');
+addItem('picareta_minas','weapon','Picareta das Minas','martelo','iron','epico','Conclua a Galeria das Minas');
+addPet('robo_minas','Robô Mineiro','robo','gold','raro','Conclua a Galeria das Minas','','vida');
+/* mercado misterioso (compra com moedas) */
+addItem('turbante_mercador','helm','Turbante do Mercador','mago','gold','raro','Compre no Mercado Misterioso');
+addItem('manto_mercador','chest','Manto do Mercador','manto','crimson','raro','Compre no Mercado Misterioso');
+addItem('botas_caravana','legs','Botas da Caravana','botas','gold','raro','Compre no Mercado Misterioso');
+addItem('capa_caravana','back','Capa da Caravana','capa','gold','epico','Compre no Mercado Misterioso');
+addItem('cajado_caravana','weapon','Cajado da Caravana','cajado','gold','epico','Compre no Mercado Misterioso');
+addItem('lanterna_mistica','weapon','Lanterna Mística','tocha','aurora','epico','Compre no Mercado Misterioso','aurora');
+addItem('coroa_ouro_velho','helm','Coroa de Ouro Velho','coroa','gold','epico','Compre no Mercado Misterioso');
+addItem('armadura_nomade','chest','Armadura Nômade','placa','gold','epico','Compre no Mercado Misterioso');
+/* lore */
+addItem('tomo_do_mundo','weapon','Tomo do Mundo','cajado','aurora','lendario','Desbloqueie todos os capítulos do Diário','aurora');
+
+/* ---------- regra: drop por tempo = só comuns, a cada 5 h acumuladas ---------- */
+const TEMPO_5H = ['capuz_couro','gato_aldeao','adaga','tunica_azul','boina_verde','botas_ferro','capa_cinza','laco_festa','elmo_osso','cajado_madeira',
+  'calca_xadrez','botas_verdes','gorro_la','chapeu_palha','calcas_linho','estilingue','capa_remendada','machado_pedra','capa_chuva','colete_feltro',
+  'cao_guarda','botinas_lama','tunica_festiva','bengala_madeira','lanterna_papel'];
+TIME_DROPS.length = 0;
+TEMPO_5H.forEach((id, i) => {
+  TIME_DROPS.push([18000 * (i + 1), id]);
+  if (ITEM_BY_ID[id]) ITEM_BY_ID[id].hint = 'Acumule ' + (5 * (i + 1)) + ' horas no mundo (soma de todas as visitas)';
+});
+/* itens que eram por tempo/horário e agora dependem de AÇÕES */
+const PA_ITEMS = ['espada_ferro','cota_malha','elmo_ferro','capa_viajante','grevas_ferro','colete_couro','capa_verde','martelo','machado_ferro','chifres',
+  'elmo_cobre','cota_cobre','grevas_cobre','manto_viajante2','capuz_real','placa_ferro','espada_bronze','botas_bronze','diadema_prata','pintinho_bronze',
+  'martelo_trovao','coroa_gelo','asas_corvo','martelo_runico','coroa','cajado_aurora','fenix_filhote','asas_anjo'];
+const PA_DROPS = [];
+(function(){
+  const base = { incomum:6, raro:45, epico:110, lendario:260, mitico:450, ultra:800 }, step = { incomum:5, raro:10, epico:18, lendario:40, mitico:150, ultra:200 };
+  const ordem = ['incomum','raro','epico','lendario','mitico','ultra'], cont = {};
+  const ids = PA_ITEMS.filter(id => ITEM_BY_ID[id]);
+  ordem.forEach(r => ids.filter(id => ITEM_BY_ID[id].rar === r).forEach(id => {
+    const k = cont[r] = (cont[r] || 0); cont[r]++;
+    const n = base[r] + step[r] * k; PA_DROPS.push([n, id]);
+    ITEM_BY_ID[id].hint = 'Reúna ' + n + ' pontos de aventura (conversar, vencer, resolver puzzles, descobrir segredos)';
+  }));
+})();
+const JANELAS = [
+  { id:'manto_noite', k:'madrugada', n:3, txt:'Faça 3 ações de madrugada (0h às 5h)' },
+  { id:'fantasma_anjo', k:'noite', n:5, txt:'Faça 5 ações à noite (22h às 5h)' },
+  { id:'armadura_solar', k:'meiodia', n:4, txt:'Faça 4 ações por volta do meio-dia' },
+  { id:'estrela_solar', k:'meiodia', n:6, txt:'Faça 6 ações por volta do meio-dia' },
+  { id:'botas_tempestade', k:'chuva', n:3, txt:'Faça 3 ações num dia de chuva real' },
+  { id:'robo_trovao', k:'chuva', n:10, txt:'Faça 10 ações num dia de chuva real' },
+  { id:'capa_alvorada', k:'alvorada', n:2, txt:'Faça 2 ações entre 5h e 6h' },
+  { id:'elmo_luar', k:'luar', n:2, txt:'Faça 2 ações entre 3h e 4h' },
+  { id:'botas_domingo', k:'domingo', n:3, txt:'Faça 3 ações num domingo' },
+  { id:'elmo_festa', k:'sabado', n:3, txt:'Faça 3 ações num sábado' }
+];
+JANELAS.forEach(j => { if (ITEM_BY_ID[j.id]) ITEM_BY_ID[j.id].hint = j.txt + ' (ação = conversar, vencer, puzzle, segredo)'; });
+function diaSemana(){ return new Date().toLocaleDateString('en-US', { weekday:'short', timeZone:'America/Sao_Paulo' }); }
+function janelasAtivas(){
+  const h = marianaHour(), a = [];
+  if (h < 5) a.push('madrugada'); if (h === 5) a.push('alvorada'); if (h === 3) a.push('luar');
+  if (h === 11 || h === 12) a.push('meiodia'); if (h >= 22 || h < 5) a.push('noite');
+  if (stage.classList.contains('rainy')) a.push('chuva');
+  const d = diaSemana(); if (d === 'Sun') a.push('domingo'); if (d === 'Sat') a.push('sabado');
+  return a;
+}
+/* ---------- pontos de aventura e moedas ---------- */
+const PESOS = { talk:[1, 1], win:[3, 5], puzzle:[2, 3], secret:[5, 8], clear:[10, 15], hid:[5, 8], event:[2, 3] };
+function award(kind, n, semJanela){
+  n = n || 1; const p = PESOS[kind]; GS.ap += p[0] * n; GS.coins += p[1] * n;
+  if (!semJanela) janelasAtivas().forEach(k => { GS.cnt[k] = (GS.cnt[k] || 0) + n; });
+  gsSave(); checkAcoes();
+}
+function checkAcoes(){
+  PA_DROPS.forEach(([n, id]) => { if (GS.ap >= n) grantItem(id); });
+  JANELAS.forEach(j => { if ((GS.cnt[j.k] || 0) >= j.n) grantItem(j.id); });
+}
+function totalWins(){ return (GS.wins.pc || 0) + (GS.wins.ms || 0); }
+function clearsAll(){ return DUNGEONS.filter((_, i) => dgCleared(i)).length; }
+function syncAcoes(){
+  const cur = { puz:GS.puz || 0, wins:totalWins(), found:Object.keys(GS.found).length, clears:clearsAll(), hid:Object.keys(GS.hid).length };
+  const primeira = !GS.acc; if (primeira) GS.acc = { puz:0, wins:0, found:0, clears:0, hid:0 };
+  const map = { puz:'puzzle', wins:'win', found:'secret', clears:'clear', hid:'hid' }; let txt = '';
+  Object.keys(map).forEach(k => {
+    const d = cur[k] - GS.acc[k];
+    if (d > 0) { const p = PESOS[map[k]]; award(map[k], d, primeira); txt = '+' + (p[0] * d) + ' PA · +' + (p[1] * d) + ' moedas'; GS.acc[k] = cur[k]; }
+  });
+  if (txt && !primeira) toastText(txt);
+  if (txt) gsSave();
+  checkAcoes();
+}
+setInterval(syncAcoes, 1500);
+const _checkMeta7 = checkMeta;
+checkMeta = function(){ _checkMeta7.apply(this, arguments); syncAcoes(); };
+/* conversar com moradores (clique) rende PA, no máximo 1 vez por morador a cada 10 min */
+world.addEventListener('click', e => {
+  const elx = e.target.closest('.resident'); if (!elx) return;
+  const n = (typeof NPC_LIST !== 'undefined') ? NPC_LIST.find(o => o.el === elx) : null; if (!n) return;
+  const now = Date.now();
+  if (!GS.talkAt[n.id] || now - GS.talkAt[n.id] > 600000) { GS.talkAt[n.id] = now; award('talk'); }
+  const hoje = dayKey(); if (GS.talkDay.d !== hoje) GS.talkDay = { d:hoje, ids:{} };
+  GS.talkDay.ids[n.id] = 1;
+  if (Object.keys(GS.talkDay.ids).length >= NPC_LIST.length) descobre('dia_social', 'Você conversou com todos os moradores num só dia!', 'faixa_embaixador');
+}, true);
+
+/* ---------- segredos de ação ---------- */
+function descobre(key, msg, itemId){
+  if (GS.hid[key]) return; GS.hid[key] = 1; gsSave(); toastText('Segredo: ' + msg); if (itemId) grantItem(itemId);
+}
+let ultMov = Date.now(), ultPos = '';
+const roomVisits = [];
+setInterval(() => {
+  const pos = Math.round(player.x) + ',' + Math.round(player.y); if (pos !== ultPos) { ultPos = pos; ultMov = Date.now(); }
+  if (currentRoomId === 'rua') {
+    if (player.x <= 45) descobre('borda_oeste', 'Você chegou ao limite oeste do mundo.', 'capa_horizonte');
+    if (player.x >= WORLD_W - 45) descobre('borda_leste', 'Você chegou ao limite leste do mundo.', 'capuz_horizonte');
+  }
+  if (currentRoomId === 'biblioteca' && Date.now() - ultMov > 90000) descobre('silencio', 'O silêncio da Biblioteca lhe contou um segredo.', 'manto_silencio');
+}, 500);
+let relogioCliques = [];
+clockTag.addEventListener('click', e => {
+  e.stopPropagation(); const t = Date.now(); relogioCliques = relogioCliques.filter(x => t - x < 6000); relogioCliques.push(t);
+  if (relogioCliques.length >= 7) { relogioCliques = []; descobre('relogio', 'O relógio do mundo parou por um instante.', 'elmo_ampulheta'); }
+});
+let carinhos = 0;
+world.addEventListener('click', e => {
+  if (typeof petPos === 'undefined' || !petEl || !GS.equip.pet) return;
+  const sr = stage.getBoundingClientRect(); const wx = (e.clientX - sr.left) / viewScale + camX, wy = (e.clientY - sr.top) / viewScale;
+  if (Math.abs(wx - (petPos.x + 20)) < 34 && Math.abs(wy - (petPos.y + 20)) < 34) { carinhos++; if (carinhos >= 10) { carinhos = -9999; descobre('carinho', 'Seu pet adorou o carinho!', 'gatinho_estelar'); } }
+}, true);
+const _renderRoom7a = renderRoom;
+renderRoom = function(id){
+  _renderRoom7a(id);
+  const t = Date.now(); roomVisits.push({ id, t }); while (roomVisits.length && t - roomVisits[0].t > 240000) roomVisits.shift();
+  const set = new Set(roomVisits.map(v => v.id)); const alvo = ['rua','biblioteca','office','salajogos','cinema','tenda','locadora'];
+  if (alvo.every(r => set.has(r))) descobre('maratona', 'Você percorreu a cidade inteira em poucos minutos!', 'botas_veloz');
+};
+
+/* ---------- lua cheia real ---------- */
+const SINODICO = 29.530588853;
+function idadeLua(ms){ const jd = ms / 86400000 + 2440587.5; let a = (jd - 2451550.1) % SINODICO; if (a < 0) a += SINODICO; return a; }
+function luaCheia(){ if (window.__luaTeste != null) return !!window.__luaTeste; return Math.abs(idadeLua(Date.now()) - SINODICO / 2) < 1.0; }
+function luaAberta(){ const h = marianaHour(); return luaCheia() && (h >= 18 || h < 6); }
+function diasAteCheia(){ const a = idadeLua(Date.now()); let d = SINODICO / 2 - a; if (d < -1) d += SINODICO; return Math.max(0, Math.ceil(d)); }
+function iluminacao(){ return Math.round((1 - Math.cos(2 * Math.PI * idadeLua(Date.now()) / SINODICO)) / 2 * 100); }
+
+/* ---------- dungeons especiais ---------- */
+const NOMES_JANELA = {};
+DUNGEONS.push(
+  { id:'lua1', special:'moon', nome:'Gruta da Lua', ic:'🌕', gate:null, desc:'Uma gruta que só existe nas noites de lua cheia, na ponta oeste da rua.',
+    puz:[ { t:'quiz', n:4, tier:2, nome:'Enigmas da Lua' }, { t:'lights', n:4, nome:'Cristais Lunares' }, { t:'memory', c:4, r:4, time:70, nome:'Reflexos' }, { t:'path', c:6, r:5, nome:'Trilha de Prata' }, { t:'code', len:4, colors:5, rep:false, tries:9, nome:'Cadeado Lunar' } ],
+    reward:['elmo_lunar', 'coruja_lunar'] },
+  { id:'lua2', special:'moon', nome:'Adega Lunar', ic:'🍷', gate:null, desc:'Uma porta na adega do Saloon, aberta só sob a lua cheia.',
+    puz:[ { t:'simon', len:6, nome:'Brinde Sombrio' }, { t:'slide', n:3, nome:'Tampas de Barril' }, { t:'quiz', n:4, tier:2, nome:'Rótulos Antigos' }, { t:'lights', n:5, nome:'Velas da Adega' }, { t:'memory', c:5, r:4, time:90, nome:'Garrafas Gêmeas' } ],
+    reward:['cota_lunar', 'raposa_lunar'] },
+  { id:'lua3', special:'moon', nome:'Sala Escarlate', ic:'🎞️', gate:null, desc:'Atrás da tela do Cinema, uma sala que só se revela na lua cheia.',
+    puz:[ { t:'code', len:4, colors:6, rep:true, tries:10, nome:'Projetor Trancado' }, { t:'path', c:7, r:6, nome:'Corredor de Fitas' }, { t:'simon', len:8, nome:'Trilha Sonora' }, { t:'quiz', n:5, tier:3, nome:'Créditos Finais' }, { t:'slide', n:4, nome:'Cartaz Rasgado' } ],
+    reward:['cetro_lunar', 'fantasma_lunar'] },
+  { id:'chave1', special:'key', key:'baralho', nome:'Câmara do Baralho', ic:'🃏', gate:null, desc:'Uma câmara escondida sob o Saloon. Só se revela para quem joga muita Paciência.',
+    puz:[ { t:'memory', c:6, r:4, time:100, nome:'Pares Reais' }, { t:'quiz', n:4, tier:2, nome:'Naipes e Números' }, { t:'code', len:3, colors:5, rep:false, tries:8, nome:'Mão Perfeita' }, { t:'lights', n:4, nome:'Candelabros' }, { t:'slide', n:3, nome:'Mesa Embaralhada' } ],
+    reward:['espada_naipes', 'carta_viva'] },
+  { id:'chave2', special:'key', key:'minas', nome:'Galeria das Minas', ic:'💣', gate:null, desc:'Uma galeria sob a forja. Só se revela para quem desarma muitas minas.',
+    puz:[ { t:'path', c:6, r:6, nome:'Campo Minado Real' }, { t:'lights', n:5, nome:'Detonadores' }, { t:'code', len:4, colors:6, rep:false, tries:8, nome:'Cofre das Minas' }, { t:'memory', c:4, r:4, time:60, nome:'Mapa de Minas' }, { t:'simon', len:6, nome:'Contagem Regressiva' } ],
+    reward:['picareta_minas', 'robo_minas'] }
+);
+const _dgLR7 = dgLockReason;
+dgLockReason = function(i){
+  const d = DUNGEONS[i];
+  if (d.special === 'moon') return luaAberta() ? '' : 'Esta porta só se abre à noite (18h às 6h) em dias de lua cheia.';
+  if (d.special === 'key') return GS.keys[d.key] ? '' : 'Falta a chave desta câmara.';
+  return _dgLR7(i);
+};
+const idxDg = id => DUNGEONS.findIndex(d => d.id === id);
+const ENTRADAS = [
+  { id:'e_forja', room:'office', dg:'forja', cls:'hatch', label:'▼ FORJA ESQUECIDA', left:170, top:448, ver:() => true },
+  { id:'e_vazio', room:'rua', dg:'vazio', cls:'cave', label:'CATACUMBA DO VAZIO', left:2490, top:392, ver:() => true },
+  { id:'e_prisma', room:'tenda', dg:'prisma', cls:'sealed', label:'SANTUÁRIO PRISMA', left:130, top:340, ver:() => true },
+  { id:'e_lua1', room:'rua', dg:'lua1', cls:'moon', label:'GRUTA DA LUA', left:40, top:392, ver:luaAberta },
+  { id:'e_lua2', room:'salajogos', dg:'lua2', cls:'moon', label:'ADEGA LUNAR', left:180, top:352, ver:luaAberta },
+  { id:'e_lua3', room:'cinema', dg:'lua3', cls:'moon', label:'SALA ESCARLATE', left:140, top:352, ver:luaAberta },
+  { id:'e_chave1', room:'salajogos', dg:'chave1', cls:'hatch key', label:'▼ CÂMARA DO BARALHO', left:830, top:452, ver:() => GS.keys.baralho },
+  { id:'e_chave2', room:'office', dg:'chave2', cls:'hatch key', label:'▼ GALERIA DAS MINAS', left:360, top:452, ver:() => GS.keys.minas }
+];
+function pintaEntradas(){
+  roomlayer.querySelectorAll('.dgate').forEach(n => n.remove());
+  ENTRADAS.filter(e => e.room === currentRoomId && e.ver()).forEach(e => {
+    const d = mkEl('div', { className:'hotspot dgate ' + e.cls }, '<div class="dg-glow"></div><div class="dg-lbl">' + esc(e.label) + '</div>');
+    d.dataset.dg = e.dg; d.style.left = e.left + 'px'; d.style.top = e.top + 'px'; roomlayer.appendChild(d);
+  });
+}
+const _renderRoom7b = renderRoom;
+renderRoom = function(id){ _renderRoom7b(id); pintaEntradas(); };
+setInterval(() => { if (currentRoomId) { const antes = roomlayer.querySelectorAll('.dgate').length; const dev = ENTRADAS.filter(e => e.room === currentRoomId && e.ver()).length; if (antes !== dev) pintaEntradas(); } }, 5000);
+world.addEventListener('click', e => {
+  const g = e.target.closest('.dgate'); if (!g) return;
+  e.stopPropagation(); const i = idxDg(g.dataset.dg), p = aproxima(g); hint.style.display = 'none';
+  walkTo(p.ax, p.ay, () => {
+    const why = dgLockReason(i);
+    if (why) { showBubble(p.bx, p.by, '🔒 ' + why, 4600); return; }
+    openDungeon(i);
+  });
+});
+
+/* chaves: movimentos na Paciência / Campo Minado */
+const META_CHAVE = { baralho:250, minas:300 };
+function checaChaves(){
+  if (GS.moves.pc >= META_CHAVE.baralho && !GS.keys.baralho) { GS.keys.baralho = 1; gsSave(); toastText('Uma chave surgiu! Algo se abriu no Saloon...'); }
+  if (GS.moves.ms >= META_CHAVE.minas && !GS.keys.minas) { GS.keys.minas = 1; gsSave(); toastText('Uma chave surgiu! Algo se abriu na forja...'); }
+}
+const _pcInc = pcIncMoves; pcIncMoves = function(){ GS.moves.pc++; if (GS.moves.pc % 10 === 0) gsSave(); checaChaves(); return _pcInc.apply(this, arguments); };
+const _msRev = msRevealCell;
+msRevealCell = function(){ const antes = msRevealedCount; const r = _msRev.apply(this, arguments); if (msRevealedCount > antes) { GS.moves.ms++; if (GS.moves.ms % 10 === 0) gsSave(); checaChaves(); } return r; };
+checaChaves();
+
+/* ---------- mercado misterioso (1 dia por semana, sorteado) ---------- */
+function dnum(key){ const [y, m, d] = key.split('-').map(Number); return Math.floor(Date.UTC(y, m - 1, d) / 86400000); }
+function dowN(n){ return (n + 4) % 7; }
+function segunda(n){ return n - ((dowN(n) + 6) % 7); }
+function diaMercado(seg){ return seg + (hashStr('mercado:' + seg) % 7); }
+const NOME_DIA = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+function estadoMercado(){
+  if (window.__mercadoTeste) return window.__mercadoTeste;
+  const t = dnum(dayKey()), seg = segunda(t), m0 = diaMercado(seg), m1 = diaMercado(seg + 7);
+  return { hoje:t === m0, vespera:t === m0 - 1 || t === m1 - 1, dia:t === m0 ? m0 : 0 };
+}
+const MKT_POOL = ['turbante_mercador','manto_mercador','botas_caravana','capa_caravana','cajado_caravana','lanterna_mistica','coroa_ouro_velho','armadura_nomade'];
+const PRECO = { raro:45, epico:100, lendario:200 };
+function ofertas(dia){
+  const r = mulberry32(hashStr('oferta:' + dia)); const a = MKT_POOL.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a.slice(0, 4);
+}
+const mktPanel = el('div', 'xpanel', '<div class="xback"></div><div class="xbox" id="mktBox"><button class="xclose" aria-label="Fechar">✕</button><div class="xhead">🛒 Mercado Misterioso</div><div class="mkt-body" id="mktBody"></div></div>');
+mktPanel.id = 'mktPanel'; stage.appendChild(mktPanel);
+mktPanel.addEventListener('click', e => { if (e.target.classList.contains('xback') || e.target.classList.contains('xclose')) mktPanel.classList.remove('show'); });
+function abreMercado(){
+  const st = estadoMercado(); if (!st.hoje) return;
+  const body = document.getElementById('mktBody'); body.innerHTML = '';
+  if (!GS.mktSeen[st.dia]) { GS.mktSeen[st.dia] = 1; GS.markets = (GS.markets || 0) + 1; gsSave(); }
+  body.appendChild(el('p', 'mkt-intro', 'O Mercador Sem Rosto troca, não vende: ele aceita as moedas de quem agiu. Ele some à meia-noite.'));
+  body.appendChild(el('div', 'mkt-coins', '🪙 Suas moedas: <b id="mktCoins">' + GS.coins + '</b>'));
+  const lista = el('div', 'mkt-list');
+  ofertas(st.dia).forEach(id => {
+    const it = ITEM_BY_ID[id], preco = PRECO[it.rar] || 100, tem = !!GS.owned[id];
+    const row = el('div', 'mkt-row'); row.appendChild(itemThumb(it, 32));
+    row.appendChild(el('div', 'mkt-info', '<b style="color:' + RAR_COR[it.rar] + '">' + esc(it.nome) + '</b><small>' + it.rar.toUpperCase() + ' · ' + esc(SLOT_NOME[it.slot] || it.slot) + '</small>'));
+    const b = el('button', 'inv-tab', tem ? 'Já tem ✔' : '🪙 ' + preco); b.disabled = tem;
+    b.addEventListener('click', () => {
+      if (GS.owned[id]) return; if (GS.coins < preco) { toastText('Moedas insuficientes.'); return; }
+      GS.coins -= preco; gsSave(); grantItem(id); abreMercado();
+    });
+    row.appendChild(b); lista.appendChild(row);
+  });
+  body.appendChild(lista); mktPanel.classList.add('show');
+}
+const _renderRoom7c = renderRoom;
+renderRoom = function(id){
+  _renderRoom7c(id);
+  if (id === 'tenda' && estadoMercado().hoje) {
+    const d = mkEl('div', { className:'mkt-merchant' }, '<div class="shadow"></div><div class="facing"><div class="bodywrap"><div class="leg left"></div><div class="leg right"></div><div class="av-body"></div></div></div><div class="nametag">Mercador Misterioso</div>');
+    d.style.left = '264px'; d.style.top = '300px'; d.style.zIndex = '55'; roomlayer.appendChild(d);
+    applyEquip(d, { helm:'turbante_mercador', chest:'manto_mercador', legs:'botas_caravana', weapon:'lanterna_mistica' });
+  }
+};
+world.addEventListener('click', e => {
+  const m = e.target.closest('.mkt-merchant'); if (!m) return;
+  e.stopPropagation(); const p = aproxima(m); hint.style.display = 'none';
+  walkTo(p.ax, p.ay, () => { if (estadoMercado().hoje) abreMercado(); });
+});
+/* aviso da véspera (uma vez por dia) */
+(function(){ const st = estadoMercado(); if (st.vespera && GS.lastEve !== dayKey()) { GS.lastEve = dayKey(); gsSave(); setTimeout(() => toastText('Rumores na rua: amanhã o Mercado Misterioso chega à Tenda...'), 4000); } })();
+/* mercador à meia-noite some: reconstrói sala se necessário */
+setInterval(() => { if (currentRoomId === 'tenda') { const tem = !!roomlayer.querySelector('.mkt-merchant'), dev = estadoMercado().hoje; if (tem !== dev) renderRoom('tenda'); } }, 20000);
+
+/* ---------- falas: aviso do mercado, lua, lore ---------- */
+const ANUNCIOS = [
+  'Ouviu os rumores? Amanhã o Mercado Misterioso chega à Tenda.', 'Amanhã, na Tenda: o mercador sem rosto volta. Junte moedas hoje.',
+  'Dizem que o Mercador Sem Rosto aparece amanhã. Só um dia, depois some.', 'Sussurros na rua: amanhã a Tenda recebe um visitante estranho.',
+  'Prepare as moedas. Amanhã tem Mercado Misterioso, e ele não espera ninguém.', 'O vento mudou. É sinal de que o mercador chega amanhã.',
+  'Quem agiu bastante tem moedas. Amanhã é dia de gastá-las na Tenda.', 'Amanhã é o dia do mercado raro. Não diga que eu não avisei.'];
+const HOJE_MKT = ['O Mercado Misterioso está na Tenda hoje! Corra antes da meia-noite.', 'O mercador chegou. Está na Tenda, de turbante e tudo.', 'Hoje tem mercado raro na Tenda. Só hoje.'];
+const LUA_FALAS = ['Noite de lua cheia: portais novos se abriram pela cidade.', 'A lua está inteira. Procure portais brilhantes na rua, no Saloon e no Cinema.', 'Já viu a luz azulada? São as portas da lua cheia.', 'Só hoje, sob a lua cheia, as portas lunares se abrem. Aproveite.'];
+const _falaDe7 = falaDe;
+falaDe = function(id){
+  const st = estadoMercado(), r = Math.random();
+  if (st.vespera && r < 0.32) return W(NPC_TXT[id].w, pick(ANUNCIOS));
+  if (st.hoje && r < 0.2) return pick(HOJE_MKT);
+  if (luaAberta() && r < 0.2) return pick(LUA_FALAS);
+  return _falaDe7(id);
+};
+TOPICOS.mercado = () => { const s = estadoMercado(); return s.vespera ? 'Dizem que o Mercado Misterioso chega amanhã.' : (s.hoje ? 'O Mercado Misterioso está na Tenda hoje!' : 'Ainda não ouvi sinal do próximo Mercado Misterioso.'); };
+TOPICOS.lua = () => luaAberta() ? 'Há portais lunares abertos esta noite.' : 'A próxima lua cheia é em ' + plural(diasAteCheia(), 'dia', 'dias') + '.';
+const LORE_NPC = {
+  tadeu: ['Patrulho a rua porque algo antigo observa as bordas do mundo.', 'Se andar até o fim da rua, diga o que viu. Eu nunca ousei ir tão longe.', 'Já vi luzes azuis na rua em noite de lua cheia. Fingi que era lampião.', 'Minhas rondas existem desde antes de eu nascer. Herdei o caderno.'],
+  lucia: ['O alçapão da Biblioteca foi escondido por mim, há muito tempo.', 'Os livros escutam. Por isso exijo silêncio.', 'Cada cripta é uma lição. A primeira ensina a ler as portas.', 'Há capítulos do mundo escritos só para quem for paciente.'],
+  ferreiro: ['A forja nunca apaga: há uma fornalha esquecida sob o chão que depende dela.', 'Forjei as grevas dos primeiros exploradores das criptas.', 'Ferro que viu a lua cheia fica mais teimoso. E mais bonito.', 'Debaixo da forja há uma galeria. Só abre para quem tem a chave certa.'],
+  bruno: ['As mesas do Saloon eram trancas antes de serem jogos.', 'Quem joga muito Paciência acaba abrindo coisas que não sabia que existiam.', 'Na adega do Saloon, sob a lua cheia, ouço música que ninguém toca.', 'Campo Minado também guarda segredos, para quem tiver a mão firme.'],
+  caio: ['Atrás da tela, em noites de lua cheia, há uma sala escarlate.', 'Tudo que é transmitido ao vivo ganha um eco aqui no Cinema.', 'Já vi um brilho atrás da cortina que não era projetor.', 'Cada canal é uma janela. Algumas dão para lugares que não existem.'],
+  ze: ['O Mercador Sem Rosto não tem dia fixo. Só avisa na véspera, em sussurros.', 'Moeda de quem só espera não vale nada para ele. Só a de quem agiu.', 'A Tenda é mais velha que as lojas da região. O mercador sabe o motivo.', 'Quando ele chega, o ar cheira a especiaria e a tinta velha.'],
+  marina: ['Cada episódio é uma porta pequena. A maratona abre todas.', 'Tenho uma fita sem rótulo que só mostra o que você precisa ver.', 'Dizem que o Cinema tem uma sala secreta. Eu prefiro a minha TV.', 'Anime bom é o que te faz querer abrir portas.'],
+  ptolomeu: ['O Arquivo nunca foi sobre guardar coisas, e sim quem as procura.', 'Sob a lua cheia surgem câmaras que eu mesmo não construí.', 'Há chaves que ninguém fabrica: elas nascem de tentativa e paciência.', 'Os quatro selos formam um ciclo. Fechar o ciclo é só o começo.'],
+  rosa: ['Plantei lavanda na borda da rua. Dizem que ela abre portas de noite.', 'A lua cheia faz as flores brilharem. Juro.', 'Já vi uma estrela cadente cair no meu canteiro.', 'Flor que nasce perto de uma cripta cheira a poeira e a hortelã.'],
+  nico: ['O lago reflete portas que a rua não mostra.', 'Em noite de lua cheia, o lago vira um espelho de prata.', 'Já vi uma estrela cadente cair no lago. Tentei pescá-la.', 'Há algo na borda oeste. Nunca me aproximei. Peixe não me dá medo, mas isso sim.'],
+  orfeu: ['Compus uma canção para a lua cheia. Só toco nessas noites.', 'A melodia das criptas é a mais antiga que conheço.', 'O mercador sem rosto assobia uma nota só. Já a escutei.', 'Dizem que quem toca na rua de madrugada acorda o que dorme embaixo.'],
+  pedrinho: ['Eu vi uma luz azul na borda da rua! Foi na lua cheia!', 'O mercador chega no dia que ninguém espera. Eu espero todo dia!', 'Se você achar uma estrela cadente, faça um pedido pra mim!', 'Eu fui até a borda oeste uma vez. Corri de volta.']
+};
+Object.keys(LORE_NPC).forEach(id => { if (NPC_TXT[id]) NPC_TXT[id].f.push(...LORE_NPC[id]); });
+
+/* ---------- eventos aleatórios ---------- */
+function eventoEstrela(){
+  const s = el('div', 'shootstar'); s.style.top = Math.round(40 + Math.random() * 110) + 'px'; s.style.left = Math.round(80 + Math.random() * 400) + 'px';
+  stage.appendChild(s); toastText('Uma estrela cadente cruza o céu! Clique nela!');
+  s.addEventListener('click', e => { e.stopPropagation(); s.remove(); const c = 3 + Math.floor(Math.random() * 4); GS.coins += c; award('event'); toastText('Você fez um pedido! +' + c + ' moedas'); });
+  setTimeout(() => s.remove(), 7000);
+}
+function eventoBau(){
+  if (currentRoomId !== 'rua') return;
+  const x = Math.round(camX + 160 + Math.random() * 640), top = 470;
+  const b = mkEl('div', { className:'hotspot evt-chest' }, '<div class="ec-lid"></div><div class="ec-body"></div>'); b.style.left = x + 'px'; b.style.top = top + 'px'; roomlayer.appendChild(b);
+  toastText('Um baú esquecido apareceu na rua!');
+  const kill = setTimeout(() => b.remove(), 40000);
+  b.addEventListener('click', e => {
+    e.stopPropagation(); const p = aproxima(b); hint.style.display = 'none';
+    walkTo(p.ax, p.ay, () => {
+      if (!b.parentNode) return; b.remove(); clearTimeout(kill);
+      const c = 6 + Math.floor(Math.random() * 8); GS.coins += c; award('event'); toastText('O baú tinha ' + c + ' moedas!');
+      const livres = TEMPO_5H.filter(id => !GS.owned[id]); if (livres.length && Math.random() < 0.3) setTimeout(() => grantItem(pick(livres)), 900);
+    });
+  });
+}
+setInterval(() => {
+  if (document.hidden) return;
+  if (GS.t - GS.lastEv < 1800 + Math.floor(Math.random() * 1800)) return;
+  const h = marianaHour(), noite = h >= 19 || h < 5;
+  const opts = []; if (noite) opts.push(eventoEstrela); if (currentRoomId === 'rua') opts.push(eventoBau);
+  if (!opts.length) return;
+  GS.lastEv = GS.t; gsSave(); pick(opts)();
+}, 15000);
+window.__eventos = { eventoEstrela, eventoBau };
+
+/* ---------- Diário do Mundo (lore) ---------- */
+const nTalked = id => (GS.talked && GS.talked[id]) ? 1 : 0;
+const LORE = [
+  { t:'A Cidade Sobre as Criptas', u:() => true, h:'', x:'Mariana cresceu sobre as ruínas de um grande arquivo. Dizem que os primeiros moradores guardavam ali fitas, discos e cartuchos de todas as eras, e que o Arquivista Ptolomeu ainda cuida do que restou. Cada rua tem uma porta, e cada porta, uma história. O mundo é pequeno, mas guarda mais do que mostra.' },
+  { t:'O Guarda e a Rua', u:() => nTalked('tadeu'), h:'Converse com o Guarda Tadeu', x:'O Guarda Tadeu diz que nunca deixou a rua desprotegida, nem por uma noite. Poucos sabem que ele patrulha para vigiar as bordas do mundo, onde a rua termina e algo antigo observa. Quem andar até o limite descobre por quê.' },
+  { t:'Os Livros que Respiram', u:() => nTalked('lucia'), h:'Converse com a Bibliotecária Lúcia', x:'A Bibliotecária Lúcia cataloga a coleção por plataformas, mas guarda um caderno à parte, o das passagens. Foi ela quem escondeu o alçapão sob a estante e quem aprendeu a decifrar as placas das criptas. Ela pede silêncio porque os livros escutam.' },
+  { t:'O Ferro Lembra', u:() => nTalked('ferreiro'), h:'Converse com o Mestre Ferreiro', x:'O Mestre Ferreiro forjou, há muito tempo, as grevas e os elmos de quem desce às criptas. A forja nunca apaga por um motivo: uma fornalha esquecida sob o chão depende do calor da superfície para não congelar de vez.' },
+  { t:'A Mesa da Sorte', u:() => totalWins() >= 1, h:'Vença uma partida no Saloon', x:'Bruno jura que as mesas do Saloon são mais velhas que a taverna. Cartas e minas não eram jogos no começo: eram trancas. Quem vencia provava ser digno de abrir o que estava escondido. Por isso cada vitória rende um prêmio, e algumas jogadas abrem algo mais.' },
+  { t:'Telas Acesas', u:() => nTalked('caio'), h:'Converse com o Lanterninha Caio', x:'As telas do Cinema acendem sozinhas quando alguém transmite ao vivo, e Caio diz que isso é um eco do Arquivo: tudo que é contado ao vivo ganha uma cópia ali. Atrás da cortina, nas noites de lua cheia, ele já viu um brilho que não era da tela.' },
+  { t:'O Mercado de Estrelas', u:() => nTalked('ze') && GS.rooms.tenda, h:'Visite a Tenda e converse com o Mercador Zé', x:'A Tenda existia antes das lojas. Zé conta que um mercador sem rosto aparecia em dias que ninguém conseguia prever, e só depois de um aviso sussurrado na véspera. Quem ignora os sussurros perde o negócio.' },
+  { t:'Fitas Sem Fim', u:() => nTalked('marina'), h:'Converse com a Atendente Marina', x:'Marina acredita que cada episódio é uma porta pequena. Quando o anime acaba, a porta fecha, e só reabre na próxima maratona. Ela guarda uma fita sem rótulo; diz que só mostra o que o espectador precisa ver.' },
+  { t:'A Primeira Cripta', u:() => dgCleared(0), h:'Conclua a Cripta do Arquivista', x:'O Arquivista não montou as criptas para ocultar tesouros, mas para treinar quem quisesse herdar o arquivo. Cada puzzle é uma lição: observar, lembrar, ordenar, confiar. Concluir a primeira cripta é só aprender a linguagem das portas.' },
+  { t:'O Tecido da Lua', u:() => ['lua1','lua2','lua3'].some(id => dgCleared(idxDg(id))), h:'Conclua uma dungeon da lua cheia', x:'Na lua cheia, a luz atravessa as pedras e desenha portas que o sol não vê. Elas só existem de noite e só enquanto a lua está inteira. O que há dentro foi guardado por quem queria que apenas os curiosos de verdade encontrassem.' },
+  { t:'Chaves e Fechaduras', u:() => GS.keys.baralho || GS.keys.minas, h:'Consiga uma chave jogando Paciência ou Campo Minado', x:'Algumas câmaras não têm porta visível. Elas só se revelam depois que alguém joga com paciência: movimento após movimento, o jogo vira chave. Quem insiste nas cartas e nas minas descobre que treinar a mão também treina a mente.' },
+  { t:'O Mercador Sem Rosto', u:() => (GS.markets || 0) >= 1, h:'Visite um Mercado Misterioso', x:'O Mercador Sem Rosto troca, não vende. Ele aceita as moedas de quem agiu: conversou, venceu, resolveu, descobriu. Diz que moeda de quem só espera não vale nada. Ele some à meia-noite e leva consigo o que sobrou.' },
+  { t:'Quatro Selos', u:() => MAIN_DG.every((_, i) => dgCleared(i)), h:'Conclua as 4 dungeons principais', x:'Os quatro selos estão abertos: o Arquivo, a Forja, o Vazio e o Prisma. Ptolomeu sorri pela primeira vez. Ele revela que o arquivo nunca foi sobre guardar coisas, e sim sobre guardar quem as procura.' },
+  { t:'O Arquivo Completo', u:() => LORE.slice(0, 13).every(c => c.u()), h:'Desbloqueie os 13 capítulos anteriores', x:'Você leu o que o mundo tinha para contar, por enquanto. O Arquivo se reescreve a cada dia e a cada lua. Volte amanhã: os puzzles mudam, os moradores falam de novo, e talvez uma estrela cadente passe só para você.' }
+];
+const diaryBtn = mkEl('div', { id:'diaryBtn', className:'hudbtn', title:'Diário do Mundo (J)' }, '📖'); stage.appendChild(diaryBtn);
+diaryBtn.addEventListener('click', e => e.stopPropagation());
+const diaryPanel = el('div', 'xpanel', '<div class="xback"></div><div class="xbox" id="diaryBox"><button class="xclose" aria-label="Fechar">✕</button><div class="xhead">📖 Diário do Mundo</div><div class="dy-stats" id="dyStats"></div><div class="dy-body"><div class="dy-list" id="dyList"></div><div class="dy-text" id="dyText"></div></div></div>');
+diaryPanel.id = 'diaryPanel'; stage.appendChild(diaryPanel);
+let dySel = 0;
+function dyStatus(){
+  const ms = estadoMercado(), lua = luaAberta() ? '🌕 Lua cheia agora: portais abertos' : '🌙 Lua ' + iluminacao() + '% · cheia em ~' + plural(diasAteCheia(), 'dia', 'dias');
+  const mer = ms.hoje ? '🛒 Mercado Misterioso: HOJE na Tenda' : (ms.vespera ? '🛒 Rumores: o mercado chega amanhã' : '🛒 Mercado: sem sinais por enquanto');
+  const kp = '🃏 ' + Math.min(GS.moves.pc, META_CHAVE.baralho) + '/' + META_CHAVE.baralho + (GS.keys.baralho ? ' ✔' : '') + ' · 💣 ' + Math.min(GS.moves.ms, META_CHAVE.minas) + '/' + META_CHAVE.minas + (GS.keys.minas ? ' ✔' : '');
+  return '<span>✦ ' + GS.ap + ' PA</span><span>🪙 ' + GS.coins + '</span><span>' + lua + '</span><span>' + mer + '</span><span>Chaves: ' + kp + '</span>';
+}
+function renderDiary(){
+  document.getElementById('dyStats').innerHTML = dyStatus();
+  const list = document.getElementById('dyList'); list.innerHTML = '';
+  let abertos = 0;
+  LORE.forEach((c, i) => {
+    const ok = !!c.u(); if (ok) abertos++;
+    const b = el('button', 'dy-item' + (ok ? '' : ' locked') + (i === dySel ? ' on' : ''), (ok ? (i + 1) + '. ' + esc(c.t) : (i + 1) + '. ???'));
+    b.addEventListener('click', () => { dySel = i; renderDiary(); }); list.appendChild(b);
+  });
+  const c = LORE[dySel], ok = !!c.u();
+  document.getElementById('dyText').innerHTML = ok ? '<h3>' + esc(c.t) + '</h3><p>' + esc(c.x) + '</p>' : '<h3>???</h3><p class="dy-hint">Capítulo bloqueado. ' + esc(c.h) + '.</p>';
+  list.appendChild(el('div', 'dy-prog', 'Capítulos: ' + abertos + '/' + LORE.length));
+  if (abertos >= LORE.length) grantItem('tomo_do_mundo');
+}
+function showDiary(){ hideInv(); hideMapPanel(); diaryPanel.classList.add('show'); renderDiary(); }
+function hideDiary(){ diaryPanel.classList.remove('show'); }
+diaryBtn.addEventListener('click', () => diaryPanel.classList.contains('show') ? hideDiary() : showDiary());
+diaryPanel.addEventListener('click', e => { if (e.target.classList.contains('xback') || e.target.classList.contains('xclose')) hideDiary(); });
+window.addEventListener('keydown', e => {
+  if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+  if (e.key === 'j' || e.key === 'J') { diaryPanel.classList.contains('show') ? hideDiary() : showDiary(); }
+  if (e.key === 'Escape') { hideDiary(); mktPanel.classList.remove('show'); }
+});
+setInterval(() => { LORE.forEach(c => c.u()); if (LORE.every(c => c.u())) grantItem('tomo_do_mundo'); }, 10000);
+syncAcoes();
+window.__x7 = { luaCheia, luaAberta, idadeLua, estadoMercado, ofertas, award, syncAcoes, LORE, PA_DROPS, JANELAS, ENTRADAS, pintaEntradas, checaChaves };
 
 /*EXTRAS_JS_END*/
 
