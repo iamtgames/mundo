@@ -1397,6 +1397,14 @@
   .map-pin.lock{border-color:#ff8a8a; color:#ffc2c2;}
   .map-pin.hid{border-style:dashed; color:#9d90bd;}
   .map-pin.soon{border-color:#ffd24d; color:#ffe08a;}
+  .dgate.portal{width:76px; height:96px;}
+  .dgate.portal .dg-glow{border-radius:50%; border:5px solid #b9a0ff; overflow:hidden; background:radial-gradient(ellipse at 50% 50%,#000 0 18%,#2a1458 55%,#7a4cff 100%); box-shadow:0 0 22px rgba(150,100,255,.9), 0 0 50px rgba(110,70,230,.55), inset 0 0 18px #000; animation:dgPulse 2.2s ease-in-out infinite;}
+  .dgate.portal .dg-glow::before{content:''; position:absolute; inset:-30%; background:conic-gradient(from 0deg,transparent 0 25%,rgba(200,170,255,.55) 40%,transparent 55% 75%,rgba(160,120,255,.45) 90%,transparent); animation:portalSpin 3.2s linear infinite;}
+  .dgate.portal .dg-glow::after{content:''; position:absolute; inset:28%; border-radius:50%; background:radial-gradient(circle,#000 0 55%,transparent 100%);}
+  .dgate.portal.moon .dg-glow{border-color:#d8ecff; background:radial-gradient(ellipse at 50% 50%,#fff 0 12%,#bfe0ff 40%,#4a6ad8 80%,#101040 100%); box-shadow:0 0 26px rgba(170,215,255,.95), 0 0 60px rgba(120,160,255,.6), inset 0 0 14px rgba(0,0,40,.8);}
+  .dgate.portal.moon .dg-glow::after{background:radial-gradient(circle,rgba(255,255,255,.9) 0 40%,transparent 100%);}
+  .dgate.portal .dg-lbl{bottom:-22px;}
+  @keyframes portalSpin{to{transform:rotate(360deg);}}
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3687,6 +3695,7 @@ world.addEventListener('click', (e) => {
 
 
 
+
 /*EXTRAS_JS_START*/
 /* =====================================================================
    iamT World — EXTRAS: save, áudio 8-bit medieval (máx 5%), inventário/equipamentos,
@@ -4487,7 +4496,7 @@ addPet('lobo_gelo','Lobo de Gelo','cachorro','ice','epico','Conclua a Cripta do 
 addPet('fantasma_anjo','Fantasminha','fantasma','angel','epico','Jogue à noite (22h às 5h)','glow','tempo');
 addPet('slime_lava','Slime de Lava','slime','fire','epico','Conclua a Forja Esquecida','fire','vida');
 addPet('estrela_solar','Estrelinha Solar','estrela','solar','epico','Jogue por volta do meio-dia','glow','sorte');
-addPet('caveira_vazio','Caveirinha do Vazio','caveira','void','epico','Conclua a Catacumba do Vazio','void','dica');
+addPet('caveira_vazio','Caveirinha do Vazio','caveira','void','epico','Conclua a Portal do Vazio','void','dica');
 addPet('coruja_meia_noite','Coruja da Meia-Noite','coruja','midnight','lendario','Reúna 25 itens','void','dica');
 addPet('dragao_fogo','Dragãozinho','dragao','fire','lendario','Venza 7 jogos no Saloon','fire','vida');
 addPet('robo_trovao','Robô Trovão','robo','storm','lendario','Jogue 10 min sob chuva real','glow','vel');
@@ -4515,7 +4524,7 @@ addItem('espada_bronze','weapon','Espada de Bronze','espada','bronze','raro','Fi
 addItem('botas_bronze','legs','Botas de Bronze','botas','bronze','raro','Fique 105 min no mundo');
 addItem('tunica_gelo','chest','Túnica de Gelo','manto','ice','raro','Conclua a Cripta do Arquivista','ice');
 addItem('grevas_brasa','legs','Grevas de Brasa','grevas','fire','epico','Conclua a Forja Esquecida','fire');
-addItem('capa_vazio','back','Capa do Vazio','capa','void','epico','Conclua a Catacumba do Vazio','void');
+addItem('capa_vazio','back','Capa do Vazio','capa','void','epico','Conclua a Portal do Vazio','void');
 addItem('cetro_prisma','weapon','Cetro Prisma','cajado','rainbow','ultra','Conclua o Santuário Prisma','rainbow');
 [[120,'capuz_couro'],[180,'adaga'],[240,'tunica_azul'],[240,'gato_aldeao'],[420,'botas_ferro'],[540,'capa_cinza'],[660,'elmo_osso'],
  [780,'cajado_madeira'],[1000,'botas_verdes'],[1500,'colete_couro'],[1500,'cao_guarda'],[2100,'capa_verde'],[2400,'machado_ferro'],
@@ -4735,7 +4744,7 @@ const DUNGEONS = [
     puz:[ { t:'quiz', n:4, tier:2, nome:'Registros da Forja' }, { t:'simon', len:5, nome:'Melodia das Bigornas' }, { t:'slide', n:3, nome:'Piso Rachado' },
           { t:'lights', n:4, nome:'Fornalhas Alinhadas' }, { t:'memory', c:4, r:4, time:75, nome:'Moldes Antigos' } ],
     reward:['grevas_brasa', 'slime_lava'] },
-  { id:'vazio', nome:'Catacumba do Vazio', ic:'🌌', gate:['fire'],
+  { id:'vazio', nome:'Portal do Vazio', ic:'🌌', gate:['fire'],
     desc:'Escuridão total. Só quem carrega fogo atravessa. Exige um item de FOGO equipado.',
     puz:[ { t:'path', c:5, r:5, nome:'Campo de Espinhos' }, { t:'code', len:4, colors:6, rep:true, tries:10, nome:'Cofre Sombrio' }, { t:'memory', c:6, r:4, time:110, nome:'Mural das Sombras' },
           { t:'simon', len:7, nome:'Coro do Vazio' }, { t:'lights', n:4, nome:'Velas do Abismo' } ],
@@ -5813,8 +5822,8 @@ addPet('gatinho_estelar','Gatinho Estelar','gato','midnight','epico','Faça cari
 addItem('faixa_embaixador','back','Faixa do Embaixador','capa','royal','epico','Converse com todos os moradores no mesmo dia');
 addItem('botas_veloz','legs','Botas do Maratonista','botas','aurora','epico','Visite todos os lugares da cidade em poucos minutos','aurora');
 /* dungeons da lua */
-addItem('elmo_lunar','helm','Elmo Lunar','mago','angel','lendario','Conclua a Gruta da Lua','glow');
-addPet('coruja_lunar','Coruja Lunar','coruja','angel','epico','Conclua a Gruta da Lua','glow','dica');
+addItem('elmo_lunar','helm','Elmo Lunar','mago','angel','lendario','Conclua a Portal da Lua','glow');
+addPet('coruja_lunar','Coruja Lunar','coruja','angel','epico','Conclua a Portal da Lua','glow','dica');
 addItem('cota_lunar','chest','Cota Lunar','placa','angel','lendario','Conclua a Adega Lunar','glow');
 addPet('raposa_lunar','Raposa Lunar','cachorro','angel','epico','Conclua a Adega Lunar','glow','vel');
 addItem('cetro_lunar','weapon','Cetro Lunar','cajado','angel','lendario','Conclua a Sala Escarlate','glow');
@@ -5965,7 +5974,7 @@ function iluminacao(){ return Math.round((1 - Math.cos(2 * Math.PI * idadeLua(Da
 /* ---------- dungeons especiais ---------- */
 const NOMES_JANELA = {};
 DUNGEONS.push(
-  { id:'lua1', special:'moon', nome:'Gruta da Lua', ic:'🌕', gate:null, desc:'Uma gruta que só existe nas noites de lua cheia, na ponta oeste da rua.',
+  { id:'lua1', special:'moon', nome:'Portal da Lua', ic:'🌕', gate:null, desc:'Um portal que só se abre nas noites de lua cheia, na ponta oeste da rua.',
     puz:[ { t:'quiz', n:4, tier:2, nome:'Enigmas da Lua' }, { t:'lights', n:4, nome:'Cristais Lunares' }, { t:'memory', c:4, r:4, time:70, nome:'Reflexos' }, { t:'path', c:6, r:5, nome:'Trilha de Prata' }, { t:'code', len:4, colors:5, rep:false, tries:9, nome:'Cadeado Lunar' } ],
     reward:['elmo_lunar', 'coruja_lunar'] },
   { id:'lua2', special:'moon', nome:'Adega Lunar', ic:'🍷', gate:null, desc:'Uma porta na adega do Saloon, aberta só sob a lua cheia.',
@@ -5991,9 +6000,9 @@ dgLockReason = function(i){
 const idxDg = id => DUNGEONS.findIndex(d => d.id === id);
 const ENTRADAS = [
   { id:'e_forja', room:'office', dg:'forja', cls:'hatch', label:'▼ FORJA ESQUECIDA', left:170, top:448, ver:() => true },
-  { id:'e_vazio', room:'rua', dg:'vazio', cls:'cave', label:'CATACUMBA DO VAZIO', left:760, top:348, ver:() => true },
+  { id:'e_vazio', room:'rua', dg:'vazio', cls:'portal void', label:'PORTAL DO VAZIO', left:762, top:336, ver:() => true },
   { id:'e_prisma', room:'tenda', dg:'prisma', cls:'sealed', label:'SANTUÁRIO PRISMA', left:185, top:217, ver:() => true },
-  { id:'e_lua1', room:'rua', dg:'lua1', cls:'moon', label:'GRUTA DA LUA', left:40, top:392, ver:luaAberta },
+  { id:'e_lua1', room:'rua', dg:'lua1', cls:'portal moon', label:'PORTAL DA LUA', left:62, top:336, ver:luaAberta },
   { id:'e_lua2', room:'salajogos', dg:'lua2', cls:'moon', label:'ADEGA LUNAR', left:180, top:352, ver:luaAberta },
   { id:'e_lua3', room:'cinema', dg:'lua3', cls:'moon', label:'SALA ESCARLATE', left:140, top:352, ver:luaAberta },
   { id:'e_chave1', room:'salajogos', dg:'chave1', cls:'hatch key', label:'▼ CÂMARA DO BARALHO', left:830, top:452, ver:() => GS.keys.baralho },
@@ -6216,7 +6225,7 @@ window.__x7 = { luaCheia, luaAberta, idadeLua, estadoMercado, ofertas, award, sy
 (function(){
   const cr = MAP_NODES.find(n => n.id === 'criptas'); if (cr) { cr.x = 87; cr.y = 50; }
   const POS = { e_vazio:[32,50], e_lua1:[68,50] };
-  const NOMES = { e_forja:'Forja Esquecida', e_vazio:'Catacumba do Vazio', e_prisma:'Santuário Prisma', e_lua1:'Gruta da Lua', e_lua2:'Adega Lunar', e_lua3:'Sala Escarlate', e_chave1:'Câmara do Baralho', e_chave2:'Galeria das Minas' };
+  const NOMES = { e_forja:'Forja Esquecida', e_vazio:'Portal do Vazio', e_prisma:'Santuário Prisma', e_lua1:'Portal da Lua', e_lua2:'Adega Lunar', e_lua3:'Sala Escarlate', e_chave1:'Câmara do Baralho', e_chave2:'Galeria das Minas' };
   const ROOM_POS = { biblioteca:[11,16,1], office:[27,84,-1], salajogos:[43,16,1], cinema:[59,84,-1], tenda:[75,16,1], locadora:[91,84,-1] };
   const _rm7 = renderMap;
   renderMap = function(){
