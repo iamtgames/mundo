@@ -1405,6 +1405,8 @@
   .dgate.portal.moon .dg-glow::after{background:radial-gradient(circle,rgba(255,255,255,.9) 0 40%,transparent 100%);}
   .dgate.portal .dg-lbl{bottom:-22px;}
   @keyframes portalSpin{to{transform:rotate(360deg);}}
+  .nbub{opacity:.32; transition:opacity .35s ease; animation:none;}
+  .nbub.near{opacity:1; z-index:86;}
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3696,6 +3698,7 @@ world.addEventListener('click', (e) => {
 
 
 
+
 /*EXTRAS_JS_START*/
 /* =====================================================================
    iamT World — EXTRAS: save, áudio 8-bit medieval (máx 5%), inventário/equipamentos,
@@ -5676,6 +5679,8 @@ function drawBubbles(now){
     if (!n.bubEl) { n.bubEl = mkEl('div', { className:'nbub' }); n.bubEl.innerHTML = '<b></b><span></span>'; roomlayer.appendChild(n.bubEl); n.bubTxt = ''; }
     if (n.bubTxt !== n.bub) { n.bubTxt = n.bub; n.bubEl.firstChild.textContent = n.r.nome; n.bubEl.lastChild.textContent = n.bub; }
     n.bubEl.style.left = Math.round(n.x) + 'px'; n.bubEl.style.top = (yOf(n) - 96) + 'px';
+    const perto = n.mode === 'hold' || (Math.abs(n.x - player.x) < 170 && Math.abs(yOf(n) - player.y) < 130);
+    n.bubEl.classList.toggle('near', !!perto);
   });
 }
 
