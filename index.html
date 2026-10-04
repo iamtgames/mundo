@@ -1258,6 +1258,9 @@
   .sv-p{margin:0; color:#d6cdea; font-size:15px; line-height:1.25;}
   #svText{width:100%; box-sizing:border-box; background:#0d0816; color:#e9e1ff; border:2px solid #3a2a55; border-radius:6px; padding:8px; font:12px/1.2 monospace; resize:none;}
   .sv-row{display:flex; gap:8px;} .sv-row .inv-tab{font-size:15px;}
+  .sv-cloud{border-top:1px solid rgba(255,255,255,.12); padding-top:8px; display:flex; flex-direction:column; gap:8px;}
+  .sv-h{font-size:16px; color:#ffd24d;} .sv-in{flex:1; background:#0d0816; color:#fff; border:2px solid #3a2a55; border-radius:6px; padding:6px 8px; font:16px monospace; text-transform:uppercase;}
+  .sv-code{font-size:15px; color:#cfc4ea;} .sv-code b{color:#7ee59a; font-size:20px; letter-spacing:2px;} .sv-code small{color:#9b8cb4;}
   .sv-msg{min-height:18px; font-size:14px; color:#ffd24d;}
 
   /* ===== dungeons ===== */
@@ -3620,6 +3623,8 @@ world.addEventListener('click', (e) => {
 
 
 
+
+
 /*EXTRAS_JS_START*/
 /* =====================================================================
    iamT World — EXTRAS: save, áudio 8-bit medieval (máx 5%), inventário/equipamentos,
@@ -4580,15 +4585,57 @@ const saveBox = mkEl('div', { id:'saveBox', className:'xpanel' },
   '<p class="sv-p">Seu progresso é salvo <b>automaticamente neste navegador</b>. Para levar para outro aparelho, copie o código abaixo e cole lá em "Importar".</p>' +
   '<textarea id="svText" rows="5" spellcheck="false"></textarea>' +
   '<div class="sv-row"><button class="inv-tab" id="svCopy">📋 Copiar código</button><button class="inv-tab" id="svLoad">📥 Carregar este código</button></div>' +
+  '<div class="sv-cloud" id="svCloud"><div class="sv-h">☁️ Nuvem (código de resgate)</div>' +
+  '<div class="sv-row"><button class="inv-tab" id="cvSave">☁️ Salvar na nuvem</button></div>' +
+  '<div class="sv-row"><input id="cvCode" class="sv-in" placeholder="ABCD-EFGH" maxlength="9" spellcheck="false" autocomplete="off"><button class="inv-tab" id="cvLoad">Carregar</button></div>' +
+  '<div class="sv-code" id="cvMine"></div></div>' +
   '<div class="sv-msg" id="svMsg"></div></div></div>');
 stage.appendChild(saveBox);
+
+/* ---------- nuvem: código de resgate (Cloudflare Worker + KV) ---------- */
+const CLOUD_URL = 'https://iamtworld-saves.ocultobadguy.workers.dev';   // URL do Worker (worker-salvar-progresso.js), sem barra no final. Vazio = recurso desligado.
+let cloudLastT = -1;
+function cloudMsg(t){ document.getElementById('svMsg').textContent = t; }
+function cloudShow(){
+  const m = document.getElementById('cvMine');
+  m.innerHTML = GS.cloud ? 'Seu código: <b>' + esc(GS.cloud) + '</b><br><small>Guarde-o. Este aparelho sincroniza sozinho a cada poucos minutos.</small>' : '';
+  document.getElementById('svCloud').style.display = CLOUD_URL ? '' : 'none';
+}
+async function cloudSave(silent){
+  if (!CLOUD_URL) return;
+  const post = code => fetch(CLOUD_URL + '/save', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ code:code || undefined, data:GS }) });
+  try {
+    let r = await post(GS.cloud);
+    if (r.status === 404 && GS.cloud) { GS.cloud = ''; r = await post(''); }
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.erro || 'erro');
+    if (GS.cloud !== j.code) { GS.cloud = j.code; gsSave(); }
+    cloudLastT = GS.t; cloudShow(); if (!silent) cloudMsg('Salvo! Seu código: ' + j.code);
+  } catch (e) { if (!silent) cloudMsg('Não foi possível salvar agora. Tente de novo.'); }
+}
+async function cloudLoad(code){
+  try {
+    const r = await fetch(CLOUD_URL + '/load?code=' + encodeURIComponent(code)); const j = await r.json();
+    if (!r.ok) throw new Error(j.erro || 'erro');
+    j.data.cloud = code; window.__importing = true; localStorage.setItem(GS_KEY, JSON.stringify(j.data)); location.reload();
+  } catch (e) { cloudMsg('Código não encontrado.'); }
+}
+document.getElementById('cvSave').addEventListener('click', () => { cloudMsg('Salvando...'); cloudSave(false); });
+document.getElementById('cvLoad').addEventListener('click', () => {
+  const c = document.getElementById('cvCode').value.toUpperCase().trim();
+  if (!/^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/.test(c)) return cloudMsg('Formato do código: ABCD-EFGH');
+  if (!confirm('Carregar este progresso substitui o progresso atual deste navegador. Continuar?')) return;
+  cloudMsg('Carregando...'); cloudLoad(c);
+});
+setInterval(() => { if (CLOUD_URL && GS.cloud && GS.t !== cloudLastT && !document.hidden) cloudSave(true); }, 120000);
+const _openSaveBox0 = null;
 let svArm = false;
 function openSaveBox(importMode){
   const ta = document.getElementById('svText'); document.getElementById('svMsg').textContent = ''; svArm = false;
   document.getElementById('svLoad').textContent = '📥 Carregar este código';
   if (importMode === true) { ta.value = ''; ta.placeholder = 'Cole aqui o código IAMT1:...'; ta.focus(); }
   else { ta.value = exportCode(); ta.select(); }
-  saveBox.classList.add('show');
+  cloudShow(); saveBox.classList.add('show');
 }
 document.getElementById('svCopy').addEventListener('click', () => {
   const ta = document.getElementById('svText'); ta.value = exportCode(); ta.select();
