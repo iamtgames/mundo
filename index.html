@@ -1140,7 +1140,7 @@
   .hudbtn{position:absolute; top:14px; z-index:46; height:30px; min-width:30px; padding:0 8px; border-radius:6px; background:rgba(20,14,36,.55);
     border:1px solid rgba(255,255,255,.15); color:#e8e0f5; font-size:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-family:'VT323',monospace; user-select:none;}
   .hudbtn:hover{background:rgba(60,40,100,.75);}
-  #invBtn{right:50px;} #mapBtn{right:86px;} #clockTag{right:122px; cursor:default; font-size:16px; letter-spacing:.5px;}
+  #invBtn{right:50px;} #mapBtn{right:86px;} #audioBtn{right:122px;} #clockTag{right:158px; cursor:default; font-size:16px; letter-spacing:.5px;}
   #toastItem{position:absolute; left:50%; top:54px; transform:translate(-50%,-20px); z-index:97; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
     background:linear-gradient(180deg,#2b1c3f,#150d24); border:3px solid var(--rar,#c9a24a); border-radius:8px; padding:8px 16px; color:#fff; font-size:19px; display:flex; align-items:center; gap:10px; box-shadow:0 8px 24px rgba(0,0,0,.6);}
   #toastItem.show{opacity:1; transform:translate(-50%,0);}
@@ -1211,6 +1211,16 @@
     .inv-body{flex-direction:column;}
     .inv-left{flex:none; width:100%;}
   }
+  #audioPop{position:absolute; right:14px; top:52px; z-index:97; width:232px; display:none; padding:10px 12px 9px; background:linear-gradient(180deg,#1f1530,#110a1c);
+    border:3px solid #000; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.6); font-family:'VT323',monospace; color:#ead9de;}
+  #audioPop.show{display:block;}
+  #audioPop .ap-title{font-size:19px; color:#fff; margin-bottom:6px;}
+  #audioPop .ap-row{display:flex; align-items:center; gap:8px; margin:6px 0;}
+  #audioPop input[type=range]{flex:1; height:6px; accent-color:#b86bff; cursor:pointer;}
+  #audioPop #apVal{width:42px; text-align:right; font-size:18px; color:#ffd24d;}
+  #audioPop .ap-btn{flex:1; padding:5px 6px; font-family:inherit; font-size:16px; border:2px solid #6b4ca3; border-radius:6px; background:#2a1c45; color:#fff; cursor:pointer;}
+  #audioPop .ap-btn:hover{background:#3d2570;}
+  #audioPop .ap-note{font-size:13px; color:#8a7b9e; margin-top:4px;}
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3489,6 +3499,7 @@ world.addEventListener('click', (e) => {
 
 
 
+
 /*EXTRAS_JS_START*/
 /* =====================================================================
    iamT World — EXTRAS: save, áudio 8-bit medieval (máx 5%), inventário/equipamentos,
@@ -3722,13 +3733,16 @@ function equipToggle(id){
 }
 
 /* ---------- áudio: volume máximo 5% ---------- */
-const MASTER_VOL = 0.001;          // teto da MÚSICA: 0,1% (efeitos usam sfxGain, volume normal do site)
+const MUSIC_MAX = 0.05;            // teto absoluto da MÚSICA (slider em 100%) = 5%
+let musicSlider = (typeof GS.musicVol === 'number') ? GS.musicVol : 14;   // padrão 14 ≈ 0,1% de ganho
+let musicOn = GS.musicOn !== false;
+function musicGainVal(){ return musicOn ? Math.pow(musicSlider / 100, 2) * MUSIC_MAX : 0; }   // curva quadrática: mais precisão nos volumes baixos (efeitos usam sfxGain, volume normal do site)
 let masterGain = null, sfxGain = null, musicBus = null, noiseBuf = null;
 let musicRoom = null, musicStep = 0, musicNext = 0, musicDucked = false, audioStarted = false;
 function audioInit(){
   const ctx = ensureAudio(); if (!ctx) return null;
   if (!masterGain) {
-    masterGain = ctx.createGain(); masterGain.gain.value = MASTER_VOL; masterGain.connect(ctx.destination);
+    masterGain = ctx.createGain(); masterGain.gain.value = musicGainVal(); masterGain.connect(ctx.destination);
     sfxGain = ctx.createGain(); sfxGain.gain.value = 0.1; sfxGain.connect(ctx.destination);   // efeitos (passos, item): volume normal do site
     musicBus = ctx.createGain(); musicBus.gain.value = 1; musicBus.connect(masterGain);
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.4, ctx.sampleRate);
@@ -4165,6 +4179,32 @@ gsSave();
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
 }
+
+/* ---------- ferramenta de áudio da música de fundo ---------- */
+const audioBtn = mkEl('div', { id:'audioBtn', className:'hudbtn', title:'Música de fundo' }, '🎵'); stage.appendChild(audioBtn);
+const audioPop = mkEl('div', { id:'audioPop' },
+  '<div class="ap-title">🎵 Música de fundo</div>' +
+  '<label class="ap-row"><input type="range" id="apRange" min="0" max="100" step="1"><span id="apVal"></span></label>' +
+  '<div class="ap-row"><button id="apToggle" class="ap-btn"></button><button id="apReset" class="ap-btn">Padrão</button></div>' +
+  '<div class="ap-note">Passos e efeitos não mudam.</div>');
+stage.appendChild(audioPop);
+const apRange = document.getElementById('apRange'), apVal = document.getElementById('apVal'), apToggle = document.getElementById('apToggle');
+function applyMusicVol(){
+  GS.musicVol = musicSlider; GS.musicOn = musicOn; gsSave();
+  if (masterGain && audioCtx) masterGain.gain.setTargetAtTime(musicGainVal(), audioCtx.currentTime, 0.05);
+  apRange.value = musicSlider; apVal.textContent = musicOn ? musicSlider + '%' : 'off';
+  apToggle.textContent = musicOn ? '🔊 Música: ligada' : '🔇 Música: desligada';
+  audioBtn.textContent = musicOn && musicSlider > 0 ? '🎵' : '🔇';
+  apRange.style.setProperty('--p', musicSlider + '%');
+}
+apRange.addEventListener('input', () => { musicSlider = +apRange.value; if (!musicOn && musicSlider > 0) musicOn = true; applyMusicVol(); });
+apToggle.addEventListener('click', () => { musicOn = !musicOn; applyMusicVol(); });
+document.getElementById('apReset').addEventListener('click', () => { musicSlider = 14; musicOn = true; applyMusicVol(); });
+audioBtn.addEventListener('click', e => { e.stopPropagation(); audioPop.classList.toggle('show'); });
+audioPop.addEventListener('click', e => e.stopPropagation());
+stage.addEventListener('pointerdown', e => { if (!audioPop.contains(e.target) && e.target !== audioBtn) audioPop.classList.remove('show'); }, true);
+window.addEventListener('keydown', e => { if (e.key === 'Escape') audioPop.classList.remove('show'); });
+applyMusicVol();
 
 /*EXTRAS_JS_END*/
 
