@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Demo Point-and-Click — Escritório iamT</title>
+<title>iamT World</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap');
   *{box-sizing:border-box; margin:0; padding:0; user-select:none;}
@@ -475,6 +475,12 @@
     font-size:12.5px; color:#c9bfc4; letter-spacing:.5px; padding:0 10px;}
   .cinema-screen-info{padding:9px 12px 6px; font-size:15px; color:#ead9de; line-height:1.35;}
   .cinema-screen-info b{color:#fff;}
+  .cinema-screen-box{width:min(980px,96%);}
+  .cinema-screen-body{display:flex; align-items:stretch;}
+  .cinema-screen-body > .cinema-screen-video{flex:1 1 auto; min-width:0; align-self:flex-start;}
+  .cinema-screen-sidebar{flex:0 0 300px; width:300px; display:flex; flex-direction:column; min-height:0;
+    border-left:1px solid rgba(255,255,255,.08);}
+  .cinema-screen-sidebar .cinema-screen-chat{flex:1 1 auto; min-height:200px;}
   .cinema-screen-chat{height:220px; overflow:hidden; position:relative; background:rgba(0,0,0,.28);
     border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06);}
   .cinema-screen-chat iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
