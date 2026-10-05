@@ -3761,6 +3761,8 @@ world.addEventListener('click', (e) => {
 
 
 
+
+
 /*EXTRAS_JS_START*/
 /* =====================================================================
    iamT World — EXTRAS: save, áudio 8-bit medieval (máx 5%), inventário/equipamentos,
@@ -6968,9 +6970,9 @@ function showTravel(){
   hideInv && hideInv(); travelOpen = true;
   const fd = GS.forest && GS.forest.d === dayKey() ? GS.forest : null, tot = 6;
   document.getElementById('travelBody').innerHTML =
-    '<div class="tv-dest" id="tvFloresta"><div class="tv-ic">🌲</div><div class="tv-tx"><b>Floresta Encantada</b><span>Mapa isométrico grande, novo a cada dia. Baús, ervas, slimes e o Santuário no extremo leste.</span>' +
+    '<div class="tv-dest" id="tvFloresta"><div class="tv-ic">🌲</div><div class="tv-tx"><b>Floresta Encantada</b><span>Uma floresta enorme, nova a cada dia. Baús, ervas, slimes e o Santuário no extremo leste.</span>' +
     '<small>Hoje: 📦 ' + (fd ? Object.keys(fd.chests).length : 0) + '/' + tot + ' · ' + (fd && fd.shrine === dayKey() ? '✨ Santuário ✔' : '✨ Santuário pendente') + '</small></div><button class="tv-go">Viajar ▶</button></div>' +
-    '<div class="tv-foot"><button class="tv-stay">◀ Ficar na cidade</button><div class="tv-cred">Tiles isométricos: Kenney (CC0) · kenney.nl</div></div>';
+    '<div class="tv-foot"><button class="tv-stay">◀ Ficar na cidade</button></div>';
   document.querySelector('#tvFloresta .tv-go').addEventListener('click', () => { hideTravel(); setTimeout(fAbrir, 120); });
   document.querySelector('.tv-stay').addEventListener('click', hideTravel);
   travelPanel.classList.add('show');
