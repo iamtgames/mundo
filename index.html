@@ -1442,6 +1442,15 @@
   #ghostBtn{right:230px;} #questBtn{right:194px;} #clockTag{right:266px !important;}
   #avatar.ghost,.ghost{position:absolute; width:72px; height:78px; opacity:.5; filter:grayscale(.6) brightness(1.25) hue-rotate(170deg); pointer-events:none; transform-origin:50% 100%;}
   .ghost .ghost-tag{position:absolute; left:50%; top:-14px; transform:translateX(-50%); font-size:13px; color:#cfe8ff; text-shadow:0 1px 0 #000; white-space:nowrap; opacity:.9; filter:none;}
+  #florestaPanel{position:absolute; inset:0; z-index:300; display:none; background:#0a1a10;} #florestaPanel.show{display:block;}
+  #fCanvas{width:100%; height:100%; image-rendering:pixelated; display:block; touch-action:none; cursor:crosshair;}
+  #fHud{position:absolute; left:10px; top:10px; display:flex; gap:12px; padding:6px 12px; background:rgba(0,0,0,.6); border:1px solid #3f7d3a; border-radius:8px; color:#e6ffe6; font-size:18px; pointer-events:none;}
+  #fClose{position:absolute; right:10px; top:10px; width:34px; height:34px; font-size:18px; background:#7a1f2a; color:#fff; border:1px solid #f66; border-radius:6px; cursor:pointer; font-family:inherit;}
+  #fAtk{position:absolute; right:14px; bottom:120px; width:62px; height:62px; font-size:28px; border-radius:50%; background:rgba(255,255,255,.18); color:#fff; border:2px solid #fff8; cursor:pointer;}
+  #fMsg{position:absolute; left:50%; bottom:26px; transform:translateX(-50%); padding:7px 16px; background:rgba(0,0,0,.7); border:1px solid #7dffb0; border-radius:8px; color:#eaffef; font-size:19px; opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap;}
+  .fgate{position:absolute; width:56px; height:96px; cursor:pointer; z-index:8;}
+  .fg-glow{position:absolute; inset:0; border-radius:50%; background:radial-gradient(ellipse,#d8ffe0 0,#4ec24a 38%,#14501f 70%,transparent 72%); box-shadow:0 0 22px #4ec24a; animation:fgPulse 1.8s ease-in-out infinite;} @keyframes fgPulse{50%{transform:scale(1.08); filter:brightness(1.3);}}
+  .fg-lbl{position:absolute; left:50%; top:100px; transform:translateX(-50%); white-space:nowrap; font-size:15px; color:#c8ffd8; text-shadow:0 2px 0 #000;}
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3716,6 +3725,8 @@ world.addEventListener('click', (e) => {
   hint.style.display = 'none';
   walkTo(x, y);
 });
+
+
 
 
 
@@ -6686,6 +6697,226 @@ renderRoom = function(id){
 };
 document.addEventListener('visibilitychange', () => { if (document.hidden) { GH.envia(); GH.comeca(currentRoomId); } });
 GH.comeca(currentRoomId); GH.busca(currentRoomId);
+
+/* =====================================================================
+   EXTRAS 12 — Floresta Encantada: ambiente procedural top-down 8-bit.
+   Mapa novo a cada dia (seed = data), árvores/clareiras/trilha, baús, ervas,
+   slimes e um santuário. Tudo desenhado em canvas com pixel art gerada por código.
+   Entrada: portal verde na rua. Sair: ESC, botão ✕ ou voltar ao portal.
+   ===================================================================== */
+GS.forest = GS.forest || { d:'', chests:{}, herbs:0, shrine:0, kills:0, best:0 };
+addItem('coroa_floresta','helm','Coroa da Floresta','coroa','angel','raro','Bênção do Santuário da Floresta (1ª vez)','glow');
+
+const F_TS = 24, F_W = 64, F_H = 48, F_VW = 960, F_VH = 540;
+const F = { open:false, map:null, ents:null, player:null, cam:{ x:0, y:0 }, keys:{}, target:null, last:0, t:0, atk:0, inv:0, msg:'', msgT:0, herbsRun:0, raf:0 };
+
+/* ---------- geração procedural ---------- */
+function fGerar(){
+  const rng = mulberry32(hashStr('floresta:' + dayKey()));
+  const G = []; for (let y = 0; y < F_H; y++) { G.push([]); for (let x = 0; x < F_W; x++) G[y].push((x < 2 || y < 2 || x >= F_W - 2 || y >= F_H - 2 || rng() < 0.43) ? 1 : 0); }
+  for (let it = 0; it < 4; it++) {
+    const N = G.map(r => r.slice());
+    for (let y = 1; y < F_H - 1; y++) for (let x = 1; x < F_W - 1; x++) {
+      let n = 0; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (G[y + dy][x + dx] === 1) n++;
+      N[y][x] = (n >= 5) ? 1 : 0;
+    }
+    for (let y = 0; y < F_H; y++) for (let x = 0; x < F_W; x++) G[y][x] = N[y][x];
+  }
+  /* clareira de entrada + trilha sinuosa até o outro lado */
+  const sy = 6 + Math.floor(rng() * (F_H - 12));
+  const clear = (cx, cy, r) => { for (let y = cy - r; y <= cy + r; y++) for (let x = cx - r; x <= cx + r; x++) if (x > 0 && y > 0 && x < F_W - 1 && y < F_H - 1 && (x - cx) * (x - cx) + (y - cy) * (y - cy) <= r * r + 1) G[y][x] = 0; };
+  clear(4, sy, 3);
+  let px = 4, py = sy; const path = new Set();
+  while (px < F_W - 6) {
+    path.add(px + ',' + py); G[py][px] = 0; if (G[py + 1]) G[py + 1][px] = 0;
+    const r = rng(); if (r < 0.55) px++; else if (r < 0.75 && py > 4) py--; else if (r < 0.95 && py < F_H - 6) py++; else px++;
+    if (rng() < 0.08) clear(px, py, 2 + Math.floor(rng() * 2));
+  }
+  clear(px, py, 4);
+  /* mantém só a região conectada à entrada */
+  const seen = new Uint8Array(F_W * F_H), q = [[4, sy]]; seen[sy * F_W + 4] = 1; const livres = [];
+  while (q.length) { const [x, y] = q.pop(); livres.push([x, y]); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const nx = x + dx, ny = y + dy; if (nx > 0 && ny > 0 && nx < F_W - 1 && ny < F_H - 1 && !G[ny][nx] && !seen[ny * F_W + nx]) { seen[ny * F_W + nx] = 1; q.push([nx, ny]); } }); }
+  for (let y = 0; y < F_H; y++) for (let x = 0; x < F_W; x++) if (!G[y][x] && !seen[y * F_W + x]) G[y][x] = 1;
+  const deco = []; for (let y = 0; y < F_H; y++) for (let x = 0; x < F_W; x++) if (!G[y][x]) { const r = rng(); deco.push(r < 0.06 ? 1 : r < 0.12 ? 2 : r < 0.2 ? 3 : 0); } else deco.push(0);
+  /* entidades em células livres, longe da entrada */
+  const longe = livres.filter(([x, y]) => (x - 4) * (x - 4) + (y - sy) * (y - sy) > 150);
+  const usa = new Set(); const sorteia = (lista, minD) => { for (let k = 0; k < 400; k++) { const c = lista[Math.floor(rng() * lista.length)]; if (!c) return null; const key = c[0] + ',' + c[1]; if (usa.has(key)) continue; usa.add(key); return c; } return null; };
+  const chests = [], herbs = [], slimes = [];
+  for (let i = 0; i < 6; i++) { const c = sorteia(longe); if (c) chests.push({ i, x:c[0] * F_TS + 12, y:c[1] * F_TS + 14 }); }
+  for (let i = 0; i < 16; i++) { const c = sorteia(livres.filter(([x, y]) => (x - 4) * (x - 4) + (y - sy) * (y - sy) > 25)); if (c) herbs.push({ i, x:c[0] * F_TS + 12, y:c[1] * F_TS + 14, got:false }); }
+  for (let i = 0; i < 9; i++) { const c = sorteia(longe); if (c) slimes.push({ i, x:c[0] * F_TS + 12, y:c[1] * F_TS + 14, hx:c[0] * F_TS + 12, hy:c[1] * F_TS + 14, hp:2, dir:rng() * 6.28, t:rng() * 3, dead:false, hit:0 }); }
+  const sh = livres.reduce((m, c) => c[0] > m[0] ? c : m, livres[0]);
+  return { G, deco, sy, path, chests, herbs, slimes, shrine:{ x:sh[0] * F_TS + 12, y:sh[1] * F_TS + 14 } };
+}
+
+/* ---------- pixel art ---------- */
+const FPAL = { r:'#d63a3a', s:'#f1c27d', k:'#1b1b1b', b:'#3a6bd6', l:'#5a3a1e', w:'#ffffff', g:'#4ec24a', G:'#2f8a2f', y:'#ffd24d', n:'#8a5a2b', N:'#5a3a1e', p:'#b04ad6', c:'#8aa0a8', C:'#5a6a72', o:'#ff8a3a' };
+function fSprite(rows){ const h = rows.length, w = rows[0].length, cv = document.createElement('canvas'); cv.width = w; cv.height = h; const c = cv.getContext('2d'); rows.forEach((r, y) => [...r].forEach((ch, x) => { if (ch !== '.') { c.fillStyle = FPAL[ch]; c.fillRect(x, y, 1, 1); } })); return cv; }
+const FS = {
+  hero:[fSprite(['..rrrr..', '.rrrrrr.', '.ssssss.', '.skssks.', '.ssssss.', '..bbbb..', '.bbbbbb.', 'sbbbbbbs', '.bbbbbb.', '..llll..', '..l..l..', '..k..k..']),
+        fSprite(['..rrrr..', '.rrrrrr.', '.ssssss.', '.skssks.', '.ssssss.', '..bbbb..', '.bbbbbb.', 'sbbbbbbs', '.bbbbbb.', '..llll..', '.l....l.', '.k....k.'])],
+  slime:[fSprite(['........', '..gggg..', '.gggggg.', 'ggwkgwkg', 'gggggggg', 'GGGGGGGG']), fSprite(['........', '........', '.gggggg.', 'ggwkgwkg', 'gggggggg', 'GGGGGGGG'])],
+  chest:fSprite(['.nnnnnn.', 'nNNNNNNn', 'nnnyynnn', 'nnnyynnn', 'nNNNNNNn', 'nNNNNNNn', '.NNNNNN.']),
+  chestO:fSprite(['.yyyyyy.', 'yy....yy', 'nNNNNNNn', 'nnnnnnnn', 'nNNNNNNn', 'nNNNNNNn', '.NNNNNN.']),
+  herb:fSprite(['..rrr...', '.rwrwr..', 'rrrrrrr.', '..www...', '..www...', '..www...']),
+  shrine:fSprite(['....pp....', '...pppp...', '...pwwp...', '....pp....', '..cccccc..', '.cCcccCcc.', '.cCcccCcc.', 'CCCCCCCCCC'])
+};
+function fPintaMapa(M){
+  const cv = document.createElement('canvas'); cv.width = F_W * F_TS; cv.height = F_H * F_TS; const c = cv.getContext('2d');
+  const top = document.createElement('canvas'); top.width = cv.width; top.height = cv.height; const t = top.getContext('2d');
+  const rng = mulberry32(hashStr('fp:' + dayKey()));
+  for (let y = 0; y < F_H; y++) for (let x = 0; x < F_W; x++) {
+    const X = x * F_TS, Y = y * F_TS, naTrilha = M.path.has(x + ',' + y);
+    c.fillStyle = naTrilha ? '#a8855a' : ['#3f7d3a', '#44853f', '#397636'][(x * 7 + y * 13) % 3]; c.fillRect(X, Y, F_TS, F_TS);
+    for (let k = 0; k < 6; k++) { c.fillStyle = naTrilha ? '#94764d' : '#2f6a2f'; c.fillRect(X + Math.floor(rng() * 22), Y + Math.floor(rng() * 22), 2, 2); }
+    const d = M.deco[y * F_W + x];
+    if (!M.G[y][x] && d === 1) { c.fillStyle = '#ff6b9a'; c.fillRect(X + 8, Y + 8, 3, 3); c.fillStyle = '#ffd24d'; c.fillRect(X + 9, Y + 9, 1, 1); }
+    if (!M.G[y][x] && d === 2) { c.fillStyle = '#fff'; c.fillRect(X + 14, Y + 12, 3, 3); c.fillStyle = '#ffd24d'; c.fillRect(X + 15, Y + 13, 1, 1); }
+    if (!M.G[y][x] && d === 3) { c.fillStyle = '#2f8a2f'; c.fillRect(X + 6, Y + 14, 2, 5); c.fillRect(X + 9, Y + 12, 2, 7); c.fillRect(X + 12, Y + 15, 2, 4); }
+    if (M.G[y][x] === 1) {
+      c.fillStyle = '#2a5d2c'; c.fillRect(X, Y, F_TS, F_TS);                                   // sombra de mata no chão
+      const j = (x * 31 + y * 17) % 5;
+      t.fillStyle = '#5a3a1e'; t.fillRect(X + 9, Y + 12, 6, 12); t.fillStyle = '#3f2a14'; t.fillRect(X + 13, Y + 12, 2, 12);
+      t.fillStyle = '#1f5a2a'; t.fillRect(X - 2, Y - 6 + j % 2, 28, 18);
+      t.fillStyle = '#2f7a36'; t.fillRect(X, Y - 8, 24, 16); t.fillRect(X - 3, Y - 2, 30, 8);
+      t.fillStyle = '#4a9c48'; t.fillRect(X + 4, Y - 8, 8, 3); t.fillRect(X + 14, Y - 4, 6, 3); t.fillRect(X + 2, Y + 2, 5, 3);
+      t.fillStyle = '#174a22'; t.fillRect(X, Y + 8, 24, 3);
+    }
+  }
+  return { ground:cv, top };
+}
+
+/* ---------- UI (overlay) ---------- */
+const fPanel = mkEl('div', { id:'florestaPanel' },
+  '<canvas id="fCanvas" width="' + F_VW + '" height="' + F_VH + '"></canvas>' +
+  '<div id="fHud"></div><button id="fClose" aria-label="Sair da floresta">✕</button><button id="fAtk" aria-label="Atacar">⚔</button>' +
+  '<div id="fMsg"></div>');
+stage.appendChild(fPanel);
+const fCv = fPanel.querySelector('#fCanvas'), fCtx = fCv.getContext('2d'), fHud = fPanel.querySelector('#fHud'), fMsg = fPanel.querySelector('#fMsg');
+fCtx.imageSmoothingEnabled = false;
+fPanel.addEventListener('click', e => e.stopPropagation()); fPanel.addEventListener('pointerdown', e => e.stopPropagation());
+fPanel.querySelector('#fClose').addEventListener('click', () => fSair());
+fPanel.querySelector('#fAtk').addEventListener('click', () => fAtacar());
+function fSay(txt, ms){ F.msg = txt; F.msgT = ms || 2200; fMsg.textContent = txt; fMsg.style.opacity = 1; }
+function fHudAtualiza(){
+  const P = F.player, M = F.map; if (!P) return;
+  fHud.innerHTML = '<span>' + '❤️'.repeat(Math.max(0, P.hp)) + '🖤'.repeat(Math.max(0, 3 - P.hp)) + '</span><span>📦 ' + Object.keys(GS.forest.chests).length + '/' + M.chests.length + '</span><span>🍄 ' + M.herbs.filter(h => h.got).length + '/' + M.herbs.length + '</span><span>🟢 ' + M.slimes.filter(s => s.dead).length + '/' + M.slimes.length + '</span><span>' + (GS.forest.shrine === dayKey() ? '✨ Santuário ✔' : '✨ Ache o Santuário →') + '</span>';
+}
+function fAbrir(){
+  if (F.open) return;
+  if (GS.forest.d !== dayKey()) GS.forest = { d:dayKey(), chests:{}, herbs:0, shrine:GS.forest.shrine === dayKey() ? dayKey() : 0, kills:0, best:GS.forest.best || 0, herbsDone:{} };
+  GS.forest.herbsDone = GS.forest.herbsDone || {};
+  F.map = fGerar(); F.layers = fPintaMapa(F.map);
+  F.map.herbs.forEach(h => { if (GS.forest.herbsDone[h.i]) h.got = true; });
+  F.map.slimes.forEach(s => { if (GS.forest.killed && GS.forest.killed[s.i]) s.dead = true; });
+  F.player = { x:4 * F_TS + 12, y:F.map.sy * F_TS + 14, hp:3, dir:1, fy:0, walk:0, vx:0, vy:0, t0:0 };
+  F.target = null; F.keys = {}; F.inv = 0; F.atk = 0; F.t = 0; F.last = performance.now(); F.open = true;
+  fPanel.classList.add('show'); hideInv && hideInv(); fHudAtualiza();
+  fSay('🌲 Floresta Encantada — layout de hoje: ' + dayKey(), 3200);
+  F.raf = requestAnimationFrame(fLoop);
+}
+function fSair(){
+  if (!F.open) return; F.open = false; cancelAnimationFrame(F.raf); fPanel.classList.remove('show'); gsSave();
+}
+window.addEventListener('keydown', e => {
+  if (!F.open) return; const k = e.key.toLowerCase();
+  if (k === 'escape') { fSair(); e.stopImmediatePropagation(); e.preventDefault(); return; }
+  if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', ' '].includes(k)) { F.keys[k] = true; F.target = null; if (k === ' ') fAtacar(); e.preventDefault(); e.stopImmediatePropagation(); }
+}, true);
+window.addEventListener('keyup', e => { if (!F.open) return; F.keys[e.key.toLowerCase()] = false; }, true);
+fCv.addEventListener('pointerdown', e => {
+  const r = fCv.getBoundingClientRect(), sx = F_VW / r.width, sy = F_VH / r.height;
+  F.target = { x:(e.clientX - r.left) * sx + F.cam.x, y:(e.clientY - r.top) * sy + F.cam.y };
+});
+function fAtacar(){ if (!F.open || F.atk > 0) return; F.atk = 0.28; sfxItem && 0; }
+
+/* ---------- física e lógica ---------- */
+function fSolido(x, y){ const tx = Math.floor(x / F_TS), ty = Math.floor(y / F_TS); if (tx < 0 || ty < 0 || tx >= F_W || ty >= F_H) return true; return F.map.G[ty][tx] === 1; }
+function fColide(x, y){ return fSolido(x - 5, y) || fSolido(x + 5, y) || fSolido(x - 5, y - 6) || fSolido(x + 5, y - 6); }
+function fMove(o, dx, dy){ if (!fColide(o.x + dx, o.y)) o.x += dx; if (!fColide(o.x, o.y + dy)) o.y += dy; }
+function fDano(){
+  const P = F.player; if (F.inv > 0) return; P.hp--; F.inv = 1.1; fHudAtualiza();
+  if (P.hp <= 0) { fSay('💫 Você desmaiou… e acordou na clareira de entrada.', 3000); P.hp = 3; P.x = 4 * F_TS + 12; P.y = F.map.sy * F_TS + 14; F.target = null; F.inv = 2; fHudAtualiza(); }
+}
+function fAbreBau(b){
+  GS.forest.chests[b.i] = 1; const moedas = 15 + Math.floor(Math.random() * 26); GS.coins += moedas; award && award('hid'); gsSave();
+  fSay('📦 Baú! +' + moedas + ' moedas', 2600); fHudAtualiza();
+  if (Math.random() < 0.3) setTimeout(() => { try { bonusDrop(); } catch (e) {} }, 500);
+}
+function fSantuario(){
+  if (GS.forest.shrine === dayKey()) { fSay('✨ O santuário já abençoou você hoje. Volte amanhã!', 2800); return; }
+  GS.forest.shrine = dayKey(); GS.forest.best = (GS.forest.best || 0) + 1; F.player.hp = 3; GS.coins += 80; award && award('clear'); gsSave(); fHudAtualiza();
+  fSay('✨ Santuário! +80 moedas e a floresta se acalma.', 3200);
+  if (!GS.owned.coroa_floresta) setTimeout(() => grantItem('coroa_floresta'), 700);
+}
+function fAtualiza(dt){
+  const P = F.player, M = F.map, K = F.keys; F.t += dt;
+  let ix = (K.d || K.arrowright ? 1 : 0) - (K.a || K.arrowleft ? 1 : 0), iy = (K.s || K.arrowdown ? 1 : 0) - (K.w || K.arrowup ? 1 : 0);
+  if (!ix && !iy && F.target) { const dx = F.target.x - P.x, dy = F.target.y - P.y, d = Math.hypot(dx, dy); if (d < 4) F.target = null; else { ix = dx / d; iy = dy / d; } }
+  const m = Math.hypot(ix, iy) || 1; const sp = 96 * dt;
+  const ox = P.x, oy = P.y; fMove(P, ix / m * sp * (ix || iy ? 1 : 0), iy / m * sp * (ix || iy ? 1 : 0));
+  if (F.target && Math.hypot(P.x - ox, P.y - oy) < 0.01 && (ix || iy)) F.target = null;
+  if (ix) P.dir = ix > 0 ? 1 : -1; P.walk = (ix || iy) ? P.walk + dt * 9 : 0;
+  F.atk = Math.max(0, F.atk - dt); F.inv = Math.max(0, F.inv - dt);
+  /* slimes */
+  M.slimes.forEach(s => {
+    if (s.dead) return; s.t += dt; s.hit = Math.max(0, s.hit - dt);
+    const d = Math.hypot(P.x - s.x, P.y - s.y);
+    if (d < 120 && d > 1) { fMove(s, (P.x - s.x) / d * 40 * dt, (P.y - s.y) / d * 40 * dt); }
+    else { s.dir += (Math.random() - 0.5) * dt * 3; const a = (s.t % 3 < 1.2) ? 18 * dt : 0; fMove(s, Math.cos(s.dir) * a, Math.sin(s.dir) * a); if (Math.hypot(s.x - s.hx, s.y - s.hy) > 90) s.dir = Math.atan2(s.hy - s.y, s.hx - s.x); }
+    if (d < 12) fDano();
+    if (F.atk > 0.12 && d < 34 && ((s.x - P.x) * P.dir > -6) && s.hit <= 0) { s.hp--; s.hit = 0.4; fMove(s, (s.x - P.x) / (d || 1) * 14, (s.y - P.y) / (d || 1) * 14); if (s.hp <= 0) { s.dead = true; GS.forest.killed = GS.forest.killed || {}; GS.forest.killed[s.i] = 1; GS.forest.kills++; if (Math.random() < 0.5) { GS.coins += 4; } gsSave(); fHudAtualiza(); fSay('🟢 Slime derrotado!', 1200); } }
+  });
+  M.herbs.forEach(h => { if (!h.got && Math.hypot(P.x - h.x, P.y - h.y) < 13) { h.got = true; GS.forest.herbsDone[h.i] = 1; GS.coins += 2; GS.forest.herbs++; F.herbsRun++; gsSave(); fHudAtualiza(); fSay('🍄 Erva coletada +2', 1100); if (M.herbs.every(x => x.got)) { award && award('secret'); fSay('🍄 Todas as ervas do dia! Bônus de PA.', 2600); } } });
+  M.chests.forEach(b => { if (!GS.forest.chests[b.i] && Math.hypot(P.x - b.x, P.y - b.y) < 15) fAbreBau(b); });
+  if (Math.hypot(P.x - M.shrine.x, P.y - M.shrine.y) < 18) fSantuario();
+  if (F.t > 2 && Math.hypot(P.x - (3 * F_TS + 12), P.y - (M.sy * F_TS + 14)) < 12 && P.x < 3 * F_TS + 14 && F.t > 2.5) { /* portal de saída à esquerda */ fSair(); return; }
+  F.cam.x = Math.max(0, Math.min(P.x - F_VW / 2, F_W * F_TS - F_VW)); F.cam.y = Math.max(0, Math.min(P.y - F_VH / 2, F_H * F_TS - F_VH));
+  if (F.msgT > 0) { F.msgT -= dt * 1000; if (F.msgT <= 0) fMsg.style.opacity = 0; }
+}
+function fDesenha(){
+  const c = fCtx, M = F.map, P = F.player, cx = Math.round(F.cam.x), cy = Math.round(F.cam.y);
+  c.clearRect(0, 0, F_VW, F_VH); c.drawImage(F.layers.ground, cx, cy, F_VW, F_VH, 0, 0, F_VW, F_VH);
+  const spr = (img, x, y, s, flip) => { const w = img.width * s, h = img.height * s; c.save(); c.translate(Math.round(x - cx), Math.round(y - cy)); if (flip) c.scale(-1, 1); c.drawImage(img, -w / 2, -h, w, h); c.restore(); };
+  /* portal de saída */
+  const gx = 3 * F_TS + 12 - cx, gy = M.sy * F_TS + 14 - cy; const pulso = 8 + Math.sin(F.t * 4) * 2;
+  c.fillStyle = 'rgba(120,255,160,.25)'; c.beginPath(); c.ellipse(gx, gy - 8, 14 + pulso, 22 + pulso, 0, 0, 6.3); c.fill(); c.fillStyle = '#c8ffd8'; c.fillRect(gx - 2, gy - 22, 4, 28);
+  M.chests.forEach(b => spr(GS.forest.chests[b.i] ? FS.chestO : FS.chest, b.x, b.y, 2));
+  M.herbs.forEach(h => { if (!h.got) spr(FS.herb, h.x, h.y, 2); });
+  spr(FS.shrine, M.shrine.x, M.shrine.y + 4, 2.4); c.fillStyle = 'rgba(200,120,255,' + (0.25 + Math.sin(F.t * 3) * 0.1) + ')'; c.beginPath(); c.arc(M.shrine.x - cx, M.shrine.y - cy - 34, 26, 0, 6.3); c.fill();
+  M.slimes.forEach(s => { if (!s.dead) { if (s.hit > 0 && Math.floor(F.t * 20) % 2) return; spr(FS.slime[Math.floor(s.t * 3) % 2], s.x, s.y, 2.2); } });
+  if (!(F.inv > 0 && Math.floor(F.t * 14) % 2)) { c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(P.x - cx, P.y - cy, 9, 4, 0, 0, 6.3); c.fill(); spr(FS.hero[Math.floor(P.walk) % 2], P.x, P.y + (Math.floor(P.walk) % 2 ? -1 : 0), 2, P.dir < 0); }
+  if (F.atk > 0) { const a = F.atk / 0.28; c.strokeStyle = 'rgba(255,255,255,' + a + ')'; c.lineWidth = 4; c.beginPath(); c.arc(P.x - cx + P.dir * 12, P.y - cy - 14, 22, P.dir > 0 ? -1.2 : Math.PI - 1.2 + 0.0, P.dir > 0 ? 1.2 : Math.PI + 1.2, false); c.stroke(); }
+  c.drawImage(F.layers.top, cx, cy, F_VW, F_VH, 0, 0, F_VW, F_VH);
+  /* penumbra de floresta */
+  const g = c.createRadialGradient(P.x - cx, P.y - cy - 10, 140, P.x - cx, P.y - cy - 10, 520); g.addColorStop(0, 'rgba(8,24,14,0)'); g.addColorStop(1, 'rgba(8,24,14,.78)'); c.fillStyle = g; c.fillRect(0, 0, F_VW, F_VH);
+  /* minimapa */
+  const mw = 128, mh = 96, mx = F_VW - mw - 10, my = F_VH - mh - 10, sx = mw / (F_W * F_TS), sy2 = mh / (F_H * F_TS);
+  c.fillStyle = 'rgba(0,0,0,.55)'; c.fillRect(mx - 2, my - 2, mw + 4, mh + 4); c.drawImage(F.layers.ground, 0, 0, F_W * F_TS, F_H * F_TS, mx, my, mw, mh);
+  c.fillStyle = '#fff'; c.fillRect(mx + P.x * sx - 2, my + P.y * sy2 - 2, 4, 4); c.fillStyle = '#c070ff'; c.fillRect(mx + M.shrine.x * sx - 2, my + M.shrine.y * sy2 - 2, 4, 4);
+  M.chests.forEach(b => { if (!GS.forest.chests[b.i]) { c.fillStyle = '#ffd24d'; c.fillRect(mx + b.x * sx - 1, my + b.y * sy2 - 1, 3, 3); } });
+}
+function fLoop(now){
+  if (!F.open) return; const dt = Math.min(0.05, (now - F.last) / 1000); F.last = now;
+  fAtualiza(dt); if (F.open) { fDesenha(); F.raf = requestAnimationFrame(fLoop); }
+}
+
+/* ---------- portal na rua + trilha ---------- */
+function pintaFloresta(){
+  roomlayer.querySelectorAll('.fgate').forEach(n => n.remove()); if (currentRoomId !== 'rua') return;
+  const d = mkEl('div', { className:'hotspot fgate' }, '<div class="fg-glow"></div><div class="fg-lbl">TRILHA DA FLORESTA</div>');
+  d.style.left = '1560px'; d.style.top = '336px'; roomlayer.appendChild(d);
+}
+const _renderRoom12 = renderRoom; renderRoom = function(id){ _renderRoom12(id); pintaFloresta(); };
+world.addEventListener('click', e => {
+  const g = e.target.closest('.fgate'); if (!g) return;
+  e.stopPropagation(); const p = aproxima(g); hint.style.display = 'none';
+  walkTo(p.ax, p.ay, () => fAbrir());
+});
+Object.assign(TRACKS, { floresta:{ bpm:84, root:50, scale:SC.mix, lead:'triangle', vol:0.55, hold:2.0, harm:true,
+  mel:[7,N,9,N, 11,N,9,N, 7,N,5,N, 4,N,N,N, 7,N,9,N, 12,N,11,N, 9,N,7,N, 5,N,N,N], bass:[0,N,4,N,3,N,4,N] } });
+const _trilha12 = trilhaDesejada; trilhaDesejada = function(){ return F.open ? 'floresta' : _trilha12(); };
+window.__f12 = { F, fGerar, fAbrir, fSair };
 
 /*EXTRAS_JS_END*/
 
