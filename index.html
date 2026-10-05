@@ -1442,15 +1442,23 @@
   #ghostBtn{right:230px;} #questBtn{right:194px;} #clockTag{right:266px !important;}
   #avatar.ghost,.ghost{position:absolute; width:72px; height:78px; opacity:.5; filter:grayscale(.6) brightness(1.25) hue-rotate(170deg); pointer-events:none; transform-origin:50% 100%;}
   .ghost .ghost-tag{position:absolute; left:50%; top:-14px; transform:translateX(-50%); font-size:13px; color:#cfe8ff; text-shadow:0 1px 0 #000; white-space:nowrap; opacity:.9; filter:none;}
-  #florestaPanel{position:absolute; inset:0; z-index:300; display:none; background:#0a1a10;} #florestaPanel.show{display:block;}
-  #fCanvas{width:100%; height:100%; image-rendering:pixelated; display:block; touch-action:none; cursor:crosshair;}
-  #fHud{position:absolute; left:10px; top:10px; display:flex; gap:12px; padding:6px 12px; background:rgba(0,0,0,.6); border:1px solid #3f7d3a; border-radius:8px; color:#e6ffe6; font-size:18px; pointer-events:none;}
-  #fClose{position:absolute; right:10px; top:10px; width:34px; height:34px; font-size:18px; background:#7a1f2a; color:#fff; border:1px solid #f66; border-radius:6px; cursor:pointer; font-family:inherit;}
-  #fAtk{position:absolute; right:14px; bottom:120px; width:62px; height:62px; font-size:28px; border-radius:50%; background:rgba(255,255,255,.18); color:#fff; border:2px solid #fff8; cursor:pointer;}
-  #fMsg{position:absolute; left:50%; bottom:26px; transform:translateX(-50%); padding:7px 16px; background:rgba(0,0,0,.7); border:1px solid #7dffb0; border-radius:8px; color:#eaffef; font-size:19px; opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap;}
-  .fgate{position:absolute; width:56px; height:96px; cursor:pointer; z-index:8;}
-  .fg-glow{position:absolute; inset:0; border-radius:50%; background:radial-gradient(ellipse,#d8ffe0 0,#4ec24a 38%,#14501f 70%,transparent 72%); box-shadow:0 0 22px #4ec24a; animation:fgPulse 1.8s ease-in-out infinite;} @keyframes fgPulse{50%{transform:scale(1.08); filter:brightness(1.3);}}
-  .fg-lbl{position:absolute; left:50%; top:100px; transform:translateX(-50%); white-space:nowrap; font-size:15px; color:#c8ffd8; text-shadow:0 2px 0 #000;}
+  #florestaPanel{position:absolute; inset:0; z-index:300; display:none; background:#0a1a10; overflow:hidden;} #florestaPanel.show{display:block;}
+  #fCanvas,#fTop{position:absolute; left:0; top:0; width:100%; height:100%; image-rendering:pixelated; display:block;} #fTop{touch-action:none; cursor:crosshair;}
+  .f-avatar{position:absolute; width:72px; height:78px; transform:scale(.95); transform-origin:50% 100%; pointer-events:none; z-index:5;}
+  #fHud{position:absolute; left:10px; top:10px; display:flex; gap:12px; padding:6px 12px; background:rgba(0,0,0,.6); border:1px solid #5fd05a; border-radius:8px; color:#e6ffe6; font-size:18px; pointer-events:none; z-index:8;}
+  #fClose{position:absolute; right:10px; top:10px; width:34px; height:34px; font-size:18px; background:#7a1f2a; color:#fff; border:1px solid #f66; border-radius:6px; cursor:pointer; font-family:inherit; z-index:8;}
+  #fAtk{position:absolute; right:14px; bottom:160px; width:62px; height:62px; font-size:28px; border-radius:50%; background:rgba(255,255,255,.18); color:#fff; border:2px solid #fff8; cursor:pointer; z-index:8;}
+  #fMsg{position:absolute; left:50%; bottom:26px; transform:translateX(-50%); padding:7px 16px; background:rgba(0,0,0,.7); border:1px solid #7dffb0; border-radius:8px; color:#eaffef; font-size:19px; opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap; z-index:8;}
+  #fBanner{position:absolute; left:0; top:70px; padding:8px 28px 8px 18px; background:linear-gradient(90deg,rgba(0,0,0,.75),transparent); color:#fff; font-size:26px; transform:translateX(-110%); z-index:8; pointer-events:none;} #fBanner.go{animation:fBan 3.2s ease forwards;}
+  @keyframes fBan{10%,75%{transform:translateX(0);} 100%{transform:translateX(-110%);}}
+  .fsign{position:absolute; width:90px; height:120px; cursor:pointer; z-index:8;}
+  .fs-post{position:absolute; left:42px; bottom:0; width:8px; height:86px; background:#5a3a1e;}
+  .fs-board{position:absolute; left:0; top:0; width:90px; padding:6px 4px; text-align:center; background:#9a6a35; border:3px solid #5a3a1e; color:#fff3d0; font-size:15px; line-height:1.1; box-shadow:0 3px 0 #000a;}
+  #travelBox{width:min(620px,96%);} .tv-body{padding:14px;}
+  .tv-dest{display:flex; align-items:center; gap:14px; padding:12px; background:#12301c; border:2px solid #5fd05a; border-radius:10px;}
+  .tv-ic{font-size:46px;} .tv-tx{flex:1; display:flex; flex-direction:column; gap:4px; color:#e6ffe6; font-size:16px;} .tv-tx b{font-size:21px; color:#fff;} .tv-tx small{color:#ffe08a;}
+  .tv-go{font-family:inherit; font-size:19px; padding:8px 18px; background:#1f7a4a; color:#fff; border:2px solid #7dffb0; border-radius:8px; cursor:pointer;}
+  .tv-foot{margin-top:12px; text-align:center;} .tv-cred{margin-top:8px; font-size:13px; color:#9aa;} .tv-stay{font-family:inherit; font-size:16px; padding:5px 14px; background:#3d2570; color:#fff; border:1px solid #6b4ca3; border-radius:8px; cursor:pointer;}
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3725,6 +3733,8 @@ world.addEventListener('click', (e) => {
   hint.style.display = 'none';
   walkTo(x, y);
 });
+
+
 
 
 
@@ -6698,125 +6708,148 @@ renderRoom = function(id){
 document.addEventListener('visibilitychange', () => { if (document.hidden) { GH.envia(); GH.comeca(currentRoomId); } });
 GH.comeca(currentRoomId); GH.busca(currentRoomId);
 
+/* Tiles isométricos: Kenney "Isometric Tiles Landscape" (Creative Commons CC0) — https://kenney.nl/assets/isometric-tiles-landscape */
+const FISO_B64 = {"grass": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIQAAABjCAYAAABaBaidAAAII0lEQVR42u2cPY8cRRCGq/ZmLeMTiQNEyC9wQICEiGyEEAEhJAREOEcit5AILPEHiC5ADtCZn8BvICCw5OAIjLEtzgiD71jOOztFcPsxH91d1T09Ox9dk51vd7w79cxb71vdcwB6wJfH7772yTEc6JUAwJS//J3jD69fu4YfA8FnAPSwKFZHP1/89Mv9T2GlQKQIAsAXUMA7eIBzAAAiegZEP6YMBioIzSNlMFBBsB8pgoEKgoIxeSBigZAiGKggKBiTA2JfIKQABioICsbogRgKCFMEAxUEBWN0QIwFhCmAgQqCgjF4IKYCwhjBQAVBwRgcEKmAMAYwUEFQMHoHQkEYLhioICgYewdCQRgPGKggKBidA6EgjBcMVBAUjOhAKAjTAQMVBAWjNRAKwnTBQAVBwfAGQkFIBwxUEBQMFggFIV0wUEFQMMpgoIKgYJTBwK+P3//gytX5nRkoCCmDsTh/9cPpydk3s+Wi+Oji3+V7q6KYE5FencSO5asV/Pn0/M0nv/7z+dli8VZWAEC+XEG+LCCbz+DK1QM4yGaAiHq1Jg7C388X8OL5Ai4WORAR5ACQARRrK0GXYOQFZJmCkQoI9SOrhg0CIIJ8WSgYiYFQA2INQ9VpaCtJCAQDEMbRxK6VKBiTBqEGBIFVKUpHviwUjCmAQFWXUNaAzH5qBBssqhgjVwS0N4TMBo5ZKbD079pKxtwaHC1jti0ysjiZ9Ufj6vhBKAFRQBkKMwDkgIRKqUQ9xmhAIGfLoFI7IEfjoUpzISKo1rvkMVQx+geBGIFHa8pAS+FNZ99B4awxgQ64+gSBO5CdQ5BDEWxnQMcnWANEmkr23hpaXNrMjhd5oIei96jH6M8sBqUMvmXUX0NCGFDnGL4gEPTyxxpKq52uwqOl+MiYT3DCoophUYSQbSkcQELAqoMpgrVRRHfEZArNt5F6KknPfDpbA0aGweOcFSB2NSAGBMNnIgC/GtbUJ5FUEuwRIimA8fXkjJ3QmDfYf78rbLNuZGghyCvGRFOJFwi24rqKjp5AmSYNy0bKICY9xChK3ZCS9RtMAYwgRUCPgkuVQfKauXH5uw4CGiQeBUYSGH9BjjkHNcEYWSvxXoZuc3+19RfuOYSpVaChjbgKXQbKBhsCvw8Da61k+B4jeBk6dqoI/D+y5sIWbVYqLM3G1EI4QGzfRKIstdZCOMhW0slaAyey3cwhmrKPVufhknfp/EGeXLj3D0ExWoEQ8lGxW1AMgynk71LW+ZBHodEDLGx6EMJewIgOQls/gXHOl9nPSrX5AgVp2e5zSUfcNjDQ/S33FFetk0UUXA4MuPND2w16lmt9vozFGMlqAs3DKLJ8LklxyTG8MgFj/mZdgGFVBIpU4NjpIvD9GdezXXssbde4OgInA3LEgGJuQ1SqPW436dgVLEZcZVsD2qd/2x9jwtGVqURryvAxfuY2YL7mJtNqi6NmWBCpuREYmStHYcvuzkUndEz/Sv8WXSSIgTBOyijvqUTHjNN0NcgxzCKHGXTNIVyfARvKgs7oWv2dRDFEi04uc4gdtgyfCWYwEEi/E9E5IhzaXQs/QCKitZT7JA8XRK5UQoKrQ+ZbisyTz3xZyFJDT/sUujzosniPsnz2MnsFL76b0/WHM6DbAHDrEgzumQxDkdFWQG4WgY5EIZ1NmDbsMDms9OwqFQSnT85k8RGnAwYVRIB4QkRHlC/v37v74GT7lb76/sbhnK7fnCHdBsBbiHjokuLdjmtu9iDdfMPpIDHVIE+t3cF9scjhj8cvR1ZNTzhL9/JaEU6IiiPK8/v37j442byicZomGPVWEtL0pMvfVViIwNCGpMMv/vybc7UGwtf5c/O9jgBaDwqMILAfhwcDBbFRWjzz68iZSCiSdwG4WKzaA+Hr/NtuaPF4r0sRvD2qGQxuLQMFt0aItSaBgoAwQmMcILitptJLgvF9iQ8I3oIVt5VIVYYxsl4Q2ZXGCkSMAkmAwEClsZw7BITgDmZXDC6Z2L6jtOg+5tPlX5rAsQrRFgzp+9u0kZYgtLY0co8haSvESJ9kAy83oLIrkVfLIIGIdQ0OxFOE6HMud1w1KESluCGJATcXgR2RS8ELAqKtepDQNzhgiwlC9NCzAwNKAy4udkqAMLeK3QKZT3M2g9KInbGL3iamUlyPsDcgZK0EHY6fG175xFfOS1SveLSU0QYgASRdgtD5WEQeV0GQMHx8AjDeRaAQMT2A9BkL196fPYCwtzmZn2Jwk0ypwvh5E7FCxGgdHk9g7ROEfQ9OhalEevfbNib4gEXy2OkLRcuY2gcIewdC1krsWW7zl/qbCQWErcUWPaG7xS2pedzu5ekPhN6AcMdVu7eoxkyfB4V4UMRAtBwcWV9WEAHhCWF/IPQOhLyVuAptbhPyJ9E7VAjBukafrWGwQPiDIUkPsi11FVP520u5vEtHHxa/O0QQBgeEPJWELaW74DGaSm4VMmBcPWQQBgsEbz595xec+RRMKlv6iTGAMHggTGAQ4K2ZUzEk6QINLSOXtwwPMMYEwmiACJtj+C2jbz0EBqpDB8vQCkRrMFxqYUkj659ab6GbAAijBcI9x6ivKbsetaKqQrhMZQIgjB6IsDmGGQ7jHEKwX2FKIEwGiC0Y3944nL8h3/NZrrNzT6XhKk0RhMkB4acYhsGUYJPtlEGYLBAhYFg9BKYDwuSB4M0nrxApgZAMEE0wNns+d2DUgUgRhOSAsIMBhxsgUgYhWSBMreS/RX7z9PH5s5RBSB6IMhirs9ffPn3019OUQdgc/wOVOBXCeDGiNwAAAABJRU5ErkJggg==", "grass2": "data:image/png;base64,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", "sand": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIQAAABjCAYAAABaBaidAAAEdElEQVR42u3ZO2/UQBAH8P/4HOeSCCRAgnwKJL4BUFDQAikoKfgEdFRI1HRABQUSDVDR0VMABQgEFIjnAcqLXAK55Gzf2Ut1STg47uHX7sxMaW3j9U8z//UCWnj8+Na+e/fO1XQnAJL88q+fXZ+vBdNnTYoF8vAyBW6/effo1cLC/URBiIRAFwzhaM2jGgCkabJERA8kwyCF8HdJhkEKYXBJhEEKQWGwB5EXBIkwSCEoDHYgyoIgAQYpBIXhPAhbIHCEQQpBYTgHwhUIHGCQQlAY1oPgAsFFGKQQFIZ1IKRAcAEGKQSFUTkIhWAvDFIICqN0EArBHRikEBRG4SAUgrswSCEojNxBKAQ+MEghKIzMIBQCXxikEBTG2CAUghwYpBAUxlAQCkEuDFIICmMvDFIICmMvDHr+5MaZ+lRw2XikEATDaLXad9+8/3jV32q1T3emk2Mz9QDelA8i0h0SVO12hMWltfmllY3zrV/t2343BUzUQRx3EQQ+ZuoBphSGFAhYWdlAO4yQmBQA4PcWGGMQKQxxEPrL73+wC6ODIJhSGEIgDASxCwMKQxCEoSD+hqGjhDOEkUHoKJEBYWwQ2jF4Q5gYhJ5KeELIDEJh8IKQGwjNGDwg5A5CM4bbEAoDoaPETQiFg1AYbkEoDYTCcAPCDohOewvezCzI8xSGUAjGAGnYRbwdw197+RYzBw9gbv4wgv37KoAh+1RSNYQkjhE2N7DdbCJthfDTKEJ7eQXh2hrqhw5VAEPmJZotEKJmE0kUITXmzwxhuonCcBCCMcCoW/QvCENDpT0weGWMojrCKNsyCoShp4zqYfAIn7aNhszHToVRHoRx2n/eEMb+D2EPDLszRpaOkPVVskCY+MeUZgweoyE3EDpKeELIDEI6DG4QcgMhDQZXCLmD4B4+uUMoDAS38Fk5hChGuF48hMJBuD5KpHSE0kG4BkMqhF0QRJ+NSbeIvDnJMMIwFgvBGJMS8MF4actPwtY1rz77wkvTiyCclAejg04nQaOxLBICQG+NMTeRdB5eufv0206/vHPp1JxXnz3hGSoVRq/Ir1UCAwA2N7fR+LosEEK6A2HnO/QvlgijLBA2QxgIQiKMokG4AGEoCEkwigLhEoSRQUiAkTcIFyGMDYIzjLxAuAxhYhAcYWQFwQFCZhCcYEwKghOE3EBwgDEuCI4QcgfhMoxRQXCGUBgIF2EMA1HFNXTZEAoHYQsMz69hegiMQSAkdITSQbjQMfpBSIRQOgibYfRASIZQGQj7YBxBRB4+ffguIiNYC8ImGLE/jUZjSTQEa0DYAGMrjPF99adoCNaBqBJGWSBshmAtiCpgFA3CBQjWgygTRlEgXILgDIgyYOQNwkUIzoEoEkZeIFyG4CyIImBkBcEBgvMg8oQxKQhOENiAyAPGuCA4QmAHIguMUUFwhsAWxCQwhoGQAIE9iHFgDAIhCYIYEKPA6AchEYI4EP+D0QMhGYJYEP+CsRnGxxd/bH6RDEE8iL0wtrve0cXV9a+SIfTqN3o1LKOeNWL7AAAAAElFTkSuQmCC", "water": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIQAAABTCAYAAABef68wAAADsUlEQVR42u3cu2sUURQG8HNmNskaEhMLNaCBgGhhIVpELMRCsLGwMmBt4Z+Q2rXTXqwkQrARtRAUBB8sPrMGIWISwZioiZoHK3E3+2J35lpIYnRd9zUzO/ee72tnLgyXH9+9xWFsQujy47ddgwPbS/F4XEnfCxYNITHXF4nyaSYaUorGXSqNLN4enYrFYi5ACIRA5J61yD7AFttERMp1FlzFNyTDYEAoj2QYDAiVIxEGAwJgGA/CKwgSYTAgAIZxIIKCIAEGAwJgaA8iLBBMhMGAABjagdAFggkwGBAAI/QgTIGgIwwGBMAIHQgpEHSAwYAAGC0HAQjhhcGAABiBgwAEfWAwIACG7yAAQV8YDAiA4TkIQDAHBgMCYDQNAhDMhcGAABh1gwAEOTAYEACjKghAkAuDAQEwNsNgQACMzTB45N79M07fnmEVaQMEwTAKyaVrmUT8kj20v/N8JJ85TtFui6KdRGxhh+RQoFJqldbevNiaHru7u/Dp6a2IlV0hnnlI9vw4Of2DVBw4RO62naQslIXpEDLvXlNu+hk5K+9JOS6RQxTZeKfwg+yZB2TPvwIMQRCI/vytVqRsDWCIhFAZBGCIhFAdBGCIglA7CMAQAaF+EIBhNITGQQCGkRCaB1EGI0FO/2HA0BSCdyA2YKTQGBpD8B4EjhKtIfgHAjC0hOA/CMDQCkJwIABDCwi/QTDNKqVyzLwFMGRCUEq5xPSR2gtZ++SRfS8jNk+Qol4i2sXMbYF8hVMg6/ssRb5MkpXNkeroInnzGL8gpCeeU+rJTSpMPyKVTQYLgXhSKXWBnOLF2Gji68ZM5dXhU93RdvsEKz5HTMcCa4z1dPQIaowQNALxlFLuFXKKd2LXxxbWn5VNXQOGTAgVQQCGTAhVQQCGLAg1gwAMGRDqBgEYZkNoGARgmAmhaRCAYRYEz0DIhGEeBM9ByIBhLgTfQJgJw3wIvoMwA4YcCIGB0BOGPAiBg9ADhlwILQMRRhhO7w4qZdKiIbQcRJhgpHv20vLnD6IhhAZEGGCksnlaTKZFQwgdiFbCCApEmCGEFkQrYKSzefrmIwgdIIQeRJAw/AKhEwRtQAQBw2sQOkLQDoSfMLwCoTMEbUH4AaPZS6UJELQH4SWMRkGYBMEYEF7AqPfIMBGCcSCagVErCJMhGAuiERjVQEiAYDyIemBUAiEJghgQtcD4+1IpEYI4EP+DsQ5CMgSxIP4FYzWXP7qcXJuTDEE8iM0wCsXCwaXl1TnJENbzE/xJknaFH8FjAAAAAElFTkSuQmCC", "dirt": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIQAAABjCAYAAABaBaidAAAD6klEQVR42u3cO09UQRQH8HPuLu4GTGwt/RBWdlCYUFhCqR2dna2FCSZ+BCuDJiYELKys7egs7DAhsQCUh0Rwl112771jQSCrsOzrPs7j/y8nM5PMyW8e1RAh9OnpfG1tYaGCShCx58WvvVq4c7syNV9Jo8choq00jt80viRfF9fXE4DwCCFES8ThAXNUIyJKQ/KTKPrgGQYDwtV4hsGA0D8eYTAgAIZ5EFlB8AiDAQEwzIEoCoIHGAwIgKEehBQIFmEwIACGOhBaIFiAwYAAGOJBWIGgEQYDAmCIA+EFggYYDAiAUToIQJALgwEBMAoHAQh6YDAgAEbuIABBLwwGBMDIHAQg2IHBgAAYE4MABLswGBAAY2QQgOAHBgMCYAwEAQh+YTAgAEYvDAYEwOiFwR9fLs7Wp6aeMxMgOIbROktWd34cLkets/hRs92djZNQCyGgOs7S6Sa0d9S8u7V9+OSocXavmqbnjd04oalqheq3qlStRMTMqJZxCL9OmnTwu0mnrS4lIaWUiKoXHUIADI8QAv17K1T/HwAYPiH0BQEYPiEMBAEYviAMDQIwfEAYGQRg2IYwNgjAkAuh2epMPF910gkAQ/eJkDkIwLABIXMQgKEbQm4gAEMnhNxBAIYuCIWBAAwdEAoHARiyIZQGAjBkQigdhHcY0iCIAeENhlQI4kBYhyEdglgQ1mBogSAehHYY2iCoAaENhlYI6kBIh6EdgloQ0mBYgaAeRNkwrEEwA6JoGFYhmAORNwzrEMyCyBqGFwjmQUwKwxsENyBGheEVwiUIJtoJIW0yRzOeYXTj1DUEItoNcWhU43bjdVSf3ozSdImY5jzCCIFo9/CEmq2OOwgh0PfA9JY4Xl1+v/Ht8rx89+zhTFSfno0Cu4JBRNTudGl7/5hSRx+mXEKg7uqLlY1NovOdcOVl5RGGJxD9IFyk71PbEwwPIAZBGAjCEwzLIIaFMDQIDzAsghgVwsggLMOwBGJcCGODsAjDAohJIUwMwhIMzSCygpAZCAswNILIGkLmIDTD0AQiLwi5gdAIQwOIvCHkDkITDMkgioJQGAgNMCSCKBpC4SAkw5AEoiwIpYGQCEMCiLIhlA5CEowyQUiBIAaEBBhlgJAGQRyIMmEUCUIqBLEgyoBRBAjpEMSDKBJGniC0QFADoggYeYDQBkEdiDxhZAlCKwS1IPKAkQUI7RDUg8gSxiQgrEAwAyILGOOAsAbBHIhJYIwCwioEsyDGgTEMCOsQzIMYBcZNILxAcANiGBjXgfAGwR2Im2D0gvAKwS2I62CcduO53f3jg4T8QnAPohdGm2v3dw7+7L1Y+ewWwkX+Aqc++4pGV6IHAAAAAElFTkSuQmCC"};
+
 /* =====================================================================
-   EXTRAS 12 — Floresta Encantada: ambiente procedural top-down 8-bit.
-   Mapa novo a cada dia (seed = data), árvores/clareiras/trilha, baús, ervas,
-   slimes e um santuário. Tudo desenhado em canvas com pixel art gerada por código.
-   Entrada: portal verde na rua. Sair: ESC, botão ✕ ou voltar ao portal.
+   EXTRAS 12 — Floresta Encantada v3 (ISOMÉTRICA).
+   Chão: tiles CC0 "Isometric Tiles Landscape" do Kenney (kenney.nl).
+   Árvores, mato, baús, slimes e santuário: desenhados por código no mesmo estilo chapado.
+   Usa o NOSSO personagem (com itens). Mapa grande e novo a cada dia.
+   Acesso: fim da cidade → escolha de viagem.
    ===================================================================== */
 GS.forest = GS.forest || { d:'', chests:{}, herbs:0, shrine:0, kills:0, best:0 };
 addItem('coroa_floresta','helm','Coroa da Floresta','coroa','angel','raro','Bênção do Santuário da Floresta (1ª vez)','glow');
 
-const F_TS = 24, F_W = 64, F_H = 48, F_VW = 960, F_VH = 540;
-const F = { open:false, map:null, ents:null, player:null, cam:{ x:0, y:0 }, keys:{}, target:null, last:0, t:0, atk:0, inv:0, msg:'', msgT:0, herbsRun:0, raf:0 };
+const F_W = 56, F_H = 44, F_VW = 960, F_VH = 540, FK = 0.8, FHW = 66 * FK, FHH = 33 * FK;   // meia-largura / meia-altura do losango
+const F = { open:false, map:null, player:null, keys:{}, target:null, last:0, t:0, atk:0, inv:0, msg:'', msgT:0, raf:0, av:null, off:{ x:0, y:0 } };
+const fSX = (gx, gy) => (gx - gy) * FHW, fSY = (gx, gy) => (gx + gy) * FHH;
 
-/* ---------- geração procedural ---------- */
+/* ---------- ruído / geração procedural (coordenadas em tiles) ---------- */
+function fNoise(seed){
+  const h = (x, y) => { let n = (x * 374761393 + y * 668265263 + seed) | 0; n = (n ^ (n >>> 13)) * 1274126177 | 0; return ((n ^ (n >>> 16)) >>> 0) / 4294967295; };
+  const sm = t => t * t * (3 - 2 * t);
+  const v = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), tx = sm(x - xi), ty = sm(y - yi); return (h(xi, yi) * (1 - tx) + h(xi + 1, yi) * tx) * (1 - ty) + (h(xi, yi + 1) * (1 - tx) + h(xi + 1, yi + 1) * tx) * ty; };
+  return (x, y) => v(x / 9, y / 9) * 0.6 + v(x / 4, y / 4) * 0.3 + v(x / 2, y / 2) * 0.1;
+}
+const FT = { GRASS:0, TREE:1, WATER:2, PATH:3, TALL:4, ROCK:5, BRIDGE:6 };
+const fSolidT = t => t === FT.TREE || t === FT.WATER || t === FT.ROCK;
 function fGerar(){
-  const rng = mulberry32(hashStr('floresta:' + dayKey()));
-  const G = []; for (let y = 0; y < F_H; y++) { G.push([]); for (let x = 0; x < F_W; x++) G[y].push((x < 2 || y < 2 || x >= F_W - 2 || y >= F_H - 2 || rng() < 0.43) ? 1 : 0); }
-  for (let it = 0; it < 4; it++) {
-    const N = G.map(r => r.slice());
-    for (let y = 1; y < F_H - 1; y++) for (let x = 1; x < F_W - 1; x++) {
-      let n = 0; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (G[y + dy][x + dx] === 1) n++;
-      N[y][x] = (n >= 5) ? 1 : 0;
+  const sd = hashStr('floresta3:' + dayKey()), rng = mulberry32(sd), nF = fNoise(sd), nW = fNoise(sd ^ 0x5bd1e995), nG = fNoise(sd ^ 0x2545f491);
+  const G = [], deco = [];
+  for (let y = 0; y < F_H; y++) { G.push([]); deco.push([]); for (let x = 0; x < F_W; x++) {
+    let t = FT.GRASS; const f = nF(x, y), w = nW(x + 40, y + 40), g = nG(x + 80, y + 80);
+    if (f > 0.57) t = FT.TREE; else if (w > 0.65) t = FT.WATER; else if (g > 0.58) t = FT.TALL; else if (rng() < 0.02) t = FT.ROCK;
+    if (x < 2 || y < 2 || x >= F_W - 2 || y >= F_H - 2) t = FT.TREE;
+    G[y].push(t); deco[y].push(t === FT.GRASS && rng() < 0.14 ? 1 + Math.floor(rng() * 3) : 0);
+  } }
+  const clearing = (cx, cy, r) => { for (let y = cy - r; y <= cy + r; y++) for (let x = cx - r; x <= cx + r; x++) if (x > 1 && y > 1 && x < F_W - 2 && y < F_H - 2 && (x - cx) * (x - cx) + (y - cy) * (y - cy) <= r * r + 1) { G[y][x] = FT.GRASS; deco[y][x] = 0; } };
+  const carve = (ax, ay, bx, by) => {
+    let x = ax, y = ay, guard = 0;
+    while ((x !== bx || y !== by) && guard++ < 2500) {
+      for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) { const tx = x + dx, ty = y + dy; if (tx > 1 && ty > 1 && tx < F_W - 2 && ty < F_H - 2) { G[ty][tx] = (G[ty][tx] === FT.WATER || G[ty][tx] === FT.BRIDGE) ? FT.BRIDGE : FT.PATH; deco[ty][tx] = 0; } }
+      const adx = bx - x, ady = by - y, r = rng();
+      if (r < 0.2 && ady !== 0) y += Math.sign(ady); else if (r < 0.4 && adx !== 0) x += Math.sign(adx); else if (r < 0.5) { y += rng() < 0.5 ? 1 : -1; }
+      else if (Math.abs(adx) > Math.abs(ady)) x += Math.sign(adx); else y += Math.sign(ady);
+      x = Math.max(4, Math.min(F_W - 5, x)); y = Math.max(4, Math.min(F_H - 5, y));
     }
-    for (let y = 0; y < F_H; y++) for (let x = 0; x < F_W; x++) G[y][x] = N[y][x];
-  }
-  /* clareira de entrada + trilha sinuosa até o outro lado */
-  const sy = 6 + Math.floor(rng() * (F_H - 12));
-  const clear = (cx, cy, r) => { for (let y = cy - r; y <= cy + r; y++) for (let x = cx - r; x <= cx + r; x++) if (x > 0 && y > 0 && x < F_W - 1 && y < F_H - 1 && (x - cx) * (x - cx) + (y - cy) * (y - cy) <= r * r + 1) G[y][x] = 0; };
-  clear(4, sy, 3);
-  let px = 4, py = sy; const path = new Set();
-  while (px < F_W - 6) {
-    path.add(px + ',' + py); G[py][px] = 0; if (G[py + 1]) G[py + 1][px] = 0;
-    const r = rng(); if (r < 0.55) px++; else if (r < 0.75 && py > 4) py--; else if (r < 0.95 && py < F_H - 6) py++; else px++;
-    if (rng() < 0.08) clear(px, py, 2 + Math.floor(rng() * 2));
-  }
-  clear(px, py, 4);
-  /* mantém só a região conectada à entrada */
-  const seen = new Uint8Array(F_W * F_H), q = [[4, sy]]; seen[sy * F_W + 4] = 1; const livres = [];
-  while (q.length) { const [x, y] = q.pop(); livres.push([x, y]); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const nx = x + dx, ny = y + dy; if (nx > 0 && ny > 0 && nx < F_W - 1 && ny < F_H - 1 && !G[ny][nx] && !seen[ny * F_W + nx]) { seen[ny * F_W + nx] = 1; q.push([nx, ny]); } }); }
-  for (let y = 0; y < F_H; y++) for (let x = 0; x < F_W; x++) if (!G[y][x] && !seen[y * F_W + x]) G[y][x] = 1;
-  const deco = []; for (let y = 0; y < F_H; y++) for (let x = 0; x < F_W; x++) if (!G[y][x]) { const r = rng(); deco.push(r < 0.06 ? 1 : r < 0.12 ? 2 : r < 0.2 ? 3 : 0); } else deco.push(0);
-  /* entidades em células livres, longe da entrada */
-  const longe = livres.filter(([x, y]) => (x - 4) * (x - 4) + (y - sy) * (y - sy) > 150);
-  const usa = new Set(); const sorteia = (lista, minD) => { for (let k = 0; k < 400; k++) { const c = lista[Math.floor(rng() * lista.length)]; if (!c) return null; const key = c[0] + ',' + c[1]; if (usa.has(key)) continue; usa.add(key); return c; } return null; };
-  const chests = [], herbs = [], slimes = [];
-  for (let i = 0; i < 6; i++) { const c = sorteia(longe); if (c) chests.push({ i, x:c[0] * F_TS + 12, y:c[1] * F_TS + 14 }); }
-  for (let i = 0; i < 16; i++) { const c = sorteia(livres.filter(([x, y]) => (x - 4) * (x - 4) + (y - sy) * (y - sy) > 25)); if (c) herbs.push({ i, x:c[0] * F_TS + 12, y:c[1] * F_TS + 14, got:false }); }
-  for (let i = 0; i < 9; i++) { const c = sorteia(longe); if (c) slimes.push({ i, x:c[0] * F_TS + 12, y:c[1] * F_TS + 14, hx:c[0] * F_TS + 12, hy:c[1] * F_TS + 14, hp:2, dir:rng() * 6.28, t:rng() * 3, dead:false, hit:0 }); }
-  const sh = livres.reduce((m, c) => c[0] > m[0] ? c : m, livres[0]);
-  return { G, deco, sy, path, chests, herbs, slimes, shrine:{ x:sh[0] * F_TS + 12, y:sh[1] * F_TS + 14 } };
+  };
+  const sy = Math.floor(F_H / 2) + Math.floor((rng() - 0.5) * 10), start = [7, sy];
+  const cols = [14, 22, 30, 38, 46], rows = [8, F_H - 9], slots = [];
+  cols.forEach(cx => rows.forEach(ry => slots.push([cx + Math.floor((rng() - 0.5) * 5), ry + Math.floor((rng() - 0.5) * 6)])));
+  const chosen = slots.sort(() => rng() - 0.5).slice(0, 6).sort((a, b) => a[0] - b[0]);
+  const shrine = [F_W - 8, 8 + Math.floor(rng() * (F_H - 16))];
+  clearing(start[0], start[1], 3); chosen.forEach(p => clearing(p[0], p[1], 2)); clearing(shrine[0], shrine[1], 3);
+  let prev = start; chosen.forEach(p => { carve(prev[0], prev[1], p[0], p[1]); prev = p; }); carve(prev[0], prev[1], shrine[0], shrine[1]);
+  for (let k = 0; k < 2; k++) { const a = chosen[Math.floor(rng() * chosen.length)], b = chosen[Math.floor(rng() * chosen.length)]; if (a !== b) carve(a[0], a[1], b[0], b[1]); }
+  const seen = new Uint8Array(F_W * F_H), q = [start], reach = []; seen[start[1] * F_W + start[0]] = 1;
+  while (q.length) { const [x, y] = q.pop(); reach.push([x, y]); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const nx = x + dx, ny = y + dy; if (nx > 0 && ny > 0 && nx < F_W - 1 && ny < F_H - 1 && !fSolidT(G[ny][nx]) && !seen[ny * F_W + nx]) { seen[ny * F_W + nx] = 1; q.push([nx, ny]); } }); }
+  const used = new Set(), cen = c => [c[0] + 0.5, c[1] + 0.5];
+  const pickR = (lista, dMin) => { for (let k = 0; k < 500; k++) { const c = lista[Math.floor(rng() * lista.length)]; if (!c) return null; const key = c[0] + ',' + c[1]; if (used.has(key) || Math.hypot(c[0] - start[0], c[1] - start[1]) < dMin) continue; used.add(key); return c; } return null; };
+  const chests = chosen.map((c, i) => { const [x, y] = cen([c[0] + 1, c[1]]); return { i, x, y }; });
+  const herbs = []; for (let i = 0; i < 18; i++) { const c = pickR(reach.filter(([x, y]) => G[y][x] === FT.GRASS || G[y][x] === FT.TALL), 6); if (c) { const [x, y] = cen(c); herbs.push({ i, x, y, got:false }); } }
+  const slimes = []; for (let i = 0; i < 12; i++) { const c = pickR(reach.filter(([x, y]) => G[y][x] === FT.TALL || G[y][x] === FT.GRASS), 12); if (c) { const [x, y] = cen(c); slimes.push({ i, x, y, hx:x, hy:y, hp:2, dir:rng() * 6.28, t:rng() * 3, dead:false, hit:0 }); } }
+  const [shx, shy] = cen(shrine);
+  return { G, deco, start, sy, chests, herbs, slimes, shrine:{ x:shx, y:shy } };
 }
 
-/* ---------- pixel art ---------- */
-const FPAL = { r:'#d63a3a', s:'#f1c27d', k:'#1b1b1b', b:'#3a6bd6', l:'#5a3a1e', w:'#ffffff', g:'#4ec24a', G:'#2f8a2f', y:'#ffd24d', n:'#8a5a2b', N:'#5a3a1e', p:'#b04ad6', c:'#8aa0a8', C:'#5a6a72', o:'#ff8a3a' };
-function fSprite(rows){ const h = rows.length, w = rows[0].length, cv = document.createElement('canvas'); cv.width = w; cv.height = h; const c = cv.getContext('2d'); rows.forEach((r, y) => [...r].forEach((ch, x) => { if (ch !== '.') { c.fillStyle = FPAL[ch]; c.fillRect(x, y, 1, 1); } })); return cv; }
-const FS = {
-  hero:[fSprite(['..rrrr..', '.rrrrrr.', '.ssssss.', '.skssks.', '.ssssss.', '..bbbb..', '.bbbbbb.', 'sbbbbbbs', '.bbbbbb.', '..llll..', '..l..l..', '..k..k..']),
-        fSprite(['..rrrr..', '.rrrrrr.', '.ssssss.', '.skssks.', '.ssssss.', '..bbbb..', '.bbbbbb.', 'sbbbbbbs', '.bbbbbb.', '..llll..', '.l....l.', '.k....k.'])],
-  slime:[fSprite(['........', '..gggg..', '.gggggg.', 'ggwkgwkg', 'gggggggg', 'GGGGGGGG']), fSprite(['........', '........', '.gggggg.', 'ggwkgwkg', 'gggggggg', 'GGGGGGGG'])],
-  chest:fSprite(['.nnnnnn.', 'nNNNNNNn', 'nnnyynnn', 'nnnyynnn', 'nNNNNNNn', 'nNNNNNNn', '.NNNNNN.']),
-  chestO:fSprite(['.yyyyyy.', 'yy....yy', 'nNNNNNNn', 'nnnnnnnn', 'nNNNNNNn', 'nNNNNNNn', '.NNNNNN.']),
-  herb:fSprite(['..rrr...', '.rwrwr..', 'rrrrrrr.', '..www...', '..www...', '..www...']),
-  shrine:fSprite(['....pp....', '...pppp...', '...pwwp...', '....pp....', '..cccccc..', '.cCcccCcc.', '.cCcccCcc.', 'CCCCCCCCCC'])
-};
-function fPintaMapa(M){
-  const cv = document.createElement('canvas'); cv.width = F_W * F_TS; cv.height = F_H * F_TS; const c = cv.getContext('2d');
-  const top = document.createElement('canvas'); top.width = cv.width; top.height = cv.height; const t = top.getContext('2d');
-  const rng = mulberry32(hashStr('fp:' + dayKey()));
-  for (let y = 0; y < F_H; y++) for (let x = 0; x < F_W; x++) {
-    const X = x * F_TS, Y = y * F_TS, naTrilha = M.path.has(x + ',' + y);
-    c.fillStyle = naTrilha ? '#a8855a' : ['#3f7d3a', '#44853f', '#397636'][(x * 7 + y * 13) % 3]; c.fillRect(X, Y, F_TS, F_TS);
-    for (let k = 0; k < 6; k++) { c.fillStyle = naTrilha ? '#94764d' : '#2f6a2f'; c.fillRect(X + Math.floor(rng() * 22), Y + Math.floor(rng() * 22), 2, 2); }
-    const d = M.deco[y * F_W + x];
-    if (!M.G[y][x] && d === 1) { c.fillStyle = '#ff6b9a'; c.fillRect(X + 8, Y + 8, 3, 3); c.fillStyle = '#ffd24d'; c.fillRect(X + 9, Y + 9, 1, 1); }
-    if (!M.G[y][x] && d === 2) { c.fillStyle = '#fff'; c.fillRect(X + 14, Y + 12, 3, 3); c.fillStyle = '#ffd24d'; c.fillRect(X + 15, Y + 13, 1, 1); }
-    if (!M.G[y][x] && d === 3) { c.fillStyle = '#2f8a2f'; c.fillRect(X + 6, Y + 14, 2, 5); c.fillRect(X + 9, Y + 12, 2, 7); c.fillRect(X + 12, Y + 15, 2, 4); }
-    if (M.G[y][x] === 1) {
-      c.fillStyle = '#2a5d2c'; c.fillRect(X, Y, F_TS, F_TS);                                   // sombra de mata no chão
-      const j = (x * 31 + y * 17) % 5;
-      t.fillStyle = '#5a3a1e'; t.fillRect(X + 9, Y + 12, 6, 12); t.fillStyle = '#3f2a14'; t.fillRect(X + 13, Y + 12, 2, 12);
-      t.fillStyle = '#1f5a2a'; t.fillRect(X - 2, Y - 6 + j % 2, 28, 18);
-      t.fillStyle = '#2f7a36'; t.fillRect(X, Y - 8, 24, 16); t.fillRect(X - 3, Y - 2, 30, 8);
-      t.fillStyle = '#4a9c48'; t.fillRect(X + 4, Y - 8, 8, 3); t.fillRect(X + 14, Y - 4, 6, 3); t.fillRect(X + 2, Y + 2, 5, 3);
-      t.fillStyle = '#174a22'; t.fillRect(X, Y + 8, 24, 3);
-    }
-  }
-  return { ground:cv, top };
+/* ---------- arte ---------- */
+let FA = null;
+function fCv(w, h, fn){ const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const c = cv.getContext('2d'); fn(c, w, h); return cv; }
+function fPoly(c, pts, col){ c.fillStyle = col; c.beginPath(); pts.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); c.fill(); }
+function fEll(c, x, y, rx, ry, col){ c.fillStyle = col; c.beginPath(); c.ellipse(x, y, rx, ry, 0, 0, 6.3); c.fill(); }
+function fArtInit(){
+  if (FA) return; FA = { tiles:{}, ready:false };
+  Object.keys(FISO_B64).forEach(k => { const im = new Image(); im.onload = () => { FA.tiles[k] = fCv(Math.round(132 * FK), Math.round(im.height * FK), (c, w, h) => { c.imageSmoothingQuality = 'high'; c.drawImage(im, 0, 0, w, h); }); FA.ready = Object.keys(FA.tiles).length === Object.keys(FISO_B64).length; }; im.src = FISO_B64[k]; });
+  const shade = (c, w, h) => { fEll(c, w / 2, h - 8, 26, 8, 'rgba(0,0,0,.2)'); };
+  FA.tree = [0, 1, 2].map(v => fCv(110, 160, (c, w, h) => {
+    shade(c, w, h); fPoly(c, [[49, 150], [49, 104], [61, 104], [61, 150]], '#7a4a22'); fPoly(c, [[56, 150], [56, 104], [61, 104], [61, 150]], '#5a3414');
+    if (v === 2) { [[118, 86, '#2a7a34'], [92, 70, '#1f6a2c'], [64, 56, '#2a7a34'], [38, 44, '#1f6a2c']].forEach(([by, hw, col], i) => { const ay = by - 52 - 0; fPoly(c, [[55 - hw / 2, by], [55, by - 54 + i * 3], [55 + hw / 2, by]], col); fPoly(c, [[55, by - 54 + i * 3], [55 + hw / 2, by], [55 + 2, by]], 'rgba(0,0,0,.18)'); }); fPoly(c, [[55 - 8, 52], [55, 8], [55 + 8, 52]], '#46b04f'); }
+    else { fEll(c, 55, 82, 40, 28, '#1f6a2c'); fEll(c, 55, 66, 38, 38, '#2a7a34'); fEll(c, 44, 56, 26, 28, '#3a9a44'); fEll(c, 36, 46, 12, 12, '#5cc05a'); fEll(c, 72, 78, 18, 14, 'rgba(0,0,0,.14)'); if (v === 1) { fEll(c, 70, 52, 5, 5, '#e04a4a'); fEll(c, 40, 74, 5, 5, '#e04a4a'); } }
+  }));
+  FA.rock = fCv(80, 60, (c, w, h) => { shade(c, w, h + 4); fPoly(c, [[10, 50], [18, 22], [40, 12], [62, 24], [70, 50], [40, 56]], '#7d8c92'); fPoly(c, [[18, 22], [40, 12], [62, 24], [40, 30]], '#b8c4c8'); fPoly(c, [[40, 30], [62, 24], [70, 50], [40, 56]], '#5a6a72'); });
+  FA.tall = fCv(84, 44, (c, w, h) => { for (let i = 0; i < 9; i++) { const x = 8 + (i * 37) % 68, y = 18 + (i * 53) % 20; fPoly(c, [[x - 5, y + 8], [x, y - 12], [x + 5, y + 8]], i % 2 ? '#2f8a2f' : '#3f9a38'); fPoly(c, [[x, y - 12], [x + 5, y + 8], [x + 1, y + 8]], 'rgba(0,0,0,.18)'); } });
+  FA.flower = [['#ff6b9a', '#ffd24d'], ['#ffffff', '#ffd24d'], ['#7aa8ff', '#ffffff']].map(cols => fCv(70, 34, c => { [[16, 20], [38, 12], [54, 24]].forEach(([x, y]) => { c.fillStyle = '#2f8a2f'; c.fillRect(x - 1, y, 2, 8); fEll(c, x, y, 5, 5, cols[0]); fEll(c, x, y, 2, 2, cols[1]); }); }));
+  FA.chest = [false, true].map(open => fCv(72, 70, (c, w, h) => {
+    fEll(c, 36, 60, 28, 9, 'rgba(0,0,0,.22)');
+    fPoly(c, [[8, 34], [36, 46], [36, 62], [8, 50]], '#8a5a28'); fPoly(c, [[64, 34], [36, 46], [36, 62], [64, 50]], '#6a4018');
+    fPoly(c, [[8, 34], [36, 22], [64, 34], [36, 46]], open ? '#2a1608' : '#c28c4a');
+    if (open) { fEll(c, 36, 34, 14, 6, 'rgba(255,220,100,.8)'); fPoly(c, [[8, 34], [36, 22], [36, 10], [8, 22]], '#a06a30'); fPoly(c, [[64, 34], [36, 22], [36, 10], [64, 22]], '#8a5a28'); }
+    else { fPoly(c, [[32, 46], [40, 46], [40, 54], [32, 54]], '#ffd24d'); fPoly(c, [[8, 34], [36, 22], [36, 25], [8, 37]], '#ffd24d'); fPoly(c, [[64, 34], [36, 22], [36, 25], [64, 37]], '#e0b020'); }
+  }));
+  FA.herb = fCv(44, 46, (c, w, h) => { fEll(c, 22, 40, 12, 4, 'rgba(0,0,0,.2)'); c.fillStyle = '#f4ecd8'; c.fillRect(17, 24, 10, 16); fEll(c, 22, 22, 17, 12, '#d63a3a'); fEll(c, 22, 18, 17, 9, '#e85a5a'); [[14, 20, 3], [24, 16, 3], [29, 23, 2.5]].forEach(([x, y, r]) => fEll(c, x, y, r, r, '#fff')); });
+  FA.slime = [0, 1].map(f => fCv(64, 50, (c, w, h) => { const sq = f ? 6 : 0; fEll(c, 32, 44, 24, 7, 'rgba(0,0,0,.22)'); fEll(c, 32, 34 + sq / 2, 24 + sq, 15 - sq / 2, '#2f8a2f'); fEll(c, 32, 30 + sq / 2, 22 + sq, 17 - sq / 2, '#5fd05a'); fEll(c, 22, 22 + sq / 2, 6, 4, 'rgba(255,255,255,.45)'); fEll(c, 24, 30 + sq / 2, 5, 6, '#fff'); fEll(c, 40, 30 + sq / 2, 5, 6, '#fff'); fEll(c, 25, 31 + sq / 2, 2.5, 3.5, '#111'); fEll(c, 41, 31 + sq / 2, 2.5, 3.5, '#111'); }));
+  FA.shrine = fCv(130, 170, (c, w, h) => { fEll(c, 65, 152, 54, 14, 'rgba(0,0,0,.22)'); fPoly(c, [[65, 118], [118, 140], [65, 162], [12, 140]], '#b8c4c8'); fPoly(c, [[12, 140], [65, 162], [65, 170], [12, 148]], '#7d8c92'); fPoly(c, [[118, 140], [65, 162], [65, 170], [118, 148]], '#5a6a72'); fPoly(c, [[50, 124], [80, 124], [80, 70], [50, 70]], '#9aa8ae'); fPoly(c, [[65, 124], [80, 124], [80, 70], [65, 70]], '#7d8c92'); fPoly(c, [[46, 70], [65, 62], [84, 70], [65, 78]], '#c8d4d8'); fEll(c, 65, 52, 15, 15, '#c070ff'); fEll(c, 60, 47, 5, 5, '#f0d8ff'); });
+}
+function fMinimapa(M){
+  const cv = document.createElement('canvas'); cv.width = F_W; cv.height = F_H; const c = cv.getContext('2d');
+  const cor = ['#74c654', '#1e6a2e', '#4aa0e8', '#dcbc7c', '#4f9a3f', '#7d8c92', '#9a6a35'];
+  for (let y = 0; y < F_H; y++) for (let x = 0; x < F_W; x++) { c.fillStyle = cor[M.G[y][x]]; c.fillRect(x, y, 1, 1); }
+  return cv;
 }
 
 /* ---------- UI (overlay) ---------- */
 const fPanel = mkEl('div', { id:'florestaPanel' },
   '<canvas id="fCanvas" width="' + F_VW + '" height="' + F_VH + '"></canvas>' +
+  '<canvas id="fTop" width="' + F_VW + '" height="' + F_VH + '"></canvas>' +
   '<div id="fHud"></div><button id="fClose" aria-label="Sair da floresta">✕</button><button id="fAtk" aria-label="Atacar">⚔</button>' +
-  '<div id="fMsg"></div>');
+  '<div id="fMsg"></div><div id="fBanner"></div>');
 stage.appendChild(fPanel);
-const fCv = fPanel.querySelector('#fCanvas'), fCtx = fCv.getContext('2d'), fHud = fPanel.querySelector('#fHud'), fMsg = fPanel.querySelector('#fMsg');
-fCtx.imageSmoothingEnabled = false;
+const fCv0 = fPanel.querySelector('#fCanvas'), fCtx = fCv0.getContext('2d'), fTop = fPanel.querySelector('#fTop'), fTc = fTop.getContext('2d'), fHud = fPanel.querySelector('#fHud'), fMsg = fPanel.querySelector('#fMsg'), fBanner = fPanel.querySelector('#fBanner');
 fPanel.addEventListener('click', e => e.stopPropagation()); fPanel.addEventListener('pointerdown', e => e.stopPropagation());
 fPanel.querySelector('#fClose').addEventListener('click', () => fSair());
 fPanel.querySelector('#fAtk').addEventListener('click', () => fAtacar());
 function fSay(txt, ms){ F.msg = txt; F.msgT = ms || 2200; fMsg.textContent = txt; fMsg.style.opacity = 1; }
 function fHudAtualiza(){
   const P = F.player, M = F.map; if (!P) return;
-  fHud.innerHTML = '<span>' + '❤️'.repeat(Math.max(0, P.hp)) + '🖤'.repeat(Math.max(0, 3 - P.hp)) + '</span><span>📦 ' + Object.keys(GS.forest.chests).length + '/' + M.chests.length + '</span><span>🍄 ' + M.herbs.filter(h => h.got).length + '/' + M.herbs.length + '</span><span>🟢 ' + M.slimes.filter(s => s.dead).length + '/' + M.slimes.length + '</span><span>' + (GS.forest.shrine === dayKey() ? '✨ Santuário ✔' : '✨ Ache o Santuário →') + '</span>';
+  fHud.innerHTML = '<span>' + '❤️'.repeat(Math.max(0, P.hp)) + '🖤'.repeat(Math.max(0, 3 - P.hp)) + '</span><span>📦 ' + Object.keys(GS.forest.chests).length + '/' + M.chests.length + '</span><span>🍄 ' + M.herbs.filter(h => h.got).length + '/' + M.herbs.length + '</span><span>🟢 ' + M.slimes.filter(s => s.dead).length + '/' + M.slimes.length + '</span><span>' + (GS.forest.shrine === dayKey() ? '✨ Santuário ✔' : '✨ Santuário: extremo leste ↘') + '</span>';
+}
+function fCriaAvatar(){
+  if (F.av) F.av.remove();
+  const el = avatar.cloneNode(true); el.removeAttribute('id'); el.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+  el.className = 'f-avatar'; el.style.cssText = '';
+  try { applyEquip(el, GS.equip); } catch (e) {}
+  fPanel.insertBefore(el, fTop); F.av = el;
+  F.avParts = { facing:el.querySelector('.facing'), body:el.querySelector('.bodywrap'), legL:el.querySelector('.leg.left'), legR:el.querySelector('.leg.right'), armL:el.querySelector('.arm.left'), armR:el.querySelector('.arm.right') };
 }
 function fAbrir(){
   if (F.open) return;
-  if (GS.forest.d !== dayKey()) GS.forest = { d:dayKey(), chests:{}, herbs:0, shrine:GS.forest.shrine === dayKey() ? dayKey() : 0, kills:0, best:GS.forest.best || 0, herbsDone:{} };
-  GS.forest.herbsDone = GS.forest.herbsDone || {};
-  F.map = fGerar(); F.layers = fPintaMapa(F.map);
+  if (GS.forest.d !== dayKey()) GS.forest = { d:dayKey(), chests:{}, herbs:0, shrine:GS.forest.shrine === dayKey() ? dayKey() : 0, kills:0, best:GS.forest.best || 0, herbsDone:{}, killed:{} };
+  GS.forest.herbsDone = GS.forest.herbsDone || {}; GS.forest.killed = GS.forest.killed || {};
+  fArtInit(); F.map = fGerar(); F.mini = fMinimapa(F.map);
   F.map.herbs.forEach(h => { if (GS.forest.herbsDone[h.i]) h.got = true; });
-  F.map.slimes.forEach(s => { if (GS.forest.killed && GS.forest.killed[s.i]) s.dead = true; });
-  F.player = { x:4 * F_TS + 12, y:F.map.sy * F_TS + 14, hp:3, dir:1, fy:0, walk:0, vx:0, vy:0, t0:0 };
+  F.map.slimes.forEach(s => { if (GS.forest.killed[s.i]) s.dead = true; });
+  F.player = { gx:F.map.start[0] + 0.5, gy:F.map.start[1] + 0.5, hp:3, dir:1, phase:0, moving:false, lastBucket:0 };
+  F.exit = { x:F.map.start[0] - 1.5, y:F.map.start[1] + 0.5 };
   F.target = null; F.keys = {}; F.inv = 0; F.atk = 0; F.t = 0; F.last = performance.now(); F.open = true;
-  fPanel.classList.add('show'); hideInv && hideInv(); fHudAtualiza();
-  fSay('🌲 Floresta Encantada — layout de hoje: ' + dayKey(), 3200);
+  fCriaAvatar(); fPanel.classList.add('show'); hideInv && hideInv(); fHudAtualiza();
+  fBanner.textContent = '🌲 Floresta Encantada'; fBanner.classList.remove('go'); void fBanner.offsetWidth; fBanner.classList.add('go');
+  fSay('Explore! Setas/WASD ou clique para andar · Espaço ataca', 3600);
   F.raf = requestAnimationFrame(fLoop);
 }
 function fSair(){
-  if (!F.open) return; F.open = false; cancelAnimationFrame(F.raf); fPanel.classList.remove('show'); gsSave();
+  if (!F.open) return; F.open = false; cancelAnimationFrame(F.raf); fPanel.classList.remove('show'); if (F.av) { F.av.remove(); F.av = null; } gsSave();
+  try { player.x = Math.max(60, ROOMS.rua.width - 190); camX = Math.max(0, player.x - STAGE_W / 2); } catch (e) {}
 }
 window.addEventListener('keydown', e => {
   if (!F.open) return; const k = e.key.toLowerCase();
@@ -6824,19 +6857,20 @@ window.addEventListener('keydown', e => {
   if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', ' '].includes(k)) { F.keys[k] = true; F.target = null; if (k === ' ') fAtacar(); e.preventDefault(); e.stopImmediatePropagation(); }
 }, true);
 window.addEventListener('keyup', e => { if (!F.open) return; F.keys[e.key.toLowerCase()] = false; }, true);
-fCv.addEventListener('pointerdown', e => {
-  const r = fCv.getBoundingClientRect(), sx = F_VW / r.width, sy = F_VH / r.height;
-  F.target = { x:(e.clientX - r.left) * sx + F.cam.x, y:(e.clientY - r.top) * sy + F.cam.y };
+fTop.addEventListener('pointerdown', e => {
+  const r = fTop.getBoundingClientRect(), sx = (e.clientX - r.left) * F_VW / r.width - F.off.x, sy = (e.clientY - r.top) * F_VH / r.height - F.off.y;
+  F.target = { gx:(sx / FHW + sy / FHH) / 2, gy:(sy / FHH - sx / FHW) / 2 };
 });
-function fAtacar(){ if (!F.open || F.atk > 0) return; F.atk = 0.28; sfxItem && 0; }
+function fAtacar(){ if (!F.open || F.atk > 0) return; F.atk = 0.3; }
 
-/* ---------- física e lógica ---------- */
-function fSolido(x, y){ const tx = Math.floor(x / F_TS), ty = Math.floor(y / F_TS); if (tx < 0 || ty < 0 || tx >= F_W || ty >= F_H) return true; return F.map.G[ty][tx] === 1; }
-function fColide(x, y){ return fSolido(x - 5, y) || fSolido(x + 5, y) || fSolido(x - 5, y - 6) || fSolido(x + 5, y - 6); }
-function fMove(o, dx, dy){ if (!fColide(o.x + dx, o.y)) o.x += dx; if (!fColide(o.x, o.y + dy)) o.y += dy; }
+/* ---------- física e lógica (coordenadas em tiles) ---------- */
+function fSolido(gx, gy){ const tx = Math.floor(gx), ty = Math.floor(gy); if (tx < 0 || ty < 0 || tx >= F_W || ty >= F_H) return true; return fSolidT(F.map.G[ty][tx]); }
+function fColide(gx, gy, r){ r = r || 0.22; return fSolido(gx - r, gy - r) || fSolido(gx + r, gy - r) || fSolido(gx - r, gy + r) || fSolido(gx + r, gy + r); }
+function fMove(o, dx, dy, r){ if (!fColide(o.gx !== undefined ? o.gx + dx : o.x + dx, o.gx !== undefined ? o.gy : o.y, r)) { if (o.gx !== undefined) o.gx += dx; else o.x += dx; } if (!fColide(o.gx !== undefined ? o.gx : o.x, o.gx !== undefined ? o.gy + dy : o.y + dy, r)) { if (o.gx !== undefined) o.gy += dy; else o.y += dy; } }
+const fPx = o => o.gx !== undefined ? o.gx : o.x, fPy = o => o.gx !== undefined ? o.gy : o.y;
 function fDano(){
-  const P = F.player; if (F.inv > 0) return; P.hp--; F.inv = 1.1; fHudAtualiza();
-  if (P.hp <= 0) { fSay('💫 Você desmaiou… e acordou na clareira de entrada.', 3000); P.hp = 3; P.x = 4 * F_TS + 12; P.y = F.map.sy * F_TS + 14; F.target = null; F.inv = 2; fHudAtualiza(); }
+  const P = F.player; if (F.inv > 0) return; P.hp--; F.inv = 1.2; fHudAtualiza();
+  if (P.hp <= 0) { fSay('💫 Você desmaiou… e acordou na clareira de entrada.', 3200); P.hp = 3; P.gx = F.map.start[0] + 0.5; P.gy = F.map.start[1] + 0.5; F.target = null; F.inv = 2.2; fHudAtualiza(); }
 }
 function fAbreBau(b){
   GS.forest.chests[b.i] = 1; const moedas = 15 + Math.floor(Math.random() * 26); GS.coins += moedas; award && award('hid'); gsSave();
@@ -6846,77 +6880,121 @@ function fAbreBau(b){
 function fSantuario(){
   if (GS.forest.shrine === dayKey()) { fSay('✨ O santuário já abençoou você hoje. Volte amanhã!', 2800); return; }
   GS.forest.shrine = dayKey(); GS.forest.best = (GS.forest.best || 0) + 1; F.player.hp = 3; GS.coins += 80; award && award('clear'); gsSave(); fHudAtualiza();
-  fSay('✨ Santuário! +80 moedas e a floresta se acalma.', 3200);
+  fSay('✨ Santuário! +80 moedas e a floresta se acalma.', 3400);
   if (!GS.owned.coroa_floresta) setTimeout(() => grantItem('coroa_floresta'), 700);
 }
 function fAtualiza(dt){
   const P = F.player, M = F.map, K = F.keys; F.t += dt;
   let ix = (K.d || K.arrowright ? 1 : 0) - (K.a || K.arrowleft ? 1 : 0), iy = (K.s || K.arrowdown ? 1 : 0) - (K.w || K.arrowup ? 1 : 0);
-  if (!ix && !iy && F.target) { const dx = F.target.x - P.x, dy = F.target.y - P.y, d = Math.hypot(dx, dy); if (d < 4) F.target = null; else { ix = dx / d; iy = dy / d; } }
-  const m = Math.hypot(ix, iy) || 1; const sp = 96 * dt;
-  const ox = P.x, oy = P.y; fMove(P, ix / m * sp * (ix || iy ? 1 : 0), iy / m * sp * (ix || iy ? 1 : 0));
-  if (F.target && Math.hypot(P.x - ox, P.y - oy) < 0.01 && (ix || iy)) F.target = null;
-  if (ix) P.dir = ix > 0 ? 1 : -1; P.walk = (ix || iy) ? P.walk + dt * 9 : 0;
+  if (!ix && !iy && F.target) { const sx = fSX(F.target.gx, F.target.gy) - fSX(P.gx, P.gy), sy = fSY(F.target.gx, F.target.gy) - fSY(P.gx, P.gy), d = Math.hypot(sx, sy); if (d < 8) F.target = null; else { ix = sx / d; iy = sy / d; } }
+  const mag = Math.hypot(ix, iy), v = 200 * dt, ox = P.gx, oy = P.gy;
+  if (mag) { const sx = ix / mag * v, sy = iy / mag * v; fMove(P, (sx / FHW + sy / FHH) / 2, (sy / FHH - sx / FHW) / 2); if (ix) P.dir = ix > 0 ? 1 : -1; }
+  const moved = Math.hypot(fSX(P.gx, P.gy) - fSX(ox, oy), fSY(P.gx, P.gy) - fSY(ox, oy)); P.moving = moved > 0.05;
+  if (mag && !P.moving) F.target = null;
+  if (P.moving) P.phase += moved * 0.1;
   F.atk = Math.max(0, F.atk - dt); F.inv = Math.max(0, F.inv - dt);
-  /* slimes */
   M.slimes.forEach(s => {
     if (s.dead) return; s.t += dt; s.hit = Math.max(0, s.hit - dt);
-    const d = Math.hypot(P.x - s.x, P.y - s.y);
-    if (d < 120 && d > 1) { fMove(s, (P.x - s.x) / d * 40 * dt, (P.y - s.y) / d * 40 * dt); }
-    else { s.dir += (Math.random() - 0.5) * dt * 3; const a = (s.t % 3 < 1.2) ? 18 * dt : 0; fMove(s, Math.cos(s.dir) * a, Math.sin(s.dir) * a); if (Math.hypot(s.x - s.hx, s.y - s.hy) > 90) s.dir = Math.atan2(s.hy - s.y, s.hx - s.x); }
-    if (d < 12) fDano();
-    if (F.atk > 0.12 && d < 34 && ((s.x - P.x) * P.dir > -6) && s.hit <= 0) { s.hp--; s.hit = 0.4; fMove(s, (s.x - P.x) / (d || 1) * 14, (s.y - P.y) / (d || 1) * 14); if (s.hp <= 0) { s.dead = true; GS.forest.killed = GS.forest.killed || {}; GS.forest.killed[s.i] = 1; GS.forest.kills++; if (Math.random() < 0.5) { GS.coins += 4; } gsSave(); fHudAtualiza(); fSay('🟢 Slime derrotado!', 1200); } }
+    const dx = P.gx - s.x, dy = P.gy - s.y, d = Math.hypot(dx, dy);
+    if (d < 4.5 && d > 0.05) fMove(s, dx / d * 1.5 * dt, dy / d * 1.5 * dt, 0.26);
+    else { s.dir += (Math.random() - 0.5) * dt * 3; const a = (s.t % 3 < 1.2) ? 0.7 * dt : 0; fMove(s, Math.cos(s.dir) * a, Math.sin(s.dir) * a, 0.26); if (Math.hypot(s.x - s.hx, s.y - s.hy) > 3) s.dir = Math.atan2(s.hy - s.y, s.hx - s.x); }
+    if (d < 0.5) fDano();
+    const sdx = fSX(s.x, s.y) - fSX(P.gx, P.gy);
+    if (F.atk > 0.14 && d < 1.5 && (sdx * P.dir > -14) && s.hit <= 0) {
+      s.hp--; s.hit = 0.45; fMove(s, dx / (d || 1) * -0.5, dy / (d || 1) * -0.5, 0.26);
+      if (s.hp <= 0) { s.dead = true; GS.forest.killed[s.i] = 1; GS.forest.kills++; if (Math.random() < 0.5) GS.coins += 4; gsSave(); fHudAtualiza(); fSay('🟢 Slime derrotado!', 1200); }
+    }
   });
-  M.herbs.forEach(h => { if (!h.got && Math.hypot(P.x - h.x, P.y - h.y) < 13) { h.got = true; GS.forest.herbsDone[h.i] = 1; GS.coins += 2; GS.forest.herbs++; F.herbsRun++; gsSave(); fHudAtualiza(); fSay('🍄 Erva coletada +2', 1100); if (M.herbs.every(x => x.got)) { award && award('secret'); fSay('🍄 Todas as ervas do dia! Bônus de PA.', 2600); } } });
-  M.chests.forEach(b => { if (!GS.forest.chests[b.i] && Math.hypot(P.x - b.x, P.y - b.y) < 15) fAbreBau(b); });
-  if (Math.hypot(P.x - M.shrine.x, P.y - M.shrine.y) < 18) fSantuario();
-  if (F.t > 2 && Math.hypot(P.x - (3 * F_TS + 12), P.y - (M.sy * F_TS + 14)) < 12 && P.x < 3 * F_TS + 14 && F.t > 2.5) { /* portal de saída à esquerda */ fSair(); return; }
-  F.cam.x = Math.max(0, Math.min(P.x - F_VW / 2, F_W * F_TS - F_VW)); F.cam.y = Math.max(0, Math.min(P.y - F_VH / 2, F_H * F_TS - F_VH));
+  M.herbs.forEach(h => { if (!h.got && Math.hypot(P.gx - h.x, P.gy - h.y) < 0.55) { h.got = true; GS.forest.herbsDone[h.i] = 1; GS.coins += 2; GS.forest.herbs++; gsSave(); fHudAtualiza(); fSay('🍄 Erva coletada +2', 1100); if (M.herbs.every(x => x.got)) { award && award('secret'); fSay('🍄 Todas as ervas do dia! Bônus de PA.', 2600); } } });
+  M.chests.forEach(b => { if (!GS.forest.chests[b.i] && Math.hypot(P.gx - b.x, P.gy - b.y) < 0.7) fAbreBau(b); });
+  if (Math.hypot(P.gx - M.shrine.x, P.gy - M.shrine.y) < 1.1) fSantuario();
+  if (F.t > 2.5 && Math.hypot(P.gx - F.exit.x, P.gy - F.exit.y) < 0.6) { fSair(); return; }
   if (F.msgT > 0) { F.msgT -= dt * 1000; if (F.msgT <= 0) fMsg.style.opacity = 0; }
 }
+function fPosAvatar(){
+  const P = F.player, A = F.av; if (!A) return; const sx = fSX(P.gx, P.gy) + F.off.x, sy = fSY(P.gx, P.gy) + F.off.y, pr = F.avParts;
+  A.style.left = (sx - 36) + 'px'; A.style.top = (sy - 72) + 'px';
+  A.style.opacity = (F.inv > 0 && Math.floor(F.t * 14) % 2) ? 0.35 : 1;
+  pr.facing.classList.toggle('flip', P.dir < 0);
+  if (P.moving) { const ang = Math.sin(P.phase) * 24; setFootStep(pr.legL, P.phase); setFootStep(pr.legR, P.phase + Math.PI); setLegArm(pr.armL, -ang * 0.7); setLegArm(pr.armR, ang * 0.7); pr.body.style.transform = 'translateY(' + (-Math.abs(Math.sin(P.phase)) * 2.4) + 'px)'; const b = Math.floor(P.phase / Math.PI); if (b !== P.lastBucket) { P.lastBucket = b; try { footstepSound(); } catch (e) {} } }
+  else pr.body.style.transform = 'translateY(' + (Math.sin(F.t * 2) * 1.4 - 1.4) + 'px)';
+}
 function fDesenha(){
-  const c = fCtx, M = F.map, P = F.player, cx = Math.round(F.cam.x), cy = Math.round(F.cam.y);
-  c.clearRect(0, 0, F_VW, F_VH); c.drawImage(F.layers.ground, cx, cy, F_VW, F_VH, 0, 0, F_VW, F_VH);
-  const spr = (img, x, y, s, flip) => { const w = img.width * s, h = img.height * s; c.save(); c.translate(Math.round(x - cx), Math.round(y - cy)); if (flip) c.scale(-1, 1); c.drawImage(img, -w / 2, -h, w, h); c.restore(); };
-  /* portal de saída */
-  const gx = 3 * F_TS + 12 - cx, gy = M.sy * F_TS + 14 - cy; const pulso = 8 + Math.sin(F.t * 4) * 2;
-  c.fillStyle = 'rgba(120,255,160,.25)'; c.beginPath(); c.ellipse(gx, gy - 8, 14 + pulso, 22 + pulso, 0, 0, 6.3); c.fill(); c.fillStyle = '#c8ffd8'; c.fillRect(gx - 2, gy - 22, 4, 28);
-  M.chests.forEach(b => spr(GS.forest.chests[b.i] ? FS.chestO : FS.chest, b.x, b.y, 2));
-  M.herbs.forEach(h => { if (!h.got) spr(FS.herb, h.x, h.y, 2); });
-  spr(FS.shrine, M.shrine.x, M.shrine.y + 4, 2.4); c.fillStyle = 'rgba(200,120,255,' + (0.25 + Math.sin(F.t * 3) * 0.1) + ')'; c.beginPath(); c.arc(M.shrine.x - cx, M.shrine.y - cy - 34, 26, 0, 6.3); c.fill();
-  M.slimes.forEach(s => { if (!s.dead) { if (s.hit > 0 && Math.floor(F.t * 20) % 2) return; spr(FS.slime[Math.floor(s.t * 3) % 2], s.x, s.y, 2.2); } });
-  if (!(F.inv > 0 && Math.floor(F.t * 14) % 2)) { c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(P.x - cx, P.y - cy, 9, 4, 0, 0, 6.3); c.fill(); spr(FS.hero[Math.floor(P.walk) % 2], P.x, P.y + (Math.floor(P.walk) % 2 ? -1 : 0), 2, P.dir < 0); }
-  if (F.atk > 0) { const a = F.atk / 0.28; c.strokeStyle = 'rgba(255,255,255,' + a + ')'; c.lineWidth = 4; c.beginPath(); c.arc(P.x - cx + P.dir * 12, P.y - cy - 14, 22, P.dir > 0 ? -1.2 : Math.PI - 1.2 + 0.0, P.dir > 0 ? 1.2 : Math.PI + 1.2, false); c.stroke(); }
-  c.drawImage(F.layers.top, cx, cy, F_VW, F_VH, 0, 0, F_VW, F_VH);
-  /* penumbra de floresta */
-  const g = c.createRadialGradient(P.x - cx, P.y - cy - 10, 140, P.x - cx, P.y - cy - 10, 520); g.addColorStop(0, 'rgba(8,24,14,0)'); g.addColorStop(1, 'rgba(8,24,14,.78)'); c.fillStyle = g; c.fillRect(0, 0, F_VW, F_VH);
-  /* minimapa */
-  const mw = 128, mh = 96, mx = F_VW - mw - 10, my = F_VH - mh - 10, sx = mw / (F_W * F_TS), sy2 = mh / (F_H * F_TS);
-  c.fillStyle = 'rgba(0,0,0,.55)'; c.fillRect(mx - 2, my - 2, mw + 4, mh + 4); c.drawImage(F.layers.ground, 0, 0, F_W * F_TS, F_H * F_TS, mx, my, mw, mh);
-  c.fillStyle = '#fff'; c.fillRect(mx + P.x * sx - 2, my + P.y * sy2 - 2, 4, 4); c.fillStyle = '#c070ff'; c.fillRect(mx + M.shrine.x * sx - 2, my + M.shrine.y * sy2 - 2, 4, 4);
-  M.chests.forEach(b => { if (!GS.forest.chests[b.i]) { c.fillStyle = '#ffd24d'; c.fillRect(mx + b.x * sx - 1, my + b.y * sy2 - 1, 3, 3); } });
+  const c = fCtx, t = fTc, M = F.map, P = F.player, T = FA.tiles;
+  if (!FA.ready) { c.fillStyle = '#0a1a10'; c.fillRect(0, 0, F_VW, F_VH); return; }
+  const ox = Math.round(F_VW / 2 - fSX(P.gx, P.gy)), oy = Math.round(F_VH / 2 + 10 - fSY(P.gx, P.gy)); F.off.x = ox; F.off.y = oy;
+  c.fillStyle = '#0a1a10'; c.fillRect(0, 0, F_VW, F_VH); t.clearRect(0, 0, F_VW, F_VH);
+  const objs = [], tw = T.grass.width, th = T.grass.height, fr = Math.floor(F.t * 2) % 2;
+  for (let y = 0; y < F_H; y++) for (let x = 0; x < F_W; x++) {
+    const X = (x - y) * FHW + ox, Y = (x + y) * FHH + oy;                      // centro do losango = (X, Y + FHH)
+    if (X < -150 || X > F_VW + 150 || Y < -200 || Y > F_VH + 40) continue;
+    const tp = M.G[y][x], h = (x * 73 + y * 151) & 255; let img = T.grass, dy = 0;
+    if (tp === FT.PATH) img = T.sand; else if (tp === FT.BRIDGE) img = T.dirt; else if (tp === FT.WATER) { img = T.water; dy = th - T.water.height; } else if (h % 5 === 0) img = T.grass2;
+    c.drawImage(img, Math.round(X - FHW), Math.round(Y + dy));
+    const cx = X, cy = Y + FHH;
+    if (tp === FT.TALL) c.drawImage(FA.tall, cx - 42, cy - 22);
+    else if (tp === FT.GRASS && M.deco[y][x]) c.drawImage(FA.flower[M.deco[y][x] - 1], cx - 35, cy - 18);
+    else if (tp === FT.TREE) objs.push({ d:x + y + 0.5, img:FA.tree[((x * 31 + y * 17) >> 1) % 3], x:cx, y:cy + 4, ax:55, ay:150 });
+    else if (tp === FT.ROCK) objs.push({ d:x + y + 0.5, img:FA.rock, x:cx, y:cy + 2, ax:40, ay:52 });
+  }
+  const put = (gx, gy, img, ax, ay, extra) => { const o = { d:gx + gy, img, x:fSX(gx, gy) + ox, y:fSY(gx, gy) + oy, ax, ay }; if (extra) Object.assign(o, extra); objs.push(o); };
+  M.chests.forEach(b => put(b.x, b.y, FA.chest[GS.forest.chests[b.i] ? 1 : 0], 36, 58));
+  M.herbs.forEach(h => { if (!h.got) put(h.x, h.y, FA.herb, 22, 40); });
+  M.slimes.forEach(s => { if (!s.dead && !(s.hit > 0 && Math.floor(F.t * 20) % 2)) put(s.x, s.y, FA.slime[Math.floor(s.t * 3) % 2], 32, 44); });
+  put(M.shrine.x, M.shrine.y, FA.shrine, 65, 152, { glow:true });
+  { const ex = fSX(F.exit.x, F.exit.y) + ox, ey = fSY(F.exit.x, F.exit.y) + oy, pul = 8 + Math.sin(F.t * 4) * 3; c.fillStyle = 'rgba(120,255,160,.3)'; c.beginPath(); c.ellipse(ex, ey, 40 + pul, 20 + pul / 2, 0, 0, 6.3); c.fill(); c.fillStyle = 'rgba(200,255,220,.7)'; c.beginPath(); c.ellipse(ex, ey, 22, 11, 0, 0, 6.3); c.fill(); }
+  objs.sort((a, b) => a.d - b.d); const pd = P.gx + P.gy;
+  objs.forEach(o => { const ctx = o.d <= pd ? c : t; if (o.glow) { ctx.fillStyle = 'rgba(200,120,255,' + (0.22 + Math.sin(F.t * 3) * 0.1) + ')'; ctx.beginPath(); ctx.arc(o.x, o.y - 104, 44, 0, 6.3); ctx.fill(); } ctx.drawImage(o.img, Math.round(o.x - o.ax), Math.round(o.y - o.ay)); });
+  if (F.atk > 0) { const a = F.atk / 0.3, sx = fSX(P.gx, P.gy) + ox + P.dir * 40, sy = fSY(P.gx, P.gy) + oy - 30; t.strokeStyle = 'rgba(255,255,255,' + a + ')'; t.lineWidth = 7; t.beginPath(); t.arc(sx, sy, 40, P.dir > 0 ? -1.3 : Math.PI - 1.3, P.dir > 0 ? 1.3 : Math.PI + 1.3); t.stroke(); }
+  const g = t.createRadialGradient(F_VW / 2, F_VH / 2, 320, F_VW / 2, F_VH / 2, 720); g.addColorStop(0, 'rgba(6,20,12,0)'); g.addColorStop(1, 'rgba(6,20,12,.5)'); t.fillStyle = g; t.fillRect(0, 0, F_VW, F_VH);
+  const mw = 168, mh = 132, mx = F_VW - mw - 12, my = F_VH - mh - 12, kx = mw / F_W, ky = mh / F_H;
+  t.fillStyle = 'rgba(0,0,0,.6)'; t.fillRect(mx - 3, my - 3, mw + 6, mh + 6); t.imageSmoothingEnabled = false; t.drawImage(F.mini, mx, my, mw, mh);
+  t.fillStyle = '#fff'; t.fillRect(mx + P.gx * kx - 2, my + P.gy * ky - 2, 5, 5); t.fillStyle = '#c070ff'; t.fillRect(mx + M.shrine.x * kx - 2, my + M.shrine.y * ky - 2, 5, 5);
+  M.chests.forEach(b => { if (!GS.forest.chests[b.i]) { t.fillStyle = '#ffd24d'; t.fillRect(mx + b.x * kx - 1, my + b.y * ky - 1, 4, 4); } });
 }
 function fLoop(now){
   if (!F.open) return; const dt = Math.min(0.05, (now - F.last) / 1000); F.last = now;
-  fAtualiza(dt); if (F.open) { fDesenha(); F.raf = requestAnimationFrame(fLoop); }
+  fAtualiza(dt); if (F.open) { fDesenha(); fPosAvatar(); F.raf = requestAnimationFrame(fLoop); }
 }
 
-/* ---------- portal na rua + trilha ---------- */
-function pintaFloresta(){
-  roomlayer.querySelectorAll('.fgate').forEach(n => n.remove()); if (currentRoomId !== 'rua') return;
-  const d = mkEl('div', { className:'hotspot fgate' }, '<div class="fg-glow"></div><div class="fg-lbl">TRILHA DA FLORESTA</div>');
-  d.style.left = '1560px'; d.style.top = '336px'; roomlayer.appendChild(d);
+/* ---------- fim da cidade: placa + escolha de viagem ---------- */
+const travelPanel = mkEl('div', { id:'travelPanel', className:'xpanel' },
+  '<div class="xback"></div><div class="xbox" id="travelBox"><button class="xclose" aria-label="Fechar">✕</button>' +
+  '<div class="xhead">🧭 Fim da cidade — para onde viajar?</div><div class="tv-body" id="travelBody"></div></div>');
+stage.appendChild(travelPanel);
+let travelOpen = false;
+function hideTravel(){ travelOpen = false; travelPanel.classList.remove('show'); }
+function showTravel(){
+  hideInv && hideInv(); travelOpen = true;
+  const fd = GS.forest && GS.forest.d === dayKey() ? GS.forest : null, tot = 6;
+  document.getElementById('travelBody').innerHTML =
+    '<div class="tv-dest" id="tvFloresta"><div class="tv-ic">🌲</div><div class="tv-tx"><b>Floresta Encantada</b><span>Mapa isométrico grande, novo a cada dia. Baús, ervas, slimes e o Santuário no extremo leste.</span>' +
+    '<small>Hoje: 📦 ' + (fd ? Object.keys(fd.chests).length : 0) + '/' + tot + ' · ' + (fd && fd.shrine === dayKey() ? '✨ Santuário ✔' : '✨ Santuário pendente') + '</small></div><button class="tv-go">Viajar ▶</button></div>' +
+    '<div class="tv-foot"><button class="tv-stay">◀ Ficar na cidade</button><div class="tv-cred">Tiles isométricos: Kenney (CC0) · kenney.nl</div></div>';
+  document.querySelector('#tvFloresta .tv-go').addEventListener('click', () => { hideTravel(); setTimeout(fAbrir, 120); });
+  document.querySelector('.tv-stay').addEventListener('click', hideTravel);
+  travelPanel.classList.add('show');
 }
-const _renderRoom12 = renderRoom; renderRoom = function(id){ _renderRoom12(id); pintaFloresta(); };
+travelPanel.querySelector('.xclose').addEventListener('click', hideTravel); travelPanel.querySelector('.xback').addEventListener('click', hideTravel);
+function pintaPlaca(){
+  roomlayer.querySelectorAll('.fsign').forEach(n => n.remove()); if (currentRoomId !== 'rua') return;
+  const d = mkEl('div', { className:'hotspot fsign' }, '<div class="fs-post"></div><div class="fs-board">ESTRADA ▸<br>VIAGEM</div>');
+  d.style.left = (ROOMS.rua.width - 150) + 'px'; d.style.top = '340px'; roomlayer.appendChild(d);
+}
+const _renderRoom12 = renderRoom; renderRoom = function(id){ _renderRoom12(id); pintaPlaca(); };
 world.addEventListener('click', e => {
-  const g = e.target.closest('.fgate'); if (!g) return;
+  const g = e.target.closest('.fsign'); if (!g) return;
   e.stopPropagation(); const p = aproxima(g); hint.style.display = 'none';
-  walkTo(p.ax, p.ay, () => fAbrir());
+  walkTo(p.ax, p.ay, () => showTravel());
 });
-Object.assign(TRACKS, { floresta:{ bpm:84, root:50, scale:SC.mix, lead:'triangle', vol:0.55, hold:2.0, harm:true,
+setInterval(() => {
+  if (currentRoomId !== 'rua' || travelOpen || F.open) return;
+  if (player.x > ROOMS.rua.width - 80) { try { walkTo(ROOMS.rua.width - 220, player.y, () => {}); } catch (e) {} showTravel(); }
+}, 400);
+Object.assign(TRACKS, { floresta:{ bpm:92, root:50, scale:SC.mix, lead:'triangle', vol:0.55, hold:2.0, harm:true,
   mel:[7,N,9,N, 11,N,9,N, 7,N,5,N, 4,N,N,N, 7,N,9,N, 12,N,11,N, 9,N,7,N, 5,N,N,N], bass:[0,N,4,N,3,N,4,N] } });
 const _trilha12 = trilhaDesejada; trilhaDesejada = function(){ return F.open ? 'floresta' : _trilha12(); };
-window.__f12 = { F, fGerar, fAbrir, fSair };
+window.__f12 = { F, fGerar, fAbrir, fSair, showTravel, fAtualiza, fDesenha };
 
 /*EXTRAS_JS_END*/
 
