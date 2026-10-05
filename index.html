@@ -1435,6 +1435,13 @@
   .date-deco{position:absolute; left:0; top:0; width:100%; height:44px; pointer-events:none; z-index:60;}
   .date-deco span{position:absolute; font-size:26px; filter:drop-shadow(0 2px 0 rgba(0,0,0,.5)); animation:chestBob 1.8s ease-in-out infinite;}
   .date-gift{position:absolute; width:38px; height:38px; font-size:32px; cursor:pointer; z-index:9; animation:chestBob 1.2s ease-in-out infinite; filter:drop-shadow(0 0 8px rgba(255,220,100,.9));}
+
+  .boss-bar{display:flex; align-items:center; gap:12px; padding:6px 12px; margin-bottom:8px; background:linear-gradient(90deg,#3a0f1a,#1a0a24); border:1px solid #a33; border-radius:8px; color:#ffb4b4; font-size:17px;}
+  .boss-bar b{color:#fff;} .boss-bar small{margin-left:auto; color:#ffd24d;}
+  .boss-hp{display:flex; gap:4px;} .boss-hp i{width:34px; height:12px; border-radius:3px; background:#2a1420; border:1px solid #633;} .boss-hp i.on{background:linear-gradient(#ff5b5b,#b01c2a); box-shadow:0 0 6px #f44;}
+  #ghostBtn{right:230px;} #questBtn{right:194px;} #clockTag{right:266px !important;}
+  #avatar.ghost,.ghost{position:absolute; width:72px; height:78px; opacity:.5; filter:grayscale(.6) brightness(1.25) hue-rotate(170deg); pointer-events:none; transform-origin:50% 100%;}
+  .ghost .ghost-tag{position:absolute; left:50%; top:-14px; transform:translateX(-50%); font-size:13px; color:#cfe8ff; text-shadow:0 1px 0 #000; white-space:nowrap; opacity:.9; filter:none;}
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3709,6 +3716,8 @@ world.addEventListener('click', (e) => {
   hint.style.display = 'none';
   walkTo(x, y);
 });
+
+
 
 
 
@@ -6502,6 +6511,181 @@ falaDe = function(id){
   return _falaDe9(id);
 };
 setInterval(() => { const antes = roomlayer.querySelectorAll('.date-deco').length, at = dataHoje(); if (currentRoomId === 'rua' && ((at ? 1 : 0) !== antes)) pintaData(); }, 4000);
+
+/* =====================================================================
+   EXTRAS 10 — Chefes nas dungeons (último puzzle vira luta em 3 fases),
+   trilha sonora por dungeon/chefe e manchetes reais da banca nas falas.
+   ===================================================================== */
+GS.bosses = GS.bosses || {};
+const BOSS_NOME = { arquivista:'Guardião dos Registros', forja:'Golem da Forja', vazio:'Devorador de Sombras', prisma:'Arquiteto Prisma' };
+const bossNome = dg => BOSS_NOME[dg.id] || ('Guardião de ' + dg.nome);
+function bossScale(cfg, fase){
+  const c = Object.assign({}, cfg), f = fase;
+  if (c.t === 'quiz') { c.n = Math.min(8, c.n + 1 + f); c.tier = 3; }
+  if (c.t === 'lights') c.n = Math.min(6, c.n + f);
+  if (c.t === 'memory') { c.time = Math.max(30, Math.round(c.time * (1 - 0.14 * f))); if (c.c * c.r < 24 && f === 2) c.r += 0; }
+  if (c.t === 'code') c.tries = Math.max(5, c.tries - f);
+  if (c.t === 'simon') c.len = Math.min(11, c.len + 2 * f);
+  if (c.t === 'path') { c.c = Math.min(8, c.c + f); c.r = Math.min(7, c.r + f); }
+  if (c.t === 'slide') c.n = Math.min(4, c.n + (f ? 0 : 0));
+  return c;
+}
+function bossBar(){
+  if (!DG || !DG.boss) return;
+  const old = dgBody.querySelector('.boss-bar'); if (old) old.remove();
+  const dg = DUNGEONS[DG.d], f = DG.boss.fase;
+  const b = el('div', 'boss-bar', '<b>👹 ' + esc(bossNome(dg)) + '</b><span class="boss-hp">' + [0, 1, 2].map(k => '<i class="' + (k < 3 - f ? 'on' : '') + '"></i>').join('') + '</span><small>Fase ' + (f + 1) + '/3</small>');
+  dgBody.insertBefore(b, dgBody.firstChild);
+  dgHead.textContent = dg.ic + ' CHEFE: ' + bossNome(dg) + ' — fase ' + (f + 1) + '/3: ' + DG.cfg.nome;
+}
+function bossFase(){
+  const dg = DUNGEONS[DG.d], base = dg.puz[dg.puz.length - 1], f = DG.boss.fase;
+  const pool = dg.puz.slice(0, -1).filter(p => PUZ[p.t]);
+  const src = f === 0 || !pool.length ? base : pool[(hashStr(dayKey() + dg.id) + f) % pool.length];
+  DG.cfg = bossScale(src, f); DG.resets += 7; DG.hints = Math.max(DG.hints, dicasPorPuzzle());
+  renderPuzzle(); bossBar();
+}
+const _win10 = winPuzzle;
+winPuzzle = function(){
+  if (!DG) return;
+  const dg = DUNGEONS[DG.d];
+  if (DG.p !== dg.puz.length - 1) return _win10();
+  if (!DG.boss) { DG.boss = { fase:0 }; DG.cfg0 = DG.cfg; }
+  DG.boss.fase++;
+  if (DG.boss.fase < 3) { toastText('💥 Golpe certeiro! ' + bossNome(dg) + ' vacila…'); sfxItem(); setTimeout(() => { if (DG && DG.boss) bossFase(); }, 700); return; }
+  const k = dg.id, primeira = !GS.bosses[k];
+  GS.bosses[k] = (GS.bosses[k] || 0) + 1; DG.boss = null; if (DG.cfg0) DG.cfg = DG.cfg0;
+  _win10();
+  const premio = 40 * (DG.d + 1) + (primeira ? 60 : 0);
+  GS.coins += premio; if (typeof award === 'function') award('clear'); gsSave();
+  toastText('👹 ' + bossNome(dg) + ' derrotado! +' + premio + ' moedas');
+};
+/* primeira exibição do chefe: ao abrir o último puzzle, mostra a barra */
+const _render10 = renderPuzzle;
+renderPuzzle = function(){
+  _render10();
+  if (!DG) return; const dg = DUNGEONS[DG.d];
+  if (DG.p === dg.puz.length - 1) { if (!DG.boss) { DG.boss = { fase:0 }; DG.cfg0 = DG.cfg; } bossBar(); }
+};
+/* sai do puzzle pela lista = chefe reinicia (DG é recriado em startPuzzle) */
+
+/* ---------- trilha sonora das dungeons e do chefe ---------- */
+Object.assign(TRACKS, {
+  cripta_arquivista:{ bpm:66, root:43, scale:SC.aeo, lead:'triangle', vol:0.5, hold:2.6,
+    mel:[7,N,N,N, 9,N,N,10, 9,N,N,N, 7,N,5,N, 4,N,N,N, 5,N,N,7, 9,N,N,N, 7,N,N,N], bass:[0,N,N,N,3,N,N,N] },
+  cripta_forja:{ bpm:100, root:38, scale:SC.phr, lead:'square', vol:0.24, hold:1.4, perc:'anvil',
+    mel:[7,N,8,N, 7,N,5,N, 3,N,5,N, 7,N,N,N, 8,N,10,N, 8,N,7,N, 5,N,3,N, 0,N,N,N], bass:[0,0,N,0,3,3,N,0] },
+  cripta_vazio:{ bpm:58, root:36, scale:SC.phr, lead:'triangle', vol:0.55, hold:3.2,
+    mel:[7,N,N,N, N,N,8,N, N,N,N,N, 5,N,N,N, 7,N,N,N, N,N,10,N, N,N,N,N, 8,N,N,N], bass:[0,N,N,N,1,N,N,N] },
+  cripta_prisma:{ bpm:92, root:52, scale:SC.mix, lead:'square', vol:0.22, hold:1.0, harm:true, perc:'bell',
+    mel:[7,9,11,14, 12,11,9,7, 9,11,14,16, 14,11,9,N, 11,14,16,18, 16,14,11,9, 7,9,11,9, 7,N,N,N], bass:[0,4,0,4,3,4,0,4] },
+  cripta:{ bpm:70, root:41, scale:SC.dor, lead:'triangle', vol:0.5, hold:2.4,
+    mel:[7,N,9,N, 10,N,N,N, 9,N,7,N, 5,N,N,N, 7,N,9,N, 12,N,N,N, 10,N,9,N, 7,N,N,N], bass:[0,N,3,N,4,N,0,N] },
+  chefe:{ bpm:144, root:40, scale:SC.phr, lead:'square', vol:0.26, hold:0.9, perc:'stomp', harm:true,
+    mel:[7,7,8,7, 10,8,7,5, 7,7,8,10, 12,10,8,7, 8,8,10,8, 12,10,8,7, 5,5,7,8, 7,5,3,N], bass:[0,0,3,0,4,3,0,1] }
+});
+function trilhaDesejada(){
+  if (typeof dgPanel !== 'undefined' && dgPanel.classList.contains('show')) {
+    if (DG && DG.boss) return 'chefe';
+    const i = (typeof dgOpenIdx === 'number' && dgOpenIdx >= 0) ? dgOpenIdx : (DG ? DG.d : -1), dg = DUNGEONS[i];
+    return dg && TRACKS['cripta_' + dg.id] ? 'cripta_' + dg.id : 'cripta';
+  }
+  return currentRoomId;
+}
+setInterval(() => { if (!audioStarted) return; const w = trilhaDesejada(); if (w !== musicRoom && TRACKS[w]) setMusicRoom(w); else if (!TRACKS[w] && musicRoom !== w) setMusicRoom(w); }, 500);
+
+/* ---------- manchetes reais da banca nas falas dos moradores ---------- */
+let MANCHETES = [];
+(async function(){
+  for (const u of ['https://iamtgames.github.io/colecao/news.json', './news.json']) {
+    try { const r = await fetch(u, { cache:'no-store' }); if (!r.ok) continue; const j = await r.json(); MANCHETES = (j.items || []).map(x => x.title).filter(Boolean); if (MANCHETES.length) return; } catch (e) {}
+  }
+})();
+const _falaDe10 = falaDe;
+falaDe = function(id){
+  if (MANCHETES.length && Math.random() < 0.12) return W(NPC_TXT[id].w, 'Li na banca: "' + pick(MANCHETES) + '"');
+  return _falaDe10(id);
+};
+
+/* =====================================================================
+   EXTRAS 11 — Fantasmas de outros jogadores.
+   Cada visita grava um rastro anônimo (sala, caminhada de ~20 s e itens equipados)
+   num Cloudflare Worker + KV. Ao entrar numa sala você vê os fantasmas recentes
+   repetindo a caminhada de outros viajantes. Sem nome, sem login. Botão 👻 liga/desliga.
+   ===================================================================== */
+const GHOST_URL = 'https://iamtworld-fantasmas.ocultobadguy.workers.dev';   // Worker (worker-fantasmas.js), sem barra no final. Vazio = desligado.
+GS.ghostOff = !!GS.ghostOff;
+if (!GS.gid) { GS.gid = Array.from(crypto.getRandomValues(new Uint8Array(6))).map(b => b.toString(16).padStart(2, '0')).join(''); gsSave(); }
+const ghostBtn = mkEl('div', { id:'ghostBtn', className:'hudbtn', title:'Fantasmas de outros jogadores (G)' }, '👻'); stage.appendChild(ghostBtn);
+ghostBtn.addEventListener('click', e => { e.stopPropagation(); toggleGhosts(); });
+function ghostBtnLook(){ ghostBtn.style.opacity = GS.ghostOff ? 0.4 : 1; }
+ghostBtnLook();
+function toggleGhosts(){ GS.ghostOff = !GS.ghostOff; gsSave(); ghostBtnLook(); toastText(GS.ghostOff ? '👻 Fantasmas ocultos' : '👻 Fantasmas visíveis'); GH.limpa(); if (!GS.ghostOff) GH.busca(currentRoomId); }
+window.addEventListener('keydown', e => { if (e.key && e.key.toLowerCase() === 'g' && !/INPUT|TEXTAREA/.test((e.target || {}).tagName || '')) toggleGhosts(); });
+
+const GH = {
+  rec:null, vivos:[], ultimoEnvio:0, falhou:false,
+  limpa(){ this.vivos.forEach(g => g.el.remove()); this.vivos = []; },
+  comeca(room){ this.rec = { room, t0:Date.now(), pts:[] }; },
+  amostra(){
+    const r = this.rec; if (!r || r.room !== currentRoomId || document.hidden) return;
+    if (r.pts.length >= 44) return;
+    const dt = Math.round((Date.now() - r.t0) / 500) * 0.5, u = r.pts[r.pts.length - 1];
+    if (u && Math.abs(u[1] - player.x) < 2 && Math.abs(u[2] - player.y) < 2 && r.pts.length > 1) { u[0] = dt; return; }   // parado: só estica o tempo
+    r.pts.push([dt, Math.round(player.x), Math.round(player.y)]);
+  },
+  async envia(){
+    const r = this.rec; this.rec = null;
+    if (!GHOST_URL || GS.ghostOff || this.falhou || !r || r.pts.length < 6) return;
+    if (Date.now() - this.ultimoEnvio < 180000) return;           // no máx. 1 rastro a cada 3 min (limite de gravações do KV)
+    this.ultimoEnvio = Date.now();
+    const equip = {}; Object.keys(GS.equip || {}).forEach(k => { if (GS.equip[k]) equip[k] = GS.equip[k]; });
+    try { await fetch(GHOST_URL + '/ghost', { method:'POST', keepalive:true, headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ id:GS.gid, room:r.room, pts:r.pts, equip }) }); } catch (e) { this.falhou = true; }
+  },
+  async busca(room){
+    if (!GHOST_URL || GS.ghostOff || this.falhou) return;
+    let lista = [];
+    try { const r = await fetch(GHOST_URL + '/ghosts?room=' + encodeURIComponent(room) + '&me=' + GS.gid); if (!r.ok) return; lista = (await r.json()).ghosts || []; } catch (e) { this.falhou = true; return; }
+    if (room !== currentRoomId) return;
+    this.limpa();
+    lista.slice(0, 5).forEach((g, i) => this.cria(g, i));
+  },
+  cria(g, i){
+    if (!Array.isArray(g.pts) || g.pts.length < 2) return;
+    const el = avatar.cloneNode(true); el.removeAttribute('id'); el.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    el.classList.add('ghost'); el.classList.remove('walking');
+    const eq = {}; Object.keys(g.equip || {}).forEach(k => { if (ITEM_BY_ID[g.equip[k]]) eq[k] = g.equip[k]; });
+    try { applyEquip(el, eq); } catch (e) {}
+    const tag = mkEl('div', { className:'ghost-tag' }, 'Viajante ' + String(g.id || '').slice(0, 4)); el.appendChild(tag);
+    world.appendChild(el);
+    const dur = g.pts[g.pts.length - 1][0] + 3;
+    this.vivos.push({ el, pts:g.pts, dur, off:i * 4.3 + Math.random() * 3, ultimoX:g.pts[0][1] });
+  },
+  tick(){
+    if (!this.vivos.length) return;
+    const t = Date.now() / 1000;
+    this.vivos.forEach(g => {
+      const ph = (t + g.off) % g.dur, P = g.pts; let a = P[0], b = P[P.length - 1], x, y;
+      if (ph >= P[P.length - 1][0]) { x = b[1]; y = b[2]; }
+      else { for (let i = 0; i < P.length - 1; i++) if (ph >= P[i][0] && ph < P[i + 1][0]) { a = P[i]; b = P[i + 1]; break; }
+        const k = b[0] > a[0] ? (ph - a[0]) / (b[0] - a[0]) : 1; x = a[1] + (b[1] - a[1]) * k; y = a[2] + (b[2] - a[2]) * k; }
+      const dx = x - g.ultimoX; g.ultimoX = x;
+      const f = g.el.querySelector('.facing'); if (f && Math.abs(dx) > 0.2) f.classList.toggle('flip', dx < 0);
+      g.el.classList.toggle('walking', Math.abs(dx) > 0.2);
+      const depthT = bounds.maxY > bounds.minY ? Math.max(0, Math.min(1, (y - bounds.minY) / (bounds.maxY - bounds.minY))) : 1;
+      g.el.style.transform = 'scale(' + (0.88 + depthT * 0.18).toFixed(3) + ')'; g.el.style.zIndex = String(39 + Math.round(depthT * 20));
+      g.el.style.left = (x - 36.5) + 'px'; g.el.style.top = (y - 78) + 'px';
+    });
+  }
+};
+(function loop(){ GH.tick(); requestAnimationFrame(loop); })();
+setInterval(() => GH.amostra(), 500);
+const _renderRoom11 = renderRoom;
+renderRoom = function(id){
+  GH.envia(); GH.limpa(); _renderRoom11(id); GH.comeca(id); GH.busca(id);
+};
+document.addEventListener('visibilitychange', () => { if (document.hidden) { GH.envia(); GH.comeca(currentRoomId); } });
+GH.comeca(currentRoomId); GH.busca(currentRoomId);
 
 /*EXTRAS_JS_END*/
 
