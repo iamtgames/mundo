@@ -1407,6 +1407,13 @@
   @keyframes portalSpin{to{transform:rotate(360deg);}}
   .nbub{opacity:.32; transition:opacity .35s ease; animation:none;}
   .nbub.near{opacity:1; z-index:86;}
+  .cinema-screen-box{width:min(940px,98%);}
+  .cinema-screen-body{min-height:468px;}
+  .cinema-screen-body > .cinema-screen-video{align-self:center;}
+  .cinema-screen-sidebar{flex:0 0 330px; width:330px;}
+  .cinema-screen-sidebar .cinema-screen-chat{flex:1 1 auto; min-height:330px; height:auto;}
+  .cinema-screen-info{padding:6px 10px 5px; font-size:13px; line-height:1.25;}
+  .cinema-screen-link{margin:6px 10px 8px; padding:5px 8px; font-size:14px;}
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3681,6 +3688,8 @@ world.addEventListener('click', (e) => {
   hint.style.display = 'none';
   walkTo(x, y);
 });
+
+
 
 
 
