@@ -1414,6 +1414,27 @@
   .cinema-screen-sidebar .cinema-screen-chat{flex:1 1 auto; min-height:330px; height:auto;}
   .cinema-screen-info{padding:6px 10px 5px; font-size:13px; line-height:1.25;}
   .cinema-screen-link{margin:6px 10px 8px; padding:5px 8px; font-size:14px;}
+
+  #questBtn{right:194px;} #clockTag{right:230px !important;}
+  #questBox{width:min(640px,96%);}
+  .q-sum{padding:7px 14px; font-size:15px; color:#ffe08a; background:rgba(0,0,0,.28);}
+  .q-list{padding:8px 12px 12px; max-height:340px; overflow:auto;}
+  .q-npc{margin-bottom:10px; padding:6px 8px; border:1px solid #3a2a55; border-radius:8px; background:#120a22;}
+  .q-npc.foco{border-color:#ffd24d; box-shadow:0 0 10px rgba(255,210,77,.35);}
+  .q-nome{font-size:17px; color:#ffe08a; margin-bottom:4px;}
+  .q-card{display:flex; flex-direction:column; gap:3px; padding:6px 8px; margin-top:5px; background:#1a1030; border-radius:6px; border-left:3px solid #6b4ca3; font-size:15px; color:#e9dcff;}
+  .q-card b{font-weight:normal; color:#fff; font-size:16px;}
+  .q-card.ready{border-left-color:#7dffb0;} .q-card.done{border-left-color:#ffd24d; opacity:.65;} .q-card.locked{opacity:.5;}
+  .q-card .rw{color:#9fe0b4;} .q-card small{color:#bdb3d8;}
+  .q-bar{height:6px; background:#0b0616; border-radius:3px; overflow:hidden;} .q-bar i{display:block; height:100%; background:linear-gradient(90deg,#6b4ca3,#7dffb0);}
+  .q-card button{align-self:flex-start; font-family:inherit; font-size:15px; padding:3px 12px; background:#3d2570; color:#fff; border:1px solid #6b4ca3; border-radius:6px; cursor:pointer;}
+  .q-card button.go{background:#1f7a4a; border-color:#7dffb0;}
+  .q-card em{color:#ffe08a; font-style:normal;}
+  .qmk{position:absolute; left:50%; top:-26px; transform:translateX(-50%); font-size:20px; text-shadow:0 2px 0 #000; animation:chestBob 1.2s ease-in-out infinite; pointer-events:none; z-index:7;}
+  .qmk.ready{color:#7dffb0;}
+  .date-deco{position:absolute; left:0; top:0; width:100%; height:44px; pointer-events:none; z-index:60;}
+  .date-deco span{position:absolute; font-size:26px; filter:drop-shadow(0 2px 0 rgba(0,0,0,.5)); animation:chestBob 1.8s ease-in-out infinite;}
+  .date-gift{position:absolute; width:38px; height:38px; font-size:32px; cursor:pointer; z-index:9; animation:chestBob 1.2s ease-in-out infinite; filter:drop-shadow(0 0 8px rgba(255,220,100,.9));}
 /*EXTRAS_CSS_END*/
 </style>
 </head>
@@ -3688,6 +3709,8 @@ world.addEventListener('click', (e) => {
   hint.style.display = 'none';
   walkTo(x, y);
 });
+
+
 
 
 
@@ -6267,6 +6290,218 @@ window.__x7 = { luaCheia, luaAberta, idadeLua, estadoMercado, ofertas, award, sy
     pin(p[0], p[1], m.hoje ? '🛒 Mercado: HOJE!' : (m.vespera ? '🛒 Mercado: amanhã' : '🛒 Mercado semanal'), m.hoje ? 'open' : (m.vespera ? 'soon' : 'hid'), () => ir('tenda', m.hoje ? '.mkt-merchant' : null));
   };
 })();
+
+/* =====================================================================
+   EXTRAS 8 — Missões dos NPCs. Cada morador tem 2 pedidos em sequência.
+   O progresso vem de contadores reais do jogo (puzzles, vitórias, segredos,
+   conversas, dungeons, salas, itens). Entregar rende moedas, PA e, no 2º
+   pedido, um item exclusivo.
+   ===================================================================== */
+GS.quests = GS.quests || {};
+const Q_ITENS = {
+  tadeu:'insignia_guarda', rosa:'tiara_petalas', nico:'chapeu_pescador', orfeu:'capa_menestrel', pedrinho:'bandana_aventura',
+  lucia:'oculos_sabio', ferreiro:'avental_forja', bruno:'chapeu_xerife', caio:'jaqueta_cineasta', ze:'turbante_ze', marina:'capa_locadora', ptolomeu:'coroa_cripta'
+};
+addItem('insignia_guarda','chest','Insígnia do Guarda','placa','iron','raro','Missão do Guarda Tadeu');
+addItem('tiara_petalas','helm','Tiara de Pétalas','coroa','forest','raro','Missão da Florista Rosa');
+addItem('chapeu_pescador','helm','Chapéu do Pescador','capuz','ice','raro','Missão do Pescador Nico');
+addItem('capa_menestrel','back','Capa do Menestrel','capa','royal','raro','Missão do Bardo Orfeu');
+addItem('bandana_aventura','helm','Bandana da Aventura','capuz','crimson','raro','Missão do Pedrinho');
+addItem('oculos_sabio','helm','Óculos do Sábio','mago','gold','raro','Missão da Bibliotecária Lúcia');
+addItem('avental_forja','chest','Avental da Forja','malha','bronze','raro','Missão do Ferreiro');
+addItem('chapeu_xerife','helm','Chapéu do Xerife','crista','leather','raro','Missão do Bruno');
+addItem('jaqueta_cineasta','chest','Jaqueta do Cineasta','manto','midnight','raro','Missão do Caio');
+addItem('turbante_ze','helm','Turbante do Zé','capuz','solar','raro','Missão do Zé');
+addItem('capa_locadora','back','Capa da Locadora','capa','fire','raro','Missão da Marina');
+addItem('coroa_cripta','helm','Coroa da Cripta','coroa','void','epico','Missão do Ptolomeu','void');
+
+const QM = {
+  puz:() => GS.puz || 0, wins:() => totalWins(), found:() => Object.keys(GS.found).length, hid:() => Object.keys(GS.hid).length,
+  clears:() => clearsAll(), chats:() => GS.chats || 0, talks:() => GS.talks || 0, markets:() => GS.markets || 0,
+  salas:() => Object.keys(GS.rooms).length, owned:() => Object.keys(GS.owned).length, talked:() => Object.keys(GS.talked || {}).length
+};
+const QABS = { salas:1, owned:1, talked:1 };
+const QUESTS = [
+  { id:'tadeu1', npc:'tadeu', t:'Olhos de Guarda', d:'A cidade precisa de rostos conhecidos. Converse com 4 moradores diferentes.', m:'talked', n:4, r:{ coins:20, ap:5 } },
+  { id:'tadeu2', npc:'tadeu', t:'Ronda Completa', d:'Quero que você conheça todo mundo. Converse com 10 moradores diferentes.', m:'talked', n:10, r:{ coins:50, ap:12 } },
+  { id:'rosa1', npc:'rosa', t:'Mente Florida', d:'Quem resolve enigmas tem a cabeça cheia de flores. Resolva 3 puzzles das dungeons.', m:'puz', n:3, r:{ coins:20, ap:5 } },
+  { id:'rosa2', npc:'rosa', t:'Jardim de Enigmas', d:'Mais 8 puzzles e o jardim das criptas floresce.', m:'puz', n:8, r:{ coins:50, ap:12 } },
+  { id:'nico1', npc:'nico', t:'Isca de Sorte', d:'Pesca-se com paciência... e com cartas. Vença 2 jogos no Saloon.', m:'wins', n:2, r:{ coins:20, ap:5 } },
+  { id:'nico2', npc:'nico', t:'Grande Pescaria', d:'Vença 5 jogos no Saloon e eu conto onde o peixe grande se esconde.', m:'wins', n:5, r:{ coins:50, ap:12 } },
+  { id:'orfeu1', npc:'orfeu', t:'Plateia Atenta', d:'Toda canção nasce de uma boa fofoca. Presencie 3 conversas entre moradores.', m:'chats', n:3, r:{ coins:20, ap:5 } },
+  { id:'orfeu2', npc:'orfeu', t:'Balada da Cidade', d:'Preciso de verso novo: presencie mais 8 conversas.', m:'chats', n:8, r:{ coins:50, ap:12 } },
+  { id:'pedrinho1', npc:'pedrinho', t:'Caça ao Tesouro', d:'Achei um mapa! Encontre 1 segredo escondido pelo mundo.', m:'found', n:1, r:{ coins:20, ap:5 } },
+  { id:'pedrinho2', npc:'pedrinho', t:'Mestre Explorador', d:'Agora encontre mais 3 segredos. Vale olhar atrás de tudo!', m:'found', n:3, r:{ coins:50, ap:12 } },
+  { id:'lucia1', npc:'lucia', t:'Prova de Fogo', d:'Os livros guardam provas. Conclua 1 dungeon por inteiro.', m:'clears', n:1, r:{ coins:25, ap:6 } },
+  { id:'lucia2', npc:'lucia', t:'Arquivista de Verdade', d:'Conclua mais 2 dungeons e o arquivo é seu.', m:'clears', n:2, r:{ coins:60, ap:14 } },
+  { id:'ferreiro1', npc:'ferreiro', t:'Aço e Sorte', d:'Mão firme na forja, sorte na mesa. Vença 3 jogos no Saloon.', m:'wins', n:3, r:{ coins:20, ap:5 } },
+  { id:'ferreiro2', npc:'ferreiro', t:'Martelo da Mente', d:'Resolva 12 puzzles para provar que também forja ideias.', m:'puz', n:12, r:{ coins:55, ap:13 } },
+  { id:'bruno1', npc:'bruno', t:'Primeira Rodada', d:'Quem entra no Saloon tem que ganhar. Vença 1 jogo.', m:'wins', n:1, r:{ coins:15, ap:4 } },
+  { id:'bruno2', npc:'bruno', t:'Lenda do Saloon', d:'Dez vitórias e seu nome vai pro quadro.', m:'wins', n:10, r:{ coins:55, ap:13 } },
+  { id:'caio1', npc:'caio', t:'Circuito de Salas', d:'Cinema bom é o de quem viaja. Já pisou em 6 salas diferentes?', m:'salas', n:6, r:{ coins:20, ap:5 } },
+  { id:'caio2', npc:'caio', t:'Mapa Completo', d:'Conheça todas as salas do mundo.', m:'salas', n:'ALL', r:{ coins:50, ap:12 } },
+  { id:'ze1', npc:'ze', t:'Visita ao Mercador', d:'Uma boa venda começa com um cliente curioso. Visite um Mercado Misterioso.', m:'markets', n:1, r:{ coins:25, ap:6 } },
+  { id:'ze2', npc:'ze', t:'Colecionador de Tenda', d:'Reúna 30 itens diferentes para eu te chamar de cliente VIP.', m:'owned', n:30, r:{ coins:55, ap:13 } },
+  { id:'marina1', npc:'marina', t:'Prateleira Cheia', d:'Quem aluga muito, guarda bastante. Reúna 20 itens.', m:'owned', n:20, r:{ coins:20, ap:5 } },
+  { id:'marina2', npc:'marina', t:'Acervo Respeitável', d:'Reúna 45 itens para o acervo.', m:'owned', n:45, r:{ coins:55, ap:13 } },
+  { id:'ptolomeu1', npc:'ptolomeu', t:'Passos nas Criptas', d:'Poucos descem até aqui. Resolva 5 puzzles.', m:'puz', n:5, r:{ coins:25, ap:6 } },
+  { id:'ptolomeu2', npc:'ptolomeu', t:'Segredos do Escuro', d:'Descubra 2 segredos escondidos do mundo e eu abro minha última gaveta.', m:'hid', n:2, r:{ coins:65, ap:15 } }
+];
+const qMeta = q => q.n === 'ALL' ? Object.keys(ROOMS).length : q.n;
+const qNpcNome = id => { const n = NPC_LIST.find(o => o.id === id); return (n && n.r && n.r.nome) || id; };
+function qState(q){
+  const rec = GS.quests[q.id];
+  if (rec && rec.st === 'done') return 'done';
+  const prev = QUESTS[QUESTS.indexOf(q) - 1];
+  if (q.id.endsWith('2') && prev && prev.npc === q.npc && !(GS.quests[prev.id] && GS.quests[prev.id].st === 'done')) return 'locked';
+  if (!rec) return 'offer';
+  return qProg(q) >= qMeta(q) ? 'ready' : 'active';
+}
+function qProg(q){
+  const rec = GS.quests[q.id], cur = QM[q.m]();
+  const base = QABS[q.m] ? 0 : (rec ? rec.base : cur);
+  return Math.max(0, Math.min(qMeta(q), cur - base));
+}
+function qAccept(id){ const q = QUESTS.find(x => x.id === id); if (!q || qState(q) !== 'offer') return; GS.quests[id] = { st:'active', base:QM[q.m](), at:Date.now() }; gsSave(); toastText('📜 Missão aceita: ' + q.t); renderQuests(); }
+function qDeliver(id){
+  const q = QUESTS.find(x => x.id === id); if (!q || qState(q) !== 'ready') return;
+  GS.quests[id].st = 'done'; GS.ap += q.r.ap; GS.coins += q.r.coins; gsSave(); checkAcoes();
+  toastText('✔ ' + q.t + ' · +' + q.r.ap + ' PA · +' + q.r.coins + ' moedas');
+  if (q.id.endsWith('2')) { const it = Q_ITENS[q.npc]; if (it) grantItem(it); }
+  renderQuests();
+}
+const questBtn = mkEl('div', { id:'questBtn', className:'hudbtn', title:'Missões (Q)' }, '📜'); stage.appendChild(questBtn);
+questBtn.addEventListener('click', e => e.stopPropagation());
+const questPanel = el('div', 'xpanel', '<div class="xback"></div><div class="xbox" id="questBox"><button class="xclose" aria-label="Fechar">✕</button><div class="xhead">📜 Missões dos Moradores</div><div class="q-sum" id="qSum"></div><div class="q-list" id="qList"></div></div>');
+questPanel.id = 'questPanel'; stage.appendChild(questPanel);
+let qFoco = null;
+function renderQuests(){
+  const list = document.getElementById('qList'), sum = document.getElementById('qSum'); if (!list) return;
+  const feitas = QUESTS.filter(q => qState(q) === 'done').length, prontas = QUESTS.filter(q => qState(q) === 'ready').length;
+  sum.textContent = feitas + '/' + QUESTS.length + ' concluídas' + (prontas ? ' · ' + prontas + ' pronta(s) para entregar!' : '');
+  const npcs = []; QUESTS.forEach(q => { if (npcs.indexOf(q.npc) < 0) npcs.push(q.npc); });
+  if (qFoco) { npcs.splice(npcs.indexOf(qFoco), 1); npcs.unshift(qFoco); }
+  list.innerHTML = npcs.map(id => {
+    const qs = QUESTS.filter(q => q.npc === id);
+    return '<div class="q-npc' + (id === qFoco ? ' foco' : '') + '"><div class="q-nome">' + esc(qNpcNome(id)) + '</div>' + qs.map(q => {
+      const st = qState(q), meta = qMeta(q);
+      if (st === 'locked') return '<div class="q-card locked"><b>🔒 ' + esc(q.t) + '</b><span>Conclua o pedido anterior.</span></div>';
+      const pr = st === 'offer' ? 0 : qProg(q);
+      const rew = '+' + q.r.coins + ' moedas · +' + q.r.ap + ' PA' + (q.id.endsWith('2') && Q_ITENS[q.npc] ? ' · item exclusivo' : '');
+      const bar = (st === 'active' || st === 'ready') ? '<div class="q-bar"><i style="width:' + Math.round(pr / meta * 100) + '%"></i></div><small>' + pr + ' / ' + meta + '</small>' : '';
+      const btn = st === 'offer' ? '<button data-qa="' + q.id + '">Aceitar</button>' : (st === 'ready' ? '<button class="go" data-qd="' + q.id + '">Entregar</button>' : (st === 'done' ? '<em>✔ concluída</em>' : ''));
+      return '<div class="q-card ' + st + '"><b>' + esc(q.t) + '</b><span>' + esc(q.d) + '</span>' + bar + '<small class="rw">' + rew + '</small>' + btn + '</div>';
+    }).join('') + '</div>';
+  }).join('');
+}
+function showQuests(id){ hideInv(); hideMapPanel(); if (typeof hideDiary === 'function') hideDiary(); qFoco = id || null; questPanel.classList.add('show'); renderQuests(); const f = document.querySelector('#qList .foco'); if (f) f.scrollIntoView({ block:'nearest' }); }
+function hideQuests(){ questPanel.classList.remove('show'); qFoco = null; }
+questBtn.addEventListener('click', () => questPanel.classList.contains('show') ? hideQuests() : showQuests());
+questPanel.addEventListener('click', e => {
+  if (e.target.classList.contains('xback') || e.target.classList.contains('xclose')) { hideQuests(); return; }
+  const a = e.target.closest('[data-qa]'); if (a) qAccept(a.dataset.qa);
+  const d = e.target.closest('[data-qd]'); if (d) qDeliver(d.dataset.qd);
+});
+window.addEventListener('keydown', e => {
+  if (isTypingTarget(document.activeElement) || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === 'q' || e.key === 'Q') questPanel.classList.contains('show') ? hideQuests() : showQuests();
+  if (e.key === 'Escape') hideQuests();
+});
+world.addEventListener('click', e => {
+  const elx = e.target.closest('.resident'); if (!elx) return;
+  const n = NPC_LIST.find(o => o.el === elx); if (!n) return;
+  const qs = QUESTS.filter(q => q.npc === n.id && ['offer', 'ready'].indexOf(qState(q)) >= 0);
+  if (qs.length) setTimeout(() => showQuests(n.id), 450);
+}, true);
+function marcaQuests(){
+  NPC_LIST.forEach(n => {
+    if (!n.el) return;
+    let mk = n.el.querySelector('.qmk');
+    const st = QUESTS.filter(q => q.npc === n.id).map(qState);
+    const t = st.indexOf('ready') >= 0 ? 'ready' : (st.indexOf('offer') >= 0 ? 'offer' : '');
+    if (!t) { if (mk) mk.remove(); return; }
+    if (!mk) { mk = document.createElement('span'); n.el.appendChild(mk); }
+    mk.className = 'qmk ' + t; mk.textContent = t === 'ready' ? '✔' : '❗';
+  });
+}
+setInterval(marcaQuests, 700);
+
+/* =====================================================================
+   EXTRAS 9 — Datas comemorativas reais (calendário de Brasília) e avisos
+   de live pelos moradores. Em cada data: decoração na rua, falas festivas
+   dos moradores e um presente clicável que rende 1 item exclusivo por ano.
+   ===================================================================== */
+GS.dates = GS.dates || {};
+function pascoa(ano){
+  const a = ano % 19, b = Math.floor(ano / 100), c = ano % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const mes = Math.floor((h + l - 7 * m + 114) / 31), dia = ((h + l - 7 * m + 114) % 31) + 1;
+  return Date.UTC(ano, mes - 1, dia) / 86400000;
+}
+const dmd = (y, m, d) => Date.UTC(y, m - 1, d) / 86400000;
+/* cada data: janela [ini, fim] em número de dia; ano usado na chave do presente */
+const DATAS = [
+  { id:'halloween', nome:'Halloween', em:'🎃', deco:['🎃','🦇','🕸️','👻'], item:'mascara_abobora', win:y => [dmd(y,10,24), dmd(y,11,2)],
+    falas:['Uuuh! Noite de Halloween na cidade!', 'As abóboras sorriem mais do que o normal esta semana.', 'Procure o presente de Halloween perto da banca de jornal!'] },
+  { id:'criancas', nome:'Dia das Crianças', em:'🎈', deco:['🎈','🧸','🍭','🎁'], item:'chapeu_balao', win:y => [dmd(y,10,10), dmd(y,10,12)],
+    falas:['Feliz Dia das Crianças! O Pedrinho está radiante.', 'Balões por toda a rua! Parece festa de verdade.', 'Tem um presente perto da banca de jornal!'] },
+  { id:'natal', nome:'Natal', em:'🎄', deco:['🎄','⭐','🔔','❄️'], item:'gorro_natalino', win:y => [dmd(y,12,18), dmd(y,12,26)],
+    falas:['Feliz Natal, viajante!', 'Os sinos da cidade não param de tocar.', 'Deixaram um presente de Natal perto da banca de jornal.'] },
+  { id:'anonovo', nome:'Ano Novo', em:'🎆', deco:['🎆','🥂','✨','🎇'], item:'coroa_reveillon', win:y => [dmd(y,12,30), dmd(y+1,1,2)],
+    falas:['Feliz Ano Novo! Que venham mais enigmas!', 'Fogos no céu! Dá para ver até da Biblioteca.', 'Tem um presente de réveillon perto da banca de jornal!'] },
+  { id:'carnaval', nome:'Carnaval', em:'🎭', deco:['🎭','🥁','🎊','🪇'], item:'mascara_carnaval', win:y => { const p = pascoa(y) - 47; return [p - 4, p + 1]; },
+    falas:['É Carnaval! Até o Ferreiro cantou hoje.', 'Confete na rua inteira!', 'Achei um presente de Carnaval perto da banca de jornal.'] },
+  { id:'pascoa', nome:'Páscoa', em:'🐰', deco:['🐰','🥚','🌷','🐣'], item:'orelhas_coelho', win:y => { const p = pascoa(y); return [p - 3, p + 1]; },
+    falas:['Feliz Páscoa! Cuidado onde pisa, há ovos por aí.', 'A Florista Rosa escondeu ovos pela rua.', 'Tem um presente de Páscoa perto da banca de jornal.'] },
+  { id:'junina', nome:'Festa Junina', em:'🔥', deco:['🔥','🌽','🎏','🎵'], item:'chapeu_junino', win:y => [dmd(y,6,13), dmd(y,6,29)],
+    falas:['Arraiá na rua! Anarriê!', 'Cheiro de milho cozido por toda a cidade.', 'Deixaram um presente junino perto da banca de jornal.'] }
+];
+addItem('mascara_abobora','helm','Máscara de Abóbora','crista','fire','raro','Presente de Halloween (24/10 a 02/11)','glow');
+addItem('chapeu_balao','helm','Chapéu de Balão','capuz','solar','raro','Presente do Dia das Crianças (10 a 12/10)');
+addItem('gorro_natalino','helm','Gorro Natalino','capuz','crimson','raro','Presente de Natal (18 a 26/12)','glow');
+addItem('coroa_reveillon','helm','Coroa de Réveillon','coroa','gold','raro','Presente de Ano Novo (30/12 a 02/01)','glow');
+addItem('mascara_carnaval','helm','Máscara de Carnaval','mago','aurora','raro','Presente de Carnaval (sexta anterior a quarta de cinzas)');
+addItem('orelhas_coelho','helm','Orelhas de Coelho','capuz','angel','raro','Presente de Páscoa (quarta a segunda de Páscoa)');
+addItem('chapeu_junino','helm','Chapéu de Palha Junino','capuz','leather','raro','Presente da Festa Junina (13 a 29/06)');
+function dataAtiva(){
+  const h = dnum(dayKey()), ano = +dayKey().slice(0, 4);
+  for (const d of DATAS) for (const y of [ano - 1, ano]) { const w = d.win(y); if (h >= w[0] && h <= w[1]) return { d, ano:y }; }
+  return null;
+}
+window.__dataTeste = null;
+const dataHoje = () => window.__dataTeste ? { d:DATAS.find(x => x.id === window.__dataTeste), ano:+dayKey().slice(0, 4) } : dataAtiva();
+function pintaData(){
+  roomlayer.querySelectorAll('.date-deco, .date-gift').forEach(n => n.remove());
+  const at = dataHoje(); if (!at || currentRoomId !== 'rua') return;
+  const faixa = mkEl('div', { className:'date-deco' }, ''); const W2 = ROOMS.rua.width; let s = '';
+  for (let x = 20, i = 0; x < W2; x += 74, i++) s += '<span style="left:' + x + 'px; top:' + (6 + (i % 2) * 14) + 'px; animation-delay:' + ((i % 5) * 0.25) + 's">' + at.d.deco[i % at.d.deco.length] + '</span>';
+  faixa.innerHTML = s; roomlayer.appendChild(faixa);
+  if (!GS.dates[at.d.id + at.ano]) {
+    const g = mkEl('div', { className:'hotspot date-gift' }, '🎁'); g.style.left = '2252px'; g.style.top = '392px'; g.dataset.dt = at.d.id; roomlayer.appendChild(g);
+  }
+}
+const _renderRoom9 = renderRoom;
+renderRoom = function(id){ _renderRoom9(id); pintaData(); };
+world.addEventListener('click', e => {
+  const g = e.target.closest('.date-gift'); if (!g) return;
+  e.stopPropagation(); const p = aproxima(g); hint.style.display = 'none';
+  walkTo(p.ax, p.ay, () => {
+    const at = dataHoje(); if (!at || !g.parentNode) return;
+    const k = at.d.id + at.ano; if (GS.dates[k]) { g.remove(); return; }
+    GS.dates[k] = 1; gsSave(); g.remove(); award('event');
+    toastText(at.d.em + ' Presente de ' + at.d.nome + '!'); setTimeout(() => grantItem(at.d.item), 700);
+  });
+});
+/* falas festivas e avisos de live pelos moradores */
+const _falaDe9 = falaDe;
+falaDe = function(id){
+  const at = dataHoje(), r = Math.random();
+  if (at && r < 0.25) return W(NPC_TXT[id].w, pick(at.d.falas));
+  const vivos = (typeof CANAIS_CINEMA !== 'undefined') ? CANAIS_CINEMA.filter(c => c.live) : [];
+  if (vivos.length && r < 0.4) { const c = pick(vivos); return W(NPC_TXT[id].w, c.n + ' está ao vivo agora no Cinema das Lives!'); }
+  return _falaDe9(id);
+};
+setInterval(() => { const antes = roomlayer.querySelectorAll('.date-deco').length, at = dataHoje(); if (currentRoomId === 'rua' && ((at ? 1 : 0) !== antes)) pintaData(); }, 4000);
 
 /*EXTRAS_JS_END*/
 
