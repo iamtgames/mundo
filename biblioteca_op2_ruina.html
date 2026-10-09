@@ -1868,6 +1868,11 @@
 .door .lbl,.crypt-enter .td-lbl,.bv-cap{display:none !important}
 .bv-eprompt{position:absolute;z-index:46;display:none;width:24px;height:24px;align-items:center;justify-content:center;background:#0c1e1c;border:2px solid #3ad8c8;color:#bff8e8;font-family:'Press Start 2P','VT323',monospace;font-size:11px;box-shadow:0 0 8px rgba(58,216,200,.6),0 3px 0 #02100e;cursor:pointer;animation:bvbob 1.2s ease-in-out infinite}
 .bv-eprompt.on{display:flex}
+.crypt-enter{opacity:.3;filter:saturate(.25) brightness(.8);pointer-events:none;transition:opacity .6s,filter .6s}
+.crypt-enter .cf{display:none}
+.bv-dark-on .crypt-enter{opacity:1;filter:none;pointer-events:auto;z-index:12}
+.bv-dark-on .crypt-enter .cf{display:block}
+.bv-dark-on .crypt-enter .td-grid{filter:drop-shadow(0 0 12px rgba(255,120,30,.9)) brightness(1.2)}
 .bv-eprompt b{font-weight:400}
 @keyframes bvbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 .door.arch-stone{width:84px !important;height:84px !important}
@@ -2744,8 +2749,8 @@ function bibRender(){
 
 function bvInit(layer){
   const W=BV.width; const dark=document.createElement('div'); dark.className='bv-dark'; dark.style.width=W+'px'; layer.appendChild(dark);
-  let mx=(typeof camX!=='undefined'?camX:0)+480,my=230,on=true;
-  const paint=()=>{ dark.style.background=on?('radial-gradient(circle 230px at '+mx+'px '+my+'px, rgba(2,12,12,0) 0%, rgba(2,12,12,.18) 50%, rgba(2,10,10,.66) 100%)'):'transparent'; };
+  let mx=(typeof camX!=='undefined'?camX:0)+480,my=230,on=false;
+  const paint=()=>{ layer.classList.toggle('bv-dark-on',on); dark.style.background=on?('radial-gradient(circle 230px at '+mx+'px '+my+'px, rgba(2,12,12,0) 0%, rgba(2,12,12,.18) 50%, rgba(2,10,10,.66) 100%)'):'transparent'; };
   paint();
   const move=(cx,cy)=>{ try{ const p=toLocal(cx,cy); mx=p.x+camX; my=p.y; paint(); }catch(e){} };
   const mm=(e)=>{ if(!document.body.contains(dark)){ document.removeEventListener('mousemove',mm); return; } move(e.clientX,e.clientY); };
@@ -2758,10 +2763,10 @@ function bvInit(layer){
   const pe=document.createElement('div'); pe.className='bv-eprompt'; pe.innerHTML='<b>E</b>'; layer.appendChild(pe);
   const doorEl=()=>layer.querySelector('.hotspot.door[data-door="out"]'), cryptEl=()=>layer.querySelector('.crypt-enter');
   let target=null;
-  const tick=()=>{ if(!document.body.contains(pe)){ window.removeEventListener('keydown',kd); return; }
+  const tick=()=>{ if(!document.body.contains(pe)){ window.removeEventListener('keydown',kd); layer.classList.remove('bv-dark-on'); return; }
     let t=null; try{
       const c=cryptEl(); const cx=c?(parseFloat(c.style.left)+48):-999;
-      if(Math.abs(player.x-cx)<64 && Math.abs(player.y-480)<56) t={k:'crypt',x:cx};
+      if(on && Math.abs(player.x-cx)<64 && Math.abs(player.y-480)<56) t={k:'crypt',x:cx};
       else if(Math.abs(player.x-60)<58 && player.y<=470) t={k:'door',x:60};
     }catch(e){}
     target=t; if(t){ pe.style.left=(t.x-12)+'px'; pe.style.top=Math.round(player.y-120)+'px'; pe.classList.add('on'); } else pe.classList.remove('on');
