@@ -648,7 +648,7 @@
   #avatar.tp-in{z-index:95; animation:tpAvIn .72s ease-out;}
   @keyframes tpAvOut{0%{clip-path:inset(0 0 0 0); filter:brightness(1);} 55%{filter:brightness(2.4) hue-rotate(-25deg);} 100%{clip-path:inset(0 0 100% 0); filter:brightness(3) hue-rotate(-25deg);}}
   @keyframes tpAvIn{0%{clip-path:inset(100% 0 0 0); filter:brightness(3) hue-rotate(-25deg);} 100%{clip-path:inset(0 0 0 0); filter:none;}}
-  @media (prefers-reduced-motion: reduce){ .cx-portal .gate,.cx-portal .pad,.cx-portal .fl,.cx-bird,.cx-portal .sp,.cx-portal .aura,.cx-portal .aura::before,.cx-portal .aura::after,.cx-portal::before,.cx-portal::after,.cx-portal .sign{animation:none;} }
+  @media (prefers-reduced-motion: reduce){ .cx-portal .gate,.cx-portal .pad,.cx-portal .fl,.cx-portal .sp,.cx-portal .aura,.cx-portal .aura::before,.cx-portal .aura::after,.cx-portal::before,.cx-portal::after,.cx-portal .sign{animation:none;} }
 
   @keyframes liveBadgePulse{0%,100%{transform:translateX(-50%) scale(1);} 50%{transform:translateX(-50%) scale(1.08);}}
   .kiosk-live-badge{position:absolute; top:-10px; left:50%; transform:translateX(-50%) scale(1); z-index:6;
@@ -2832,14 +2832,14 @@ let cxLayers = [];
 const cxReduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 window.cxCam = function(x){
   if (currentRoomId !== 'cinema' && currentRoomId !== 'rua') return;
-  const tt = cxReduce ? 0 : performance.now() / 1000;
+  const tt = performance.now() / 1000; /* vida ambiente (nuvens) sempre ativa, mesmo com 'reduzir movimento' do SO */
   for (let i = 0; i < cxLayers.length; i++) {
     const l = cxLayers[i], w = l._w, off = (((x * l._s + tt * l._d) % w) + w) % w;
     const v = l._d >= 4 ? (x - off) : (x - Math.round(off));
     if (v !== l._v) { l._v = v; l.style.transform = 'translate3d(' + (l._d >= 4 ? v.toFixed(2) : v) + 'px,0,0)'; }
   }
 };
-if (!cxReduce) (function cxDrift(){
+(function cxDrift(){
   if (currentRoomId === 'rua' || currentRoomId === 'cinema') { try { window.cxCam(camX); } catch (e) {} }
   requestAnimationFrame(cxDrift);
 })();
