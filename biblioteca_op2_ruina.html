@@ -1870,9 +1870,9 @@
 .bv-eprompt.on{display:flex}
 .crypt-enter{opacity:.3;filter:saturate(.25) brightness(.8);pointer-events:none;transition:opacity .6s,filter .6s}
 .crypt-enter .cf{display:none}
-.bv-dark-on .crypt-enter{opacity:1;filter:none;pointer-events:auto;z-index:12}
-.bv-dark-on .crypt-enter .cf{display:block}
-.bv-dark-on .crypt-enter .td-grid{filter:drop-shadow(0 0 12px rgba(255,120,30,.9)) brightness(1.2)}
+.bv-dark.on ~ .crypt-enter{opacity:1;filter:none;pointer-events:auto;z-index:12}
+.bv-dark.on ~ .crypt-enter .cf{display:block}
+.bv-dark.on ~ .crypt-enter .td-grid{filter:drop-shadow(0 0 12px rgba(255,120,30,.9)) brightness(1.2)}
 .bv-eprompt b{font-weight:400}
 @keyframes bvbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 .door.arch-stone{width:84px !important;height:84px !important}
@@ -2750,7 +2750,7 @@ function bibRender(){
 function bvInit(layer){
   const W=BV.width; const dark=document.createElement('div'); dark.className='bv-dark'; dark.style.width=W+'px'; layer.appendChild(dark);
   let mx=(typeof camX!=='undefined'?camX:0)+480,my=230,on=false;
-  const paint=()=>{ layer.classList.toggle('bv-dark-on',on); dark.style.background=on?('radial-gradient(circle 230px at '+mx+'px '+my+'px, rgba(2,12,12,0) 0%, rgba(2,12,12,.18) 50%, rgba(2,10,10,.66) 100%)'):'transparent'; };
+  const paint=()=>{ dark.classList.toggle('on',on); dark.style.background=on?('radial-gradient(circle 230px at '+mx+'px '+my+'px, rgba(2,12,12,0) 0%, rgba(2,12,12,.18) 50%, rgba(2,10,10,.66) 100%)'):'transparent'; };
   paint();
   const move=(cx,cy)=>{ try{ const p=toLocal(cx,cy); mx=p.x+camX; my=p.y; paint(); }catch(e){} };
   const mm=(e)=>{ if(!document.body.contains(dark)){ document.removeEventListener('mousemove',mm); return; } move(e.clientX,e.clientY); };
