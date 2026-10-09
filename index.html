@@ -7564,7 +7564,7 @@ travelPanel.querySelector('.xclose').addEventListener('click', hideTravel); trav
 function pintaPlaca(){
   roomlayer.querySelectorAll('.fsign').forEach(n => n.remove()); if (currentRoomId !== 'rua') return;
   const d = mkEl('div', { className:'hotspot fsign' }, '<div class="fs-post"></div><div class="fs-board">Explorar mundo</div>');
-  d.style.left = (ROOMS.rua.width - 176) + 'px'; d.style.top = '318px'; roomlayer.appendChild(d);
+  d.style.left = (ROOMS.rua.width - 108) + 'px'; d.style.top = '338px'; roomlayer.appendChild(d);
 }
 const _renderRoom12 = renderRoom; renderRoom = function(id){ _renderRoom12(id); pintaPlaca(); };
 world.addEventListener('click', e => {
@@ -8543,7 +8543,7 @@ function createShinobi(assets,done){
   @keyframes csPulse{50%{opacity:.55;}}
   #stage.day:not(.cloudy):not(.rainy) .clouds-rua{opacity:.6;}
   #stage.twilight:not(.cloudy):not(.rainy) .clouds-rua{opacity:.4;}
-  .fsign{width:150px !important; height:150px !important; transform:scale(.86); transform-origin:left bottom;}
+  .fsign{width:150px !important; height:150px !important; transform:scale(.7); transform-origin:left bottom;}
   .fsign .fs-post{left:62px !important; width:26px !important; top:44px !important; height:auto !important; bottom:-4px !important; background:url(${SP_STEM}) repeat-y center top / 26px auto !important; filter:brightness(.8) saturate(.85) drop-shadow(0 3px 2px rgba(0,0,0,.45)); image-rendering:pixelated;}
   .fsign .fs-board{left:0 !important; top:0 !important; width:150px !important; height:62px !important; box-sizing:border-box; padding:27px 28px 8px 14px !important; border:0 !important; white-space:nowrap; font-family:'VT323',monospace; font-size:19px !important; line-height:22px !important; letter-spacing:.4px; color:#3a2410 !important; text-shadow:0 1px 0 rgba(255,232,180,.65); text-align:center;
     background:url(${SP_PLANK}) 0 0 / 100% 100% no-repeat !important; box-shadow:none !important; image-rendering:pixelated; filter:drop-shadow(0 3px 2px rgba(0,0,0,.4));}
