@@ -1265,6 +1265,9 @@
   #avatar.walking .shadow{width:25px; opacity:.75;}
   .facing{position:absolute; left:0; top:0; width:100%; height:100%; transition:transform .08s ease-out;}
   .facing.flip{transform:scaleX(-1);}
+  @keyframes respan{to{background-position-x:calc(var(--tw) * -1);}}
+  .resident-sp .leg,.resident-sp .av-body,.resident-sp .bodywrap{display:none;}
+  .resident-sp .pn-sp{position:absolute;image-rendering:pixelated;}
   .bodywrap{position:relative; width:100%; height:100%; transform-origin:50% 100%;}
   .bodywrap.squash{animation:squash .18s ease-out;}
   @keyframes squash{0%{transform:scale(1,1);}35%{transform:scale(1.16,.82);}100%{transform:scale(1,1);}}
@@ -2132,7 +2135,7 @@ const ROOMS = {
         <div class="arrow" role="button" tabindex="0" data-goto="1780" style="z-index:6; top:262px; --ac:#4fcf6a; transform:rotate(-1.5deg);">Tenda</div>
         <div class="arrow" role="button" tabindex="0" data-goto="2150" style="z-index:5; top:314px; --ac:#4f9bff; transform:rotate(1.5deg);">Locadora</div>
       </div>
-      <div class="avisos-board" role="button" tabindex="0" aria-label="Quadro de Avisos" style="left:338px;">
+      <div class="avisos-board" role="button" tabindex="0" aria-label="Quadro de Avisos" style="left:1158px;">
         <div class="legs"></div><div class="bd"><i class="pp p1"></i><i class="pp p2"></i><i class="pp p3"></i></div><div class="hd">AVISOS</div><span class="bg">0</span>
       </div>
       <i class="vb-sh" style="left:136px; width:316px; bottom:128px;"></i>
@@ -6073,9 +6076,9 @@ const NPC_DEF = {
   nico:     { room:'rua', idx:2, street:true, range:[1550, 2420], speed:34, off:[21, 5] },
   orfeu:    { room:'rua', idx:3, street:true, range:[300, 2300], speed:42, off:[0, 7] },
   pedrinho: { room:'rua', idx:4, street:true, range:[120, 2440], speed:78, off:[20, 7] },
-  lucia:    { room:'biblioteca', idx:0, door:300, speed:44 },
-  ferreiro: { room:'office', idx:0, door:660, speed:44 },
-  bruno:    { room:'salajogos', idx:0, door:990, speed:46 },
+  lucia:    { room:'biblioteca', idx:0, door:300, speed:44, fixed:true },
+  ferreiro: { room:'office', idx:0, door:660, speed:44, fixed:true },
+  bruno:    { room:'salajogos', idx:0, door:990, speed:46, fixed:true },
   caio:     { room:'cinema', idx:0, door:1378, speed:40 },
   ze:       { room:'tenda', idx:0, door:1780, speed:50 },
   marina:   { room:'locadora', idx:0, door:2150, speed:48 },
@@ -6268,12 +6271,25 @@ function moveToward(n, tx, tyf, dt){
 }
 
 /* ---------- DOM ---------- */
+const SPRITE_RES = {
+  ferreiro:{ idle:{ key:'blacksmith', n:5, fw:34, fh:34, b:[7,3,25,33], sc:2.93 } },
+  lucia:{ idle:{ key:'mage_idle', n:8, fw:128, fh:128, b:[29,62,81,128], sc:1.38 } },
+  bruno:{ idle:{ key:'vamp2_idle', n:5, fw:128, fh:128, b:[38,55,90,128], sc:1.25 } },
+  tadeu:{ idle:{ key:'knight1_idle', n:4, fw:128, fh:128, b:[12,64,55,128], sc:1.42 }, walk:{ key:'knight1_walk', n:8, fw:128, fh:128, b:[13,64,63,128], sc:1.42 } }
+};
+function applyRes(n, mv){
+  const SR = SPRITE_RES[n.id]; if (!SR || !n.el) return;
+  const S = (mv && SR.walk) ? SR.walk : SR.idle; if (n.resKey === S.key) return; n.resKey = S.key;
+  const w = S.fw * S.sc, h = S.fh * S.sc, cx = (S.b[0] + S.b[2]) / 2 * S.sc;
+  n.el.querySelector('.facing').innerHTML = '<i class="pn-sp pns-' + S.key + '" style="left:' + (36 - cx) + 'px;top:' + (78 - S.b[3] * S.sc) + 'px;width:' + w + 'px;height:' + h + 'px;background-size:' + (S.n * w) + 'px ' + h + 'px;--tw:' + (S.n * w) + 'px;animation:respan ' + (S.n * (mv ? 0.1 : 0.16)) + 's steps(' + S.n + ') infinite;"></i>';
+}
 function mkNpcEl(n){
   const r = n.r, d = mkEl('div', { className:'resident' });
   d.dataset.res = n.def.room + ':' + n.def.idx;
   d.style.transformOrigin = '50% 100%';
   d.innerHTML = '<div class="shadow"></div><div class="facing"><div class="bodywrap"><div class="leg left"></div><div class="leg right"></div><div class="av-body"></div></div></div><div class="nametag">' + esc(r.nome) + '</div>';
-  roomlayer.appendChild(d); applyEquip(d, r.look);
+  roomlayer.appendChild(d);
+  if (SPRITE_RES[n.id]) { d.classList.add('resident-sp'); n.el = d; n.resKey = ''; applyRes(n, false); } else applyEquip(d, r.look);
   n.el = d; n.lastKey = ''; placeEl(n);
 }
 function placeEl(n){
@@ -6285,6 +6301,7 @@ function placeEl(n){
   n.el.style.left = (n.x - 36) + 'px'; n.el.style.top = (y - 78) + 'px';
   n.el.style.zIndex = String(40 + Math.round(depthT * 20));
   n.el.style.transform = 'scale(' + sc.toFixed(3) + ')';
+  if (SPRITE_RES[n.id]) applyRes(n, n.moving);
   const f = n.el.querySelector('.facing'); if (f) f.classList.toggle('flip', !!n.flip);
   const ll = n.el.querySelector('.leg.left'), lr = n.el.querySelector('.leg.right');
   if (ll && lr && typeof setFootStep === 'function') {
@@ -7743,7 +7760,6 @@ window.__f12 = { F, fGerar, fAbrir, fSair, showTravel, fAtualiza, fDesenha };
   const SH = {"blacksmith": {"n": 5, "fw": 34, "fh": 34, "b": [7, 3, 25, 33]}, "dwarf": {"n": 4, "fw": 32, "fh": 32, "b": [2, 5, 30, 32]}, "barkeep": {"n": 5, "fw": 34, "fh": 34, "b": [8, 2, 25, 33]}, "barmaid": {"n": 5, "fw": 34, "fh": 34, "b": [5, 1, 29, 33]}, "dog": {"n": 4, "fw": 32, "fh": 32, "b": [10, 11, 27, 32]}, "merchant": {"n": 5, "fw": 32, "fh": 32, "b": [3, 2, 31, 32]}, "farmer_02": {"n": 5, "fw": 32, "fh": 32, "b": [5, 5, 23, 32]}, "elder": {"n": 4, "fw": 32, "fh": 32, "b": [5, 8, 25, 32]}, "princess": {"n": 4, "fw": 32, "fh": 32, "b": [8, 7, 28, 32]}, "seer": {"n": 6, "fw": 34, "fh": 34, "b": [9, 4, 27, 32]}, "jester": {"n": 5, "fw": 34, "fh": 34, "b": [2, 2, 29, 31]}, "priestess": {"n": 5, "fw": 32, "fh": 32, "b": [3, 1, 32, 32]}, "adventurer_05": {"n": 4, "fw": 32, "fh": 32, "b": [3, 5, 27, 32]}, "minstrel": {"n": 5, "fw": 34, "fh": 34, "b": [6, 2, 30, 32]}, "villager_01": {"n": 5, "fw": 34, "fh": 34, "b": [3, 5, 33, 32]}, "farmer_01": {"n": 5, "fw": 32, "fh": 32, "b": [1, 3, 27, 30]}, "beggar": {"n": 5, "fw": 34, "fh": 34, "b": [2, 13, 31, 31]}, "witch": {"n": 5, "fw": 34, "fh": 34, "b": [6, 1, 32, 33]}, "shady_guy": {"n": 5, "fw": 34, "fh": 34, "b": [9, 2, 30, 32]}, "fairy": {"n": 4, "fw": 32, "fh": 32, "b": [8, 6, 23, 27]}, "knight1_idle": {"n": 4, "fw": 128, "fh": 128, "b": [12, 64, 55, 128]}, "knight1_walk": {"n": 8, "fw": 128, "fh": 128, "b": [13, 64, 63, 128]}, "satyr3_idle": {"n": 6, "fw": 128, "fh": 128, "b": [45, 52, 80, 128]}, "satyr3_walk": {"n": 12, "fw": 128, "fh": 128, "b": [34, 50, 91, 128]}, "satyr1_idle": {"n": 7, "fw": 128, "fh": 128, "b": [50, 53, 78, 128]}, "satyr1_walk": {"n": 12, "fw": 128, "fh": 128, "b": [34, 51, 89, 128]}, "girl2_idle": {"n": 7, "fw": 128, "fh": 128, "b": [48, 56, 80, 128]}, "girl2_walk": {"n": 12, "fw": 128, "fh": 128, "b": [45, 55, 81, 128]}, "girl3_idle": {"n": 6, "fw": 128, "fh": 128, "b": [47, 55, 79, 128]}, "girl3_walk": {"n": 12, "fw": 128, "fh": 128, "b": [46, 54, 81, 128]}, "peasant_idle": {"n": 6, "fw": 96, "fh": 96, "b": [27, 28, 62, 96]}, "peasant_walk": {"n": 8, "fw": 96, "fh": 96, "b": [26, 31, 63, 96]}, "monk_idle": {"n": 7, "fw": 96, "fh": 96, "b": [31, 25, 67, 96]}, "monk_walk": {"n": 7, "fw": 96, "fh": 96, "b": [30, 23, 88, 96]}, "mage_idle": {"n": 8, "fw": 128, "fh": 128, "b": [29, 62, 81, 128]}, "mage_walk": {"n": 7, "fw": 128, "fh": 128, "b": [38, 62, 90, 128]}, "samurai_idle": {"n": 6, "fw": 128, "fh": 128, "b": [0, 59, 128, 128]}, "samurai_walk": {"n": 9, "fw": 128, "fh": 128, "b": [25, 58, 84, 128]}, "vamp1_idle": {"n": 5, "fw": 128, "fh": 128, "b": [30, 50, 79, 128]}, "vamp1_walk": {"n": 8, "fw": 128, "fh": 128, "b": [27, 49, 75, 128]}, "vamp2_idle": {"n": 5, "fw": 128, "fh": 128, "b": [38, 55, 90, 128]}, "vamp2_walk": {"n": 6, "fw": 128, "fh": 128, "b": [36, 54, 79, 128]}, "yurei_idle": {"n": 5, "fw": 128, "fh": 128, "b": [39, 54, 77, 124]}, "yurei_walk": {"n": 5, "fw": 128, "fh": 128, "b": [31, 54, 70, 124]}};
   const DEF=[
  /* ---- moradores que ficam no posto ---- */
- {id:'gorn',type:'post',idle:'blacksmith',name:'Gorn',role:'ferreiro',bi:5,dx:-62,y:40,fx:1,lines:['O fogo da forja nunca apaga. Nem o meu mau humor.','Na bigorna eu marco preços, estatísticas e o calendário.','Metal bom canta quando bate.','Quer uma espada? Primeiro traga carvão.','Tem lançamento novo chegando. Já anotei na parede.','Não encoste na brasa, aprendi isso do jeito difícil.']},
  {id:'brok',type:'post',idle:'dwarf',name:'Brok',role:'anao',bi:5,dx:148,y:38,fx:-1,lines:['Pedra boa é pedra velha. Como eu.','Já cavei debaixo desta rua. Tem coisas lá embaixo.','Nada como um bom machado... e uma boa cerveja.','Os humanos são altos, mas pisam sem olhar.','O Gorn faz o melhor aço. Mas nunca digo isso a ele.','Se achar ouro, divida comigo. É o costume.']},
  {id:'zeca',type:'post',idle:'barkeep',name:'Zeca',role:'taverneiro',bi:1,dx:-82,y:36,fx:1,lines:['Aqui na Sala de Jogos tem Campo Minado e Paciência.','Quer uma caneca? Hoje o hidromel está barato.','Barulho eu aguento, bagunça não.','Já vi gente chorar por perder no Campo Minado.','Se tem fila, é porque o jogo está bom.','Cuidado com a Lia, ela escuta tudo.']},
  {id:'lia',type:'post',idle:'barmaid',name:'Lia',role:'garconete',bi:1,dx:80,y:40,fx:-1,lines:['Mesa livre perto da janela, se quiser.','Eu levo cinco canecas de uma vez. Sem derramar!','O Zeca é mandão, mas tem bom coração.','Já ouviu a nova canção do Pip? É boa de verdade.','À noite a rua fica mais bonita, não acha?','Vi um vagalume entrar na Locadora ontem.']},
@@ -7763,18 +7779,15 @@ window.__f12 = { F, fGerar, fAbrir, fSair, showTravel, fAtualiza, fDesenha };
  {id:'morgana',type:'post',idle:'witch',name:'Morgana',role:'bruxa',x:2244,y:46,fx:-1,lines:['Não me olhe assim. Só faço poções de tosse.','Esta rua tem mais magia do que parece.','Se sentir arrepio, é só o vento. Provavelmente.','Compro cogumelos raros. Pago bem.','A lua cheia deixa tudo mais interessante.']},
  {id:'sombra',type:'post',idle:'shady_guy',name:'Sombra',role:'sombra',x:790,y:34,fx:1,lines:['Psiu... você não me viu aqui.','Tenho informações. Custam caro.','Não, não sou ladrão. Sou... consultor.','Cuidado com quem pergunta demais.','A noite é minha melhor amiga.']},
  /* ---- andarilhos: sprites com caminhada real ---- */
- {id:'tito',type:'walk',idle:'knight1_idle',walk:'knight1_walk',name:'Capitão Tito',role:'guarda',h:68,sp:46,lines:['Rua tranquila, graças a mim. E ao gato.','Alto lá! Brincadeira. Pode passar.','Faço a ronda três vezes por dia.','Se ver algo estranho, avise a guarda.','A espada nova é obra do Gorn. Pesa uma tonelada.','Noite calma é noite boa.']},
  {id:'davi',type:'walk',idle:'satyr3_idle',walk:'satyr3_walk',name:'Davi',role:'aldeao',h:66,sp:44,lines:['Vou buscar lenha para a forja.','Já viu as montanhas hoje? Estão lindas.','Meu irmão jura que viu um dragão. Eu duvido.','Se for à Tenda, leve moedas.','Bom dia! Ou boa tarde? Perdi a hora.']},
  {id:'rosa',type:'walk',idle:'satyr1_idle',walk:'satyr1_walk',name:'Rosa',role:'aldea2',h:64,sp:42,lines:['Estou procurando o Davi. Ele sumiu de novo.','As flores do vale estão no auge.','Passei na Biblioteca e adorei.','Se vir meu cachorro, diga que o chamo.','Vou aproveitar a tarde antes que escureça.']},
  {id:'hana',type:'walk',idle:'girl2_idle',walk:'girl2_walk',name:'Hana',role:'estudante',h:62,sp:48,lines:['Estou atrasada para a aula!','Alguém viu meu caderno?','A Biblioteca é o meu lugar favorito.','Prefiro estudar à noite, é mais silencioso.','Dizem que o Ancião sabe de tudo. Será?']},
  {id:'ana',type:'walk',idle:'girl3_idle',walk:'girl3_walk',name:'Ana',role:'estudante',h:62,sp:44,lines:['A Hana é minha melhor amiga. Mas ela é distraída!','Vamos passar na Locadora depois da aula?','Quero ser exploradora quando crescer.','Cuidado, o chão está escorregadio.','O vento hoje está gostoso.']},
  {id:'toshi',type:'walk',idle:'peasant_idle',walk:'peasant_walk',name:'Toshi',role:'campones',h:56,sp:36,lines:['Carrego cogumelos do vale. Quer um?','Meu chapéu é a coisa mais confortável que tenho.','Tudo que cresce aqui tem sabor de chuva.','Trabalhar cedo e dormir cedo, esse é o segredo.']},
  {id:'ren',type:'walk',idle:'monk_idle',walk:'monk_walk',name:'Monge Ren',role:'monge',h:66,sp:34,lines:['Respire fundo. O mundo pode esperar.','Caminhar é a melhor forma de meditar.','Quem tem pressa perde a paisagem.','Não procuro nada. Por isso encontro tudo.']},
- {id:'ever',type:'walk',idle:'mage_idle',walk:'mage_walk',name:'Mago Ever',role:'mago',h:68,sp:38,lines:['Procuro ingredientes. Pena de coruja, alguém tem?','Magia é só ciência que ainda não foi explicada.','Esse capuz? Pura moda arcana.','Não, não posso transformar ninguém em sapo. Hoje.','A rua tem boa energia. Sinto no ar.']},
  {id:'kai',type:'walk',idle:'samurai_idle',walk:'samurai_walk',name:'Kai',role:'forasteiro',h:66,sp:50,lines:['Estou só de passagem... talvez fique.','Essas montanhas me lembram minha terra.','Conheci muitas ruas, mas esta é diferente.','Procuro alguém. Ainda não sei quem.','Não pergunte meu sobrenome.','Se visitar o Cinema, olhe o chat. É divertido.']},
  /* ---- só aparecem à noite ---- */
  {id:'victor',type:'night',idle:'vamp1_idle',walk:'vamp1_walk',name:'Cavalheiro Victor',role:'cavalheiro',h:68,sp:36,lines:['Boa noite. Gosto do ar da noite, é mais... fresco.','Não, não evito o sol. Apenas prefiro a lua.','Elegância nunca sai de moda.','Procuro uma boa biblioteca aberta de madrugada.']},
- {id:'lucia',type:'night',idle:'vamp2_idle',walk:'vamp2_walk',name:'Condessa Lúcia',role:'condessa',h:68,sp:32,lines:['Que noite adorável para uma caminhada.','Este vestido? Tem trezentos anos. Foi barato.','Os lampiões são tão... quentes.','Você tem um aroma de coragem. Interessante.']},
  {id:'yurei',type:'night',idle:'yurei_idle',walk:'yurei_walk',name:'Yurei',role:'fantasma',h:70,sp:24,float:1,lines:['...','Frio... tão frio...','Eu já morei aqui. Há muito tempo.','Não tenha medo. Eu já tive.']},
  {id:'fada',type:'float',idle:'fairy',name:'Fada',role:'fada',h:30,noTalk:1,lines:['...']}
 ];
@@ -8532,7 +8545,7 @@ function createShinobi(assets,done){
   .cs2 .arrow .tg{position:absolute; right:20px; top:5px; padding:0 4px; font-size:12px; line-height:13px; letter-spacing:.4px; border-radius:2px; color:#fff; background:#d12b2b; text-shadow:none; border:1px solid #3a2410; animation:csPulse 1.4s ease-in-out infinite;}
   .cs2 .arrow .tg.mk{background:#8a5fd0;}
   @keyframes csPulse{50%{opacity:.55;}}
-  .avisos-board{position:absolute; bottom:20%; width:154px; height:196px; z-index:6; cursor:pointer; outline:none; transform:scale(.9); transform-origin:left bottom;}
+  .avisos-board{position:absolute; bottom:20%; width:154px; height:196px; z-index:6; cursor:pointer; outline:none; transform:scale(.8); transform-origin:left bottom;}
   .rv .avisos-board{bottom:140px;}
   .avisos-board .legs{position:absolute; left:0; right:0; top:90px; bottom:-4px;
     background:url(${SP_STEM}) repeat-y 30px top / 20px auto, url(${SP_STEM}) repeat-y 104px top / 20px auto; image-rendering:pixelated; filter:brightness(.78) saturate(.85) drop-shadow(0 3px 2px rgba(0,0,0,.45));}
