@@ -6080,8 +6080,8 @@ const NPC_DEF = {
   ferreiro: { room:'office', idx:0, door:660, speed:44, fixed:true },
   bruno:    { room:'salajogos', idx:0, door:990, speed:46, fixed:true },
   caio:     { room:'cinema', idx:0, door:1378, speed:40 },
-  ze:       { room:'tenda', idx:0, door:1780, speed:50 },
-  marina:   { room:'locadora', idx:0, door:2150, speed:48 },
+  ze:       { room:'tenda', idx:0, door:1780, speed:50, fixed:true },
+  marina:   { room:'locadora', idx:0, door:2150, speed:48, fixed:true },
   ptolomeu: { room:'criptas', idx:0, fixed:true, speed:26 }
 };
 const NP = {}, NPC_LIST = [];
@@ -6275,6 +6275,8 @@ const SPRITE_RES = {
   ferreiro:{ idle:{ key:'blacksmith', n:5, fw:34, fh:34, b:[7,3,25,33], sc:2.93 } },
   lucia:{ idle:{ key:'mage_idle', n:8, fw:128, fh:128, b:[29,62,81,128], sc:1.38 } },
   bruno:{ idle:{ key:'vamp2_idle', n:5, fw:128, fh:128, b:[38,55,90,128], sc:1.25 } },
+  marina:{ idle:{ key:'girl2_idle', n:7, fw:128, fh:128, b:[48,56,80,128], sc:1.15 } },
+  ze:{ idle:{ key:'satyr3_idle', n:6, fw:128, fh:128, b:[45,52,80,128], sc:1.16 } },
   tadeu:{ idle:{ key:'knight1_idle', n:4, fw:128, fh:128, b:[12,64,55,128], sc:1.42 }, walk:{ key:'knight1_walk', n:8, fw:128, fh:128, b:[13,64,63,128], sc:1.42 } }
 };
 function applyRes(n, mv){
@@ -7779,9 +7781,7 @@ window.__f12 = { F, fGerar, fAbrir, fSair, showTravel, fAtualiza, fDesenha };
  {id:'morgana',type:'post',idle:'witch',name:'Morgana',role:'bruxa',x:2244,y:46,fx:-1,lines:['Não me olhe assim. Só faço poções de tosse.','Esta rua tem mais magia do que parece.','Se sentir arrepio, é só o vento. Provavelmente.','Compro cogumelos raros. Pago bem.','A lua cheia deixa tudo mais interessante.']},
  {id:'sombra',type:'post',idle:'shady_guy',name:'Sombra',role:'sombra',x:790,y:34,fx:1,lines:['Psiu... você não me viu aqui.','Tenho informações. Custam caro.','Não, não sou ladrão. Sou... consultor.','Cuidado com quem pergunta demais.','A noite é minha melhor amiga.']},
  /* ---- andarilhos: sprites com caminhada real ---- */
- {id:'davi',type:'walk',idle:'satyr3_idle',walk:'satyr3_walk',name:'Davi',role:'aldeao',h:66,sp:44,lines:['Vou buscar lenha para a forja.','Já viu as montanhas hoje? Estão lindas.','Meu irmão jura que viu um dragão. Eu duvido.','Se for à Tenda, leve moedas.','Bom dia! Ou boa tarde? Perdi a hora.']},
  {id:'rosa',type:'walk',idle:'satyr1_idle',walk:'satyr1_walk',name:'Rosa',role:'aldea2',h:64,sp:42,lines:['Estou procurando o Davi. Ele sumiu de novo.','As flores do vale estão no auge.','Passei na Biblioteca e adorei.','Se vir meu cachorro, diga que o chamo.','Vou aproveitar a tarde antes que escureça.']},
- {id:'hana',type:'walk',idle:'girl2_idle',walk:'girl2_walk',name:'Hana',role:'estudante',h:62,sp:48,lines:['Estou atrasada para a aula!','Alguém viu meu caderno?','A Biblioteca é o meu lugar favorito.','Prefiro estudar à noite, é mais silencioso.','Dizem que o Ancião sabe de tudo. Será?']},
  {id:'ana',type:'walk',idle:'girl3_idle',walk:'girl3_walk',name:'Ana',role:'estudante',h:62,sp:44,lines:['A Hana é minha melhor amiga. Mas ela é distraída!','Vamos passar na Locadora depois da aula?','Quero ser exploradora quando crescer.','Cuidado, o chão está escorregadio.','O vento hoje está gostoso.']},
  {id:'toshi',type:'walk',idle:'peasant_idle',walk:'peasant_walk',name:'Toshi',role:'campones',h:56,sp:36,lines:['Carrego cogumelos do vale. Quer um?','Meu chapéu é a coisa mais confortável que tenho.','Tudo que cresce aqui tem sabor de chuva.','Trabalhar cedo e dormir cedo, esse é o segredo.']},
  {id:'ren',type:'walk',idle:'monk_idle',walk:'monk_walk',name:'Monge Ren',role:'monge',h:66,sp:34,lines:['Respire fundo. O mundo pode esperar.','Caminhar é a melhor forma de meditar.','Quem tem pressa perde a paisagem.','Não procuro nada. Por isso encontro tudo.']},
