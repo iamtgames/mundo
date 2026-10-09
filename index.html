@@ -595,7 +595,6 @@
   .cx-portal .sp{position:absolute; bottom:46px; width:3px; height:3px; background:#bff8ff; box-shadow:0 0 4px #7fe0ff; pointer-events:none; z-index:2; animation:cxRise 2.4s linear infinite;}
   @keyframes cxRise{0%{transform:translateY(0); opacity:0;} 15%{opacity:1;} 100%{transform:translateY(-90px); opacity:0;}}
   .cx-portal:hover .aura{opacity:1; animation:none;}
-  .cx-portal .live-now-pin{top:-100px;}
 
   /* efeito de transição (canvas) + materialização do herói */
   #tpfx{position:absolute; left:0; top:0; width:960px; height:540px; z-index:40; pointer-events:none; opacity:0; image-rendering:pixelated;}
@@ -660,25 +659,25 @@
 
   /* placa "ao vivo agora" pendurada rente à porta do Cinema, na Rua -- mesma linguagem visual
      da taboinha de madeira entalhada (.sign) das casas, como se fosse mais uma placa da fachada. */
-  .live-now-pin{position:absolute; left:50%; top:112px; transform:translateX(-50%) rotate(-1.2deg); z-index:6;
-    display:flex; flex-direction:column; gap:1px; align-items:stretch; width:auto; max-width:150px; min-width:78px;
-    pointer-events:none; overflow:hidden;
-    background:
-      repeating-linear-gradient(90deg, rgba(0,0,0,.14) 0 2px, transparent 2px 7px),
-      linear-gradient(180deg, #8a5a32 0%, #74492a 55%, #5c3a20 100%);
-    border:2px solid #3f2814; border-radius:2px; padding:3px 6px 4px;
-    box-shadow:0 4px 7px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,220,160,.15);}
-  .live-now-pin::before,.live-now-pin::after{content:''; position:absolute; top:-3px; width:5px; height:5px;
-    border-radius:50%; background:radial-gradient(circle at 35% 30%, #6b6358, #2a2620 70%); box-shadow:0 1px 2px rgba(0,0,0,.6);}
-  .live-now-pin::before{left:4px;} .live-now-pin::after{right:4px;}
-  .live-now-head{font-family:'Press Start 2P','VT323',monospace; font-size:5.5px; letter-spacing:.5px;
-    color:#ffb9b9; text-shadow:0 1px 0 rgba(0,0,0,.6); text-transform:uppercase; margin-bottom:0;
-    border-bottom:1px solid rgba(255,220,160,.25); padding-bottom:1px;}
-  .live-now-pin .pill{display:flex; align-items:center; gap:3px; color:#f1e0b8; font-family:'VT323',monospace;
-    font-size:10.5px; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    text-shadow:0 1px 0 rgba(0,0,0,.5);}
-  .live-now-pin .pill .dot{width:4px; height:4px; border-radius:50%; background:var(--platc,#e21212); flex:none;
-    box-shadow:0 0 3px var(--platc,#e21212); animation:liveDot .9s ease-in-out infinite;}
+  .live-now-pin{position:absolute; right:calc(100% + 14px); bottom:26px; left:auto; top:auto; transform:none; z-index:6;
+    display:flex; flex-direction:column; gap:2px; align-items:stretch; width:max-content; min-width:124px; max-width:130px; box-sizing:border-box;
+    pointer-events:none; image-rendering:pixelated; overflow:visible;
+    padding:0 2px 1px; border:16px solid transparent; border-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABo0lEQVR42rVWvU7DQAz+UlUdOlkeqj5Cd8QrdKcSMMPEGyAGJgbEizAXiQXxDgwRA1NUdUJUsqxIdGBIGSond5fLz9BainJOvnz2Z/uuTQBgwrMdjmA/8pUkE57t7m4fjsGPx6d7DM3ZbH6h+g2i6cHuAKoA9lBEAIyQZRmIqPTb7sz771S3KApBmn5itX4GAAwsQEXe35gZAMrviKiGGbgKmBnMjLPFHMxjqGqU0MyIzxZzDAZ/NXxUgYjgZfmKt/dlDewqdMkM36nArChGuDy/aS2PS1YUI5yezKM4T4GblYiAiGqym3wLGL4PpogaMw3rH1Ni/nrdQ0GYofXHAtlAhOvQhmEP2oK469izzh7swf33gqpA1Xol7QFMARH3JjesqpbrsCc1BbEmxrKrCNkjDcvlKWiSaSRNUxaOaqOCWHlWq6zMbF8KX1FXs6M7+er6AszjoBTk1bvyxcN3TpF7tjQ1t1IknfhhTIHItna2uPKt7qYuhm/YyVJKjzUsdv64V2wfeQryXJGmHwDgnSeh5bl2YmoBiKblz9whLTn235Z/RNs1KWoiMk0AAAAASUVORK5CYII=") 8 fill / 16px round; background:none;
+    filter:drop-shadow(0 0 7px rgba(120,100,255,.35)); transition:min-height .3s;}
+  /* pernas de ferro + base de pedra: a placa fica em pé no chão e cresce pra cima conforme entram lives */
+  .live-now-pin::before{content:''; position:absolute; left:14px; right:14px; top:100%; margin-top:0; height:26px; border:0; border-radius:0; box-shadow:none;
+    background:linear-gradient(90deg,#4a4170,#363058 60%,#231d3d) 0 0/8px 100% no-repeat, linear-gradient(90deg,#4a4170,#363058 60%,#231d3d) 100% 0/8px 100% no-repeat;}
+  .live-now-pin::after{content:''; position:absolute; left:6px; right:6px; top:calc(100% + 18px); height:10px; border:0; border-radius:0; box-shadow:none;
+    background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAFCAYAAABM6GxJAAAALUlEQVR42mPs71z9n4ECwGhvFfNfW0uHbAOYCGm+eu0KfgMYKASM9lYxFIUBADk4CfOEwKcmAAAAAElFTkSuQmCC") 0 0/32px 10px repeat-x;}
+  .live-now-head{display:flex; align-items:center; gap:6px; font-family:'VT323',monospace; font-size:19px; line-height:1; letter-spacing:2px; font-weight:400;
+    color:#e4f8ff; text-shadow:1px 1px 0 #1a1238, 0 0 6px rgba(120,210,255,.6); text-transform:uppercase; margin:0 0 3px; padding-bottom:3px;
+    border-bottom:2px solid rgba(127,224,255,.35);}
+  .live-now-head::before{content:''; width:7px; height:7px; background:#ff4a5a; box-shadow:0 0 6px #ff4a5a; animation:liveDot .9s ease-in-out infinite; flex:none;}
+  .live-now-pin .pill{display:flex; align-items:center; gap:6px; color:#d6f4ff; font-family:'VT323',monospace;
+    font-size:17px; line-height:1; letter-spacing:.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    text-shadow:1px 1px 0 #1a1238;}
+  .live-now-pin .pill .dot{width:6px; height:6px; border-radius:0; background:var(--platc,#e21212); flex:none;
+    box-shadow:0 0 5px var(--platc,#e21212); animation:liveDot .9s ease-in-out infinite;}
 
   /* ---------- banca de jornal (rua): toldo listrado + jornais em leque na bancada + placa de madeira
      pendurada, reaproveitando poste/toldo/balcão já usados na tenda e o mesmo esqueleto de placa das
@@ -2020,10 +2019,10 @@ const ROOMS = {
         <div class="hotspot door arch-stone" data-door="bldgSalaJogos" style="left:50%; bottom:0; transform:translateX(-50%);"><div class="glow"></div>
           <div class="arch-img"></div><div class="lbl">ENTRAR ▲</div></div>
       </div>
-      <div class="prop prop-cratestack" style="left:1140px;"></div>
-      <div class="prop prop-signpost" style="left:1200px;"></div>
+      <div class="prop prop-cratestack" style="left:1098px;"></div>
+      <div class="prop prop-signpost" style="left:1126px;"></div>
       <div class="cx-portal" data-tp="cinema" style="left:1298px;">
-        <div class="aura"></div><div class="lampL"></div><div class="lampR"></div>
+        <div class="aura"></div><div class="lampR"></div>
         <div class="cr c"></div><div class="cr a"></div><div class="cr b"></div><div class="fl l"></div><div class="fl r"></div>
         <div class="gate"></div><div class="pad"></div><i class="sp" style="left:52px; animation-delay:0.0s;"></i><i class="sp" style="left:72px; animation-delay:0.8s;"></i><i class="sp" style="left:92px; animation-delay:1.5s;"></i><i class="sp" style="left:110px; animation-delay:0.4s;"></i>
         <div class="sign s-cin">CINEMA DAS LIVES</div>
@@ -2929,9 +2928,8 @@ function renderLiveNowPin(){
   if (!aoVivo.length) return;
   const pin = document.createElement('div');
   pin.className = 'live-now-pin';
-  pin.innerHTML = '<div class="live-now-head">📡 AO VIVO</div>' + aoVivo.map(ch =>
-    '<div class="pill" style="--platc:' + (PLAT_COR[ch.plat] || '#e21212') + '"><span class="dot"></span>' +
-      (PLAT_ICON[ch.plat] || '🔴') + ' ' + ch.n + '</div>'
+  pin.innerHTML = '<div class="live-now-head">AO VIVO</div>' + aoVivo.map(ch =>
+    '<div class="pill" style="--platc:' + (PLAT_COR[ch.plat] || '#e21212') + '"><span class="dot"></span>' + esc(ch.n) + '</div>'
   ).join('');
   bldg.appendChild(pin);
 }
