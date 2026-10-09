@@ -2109,11 +2109,11 @@ const ROOMS = {
       <div class="wall cx-skybg"></div>
       <div class="cxp cx-stars" data-s="0" data-d="0" data-w="960" style="width:960px;"></div>
       <div class="cxp" data-s="0" data-d="0" data-w="960" style="width:960px;"><div class="sun-rua"></div><div class="moon-rua"></div><div class="clouds-rua"></div></div>
-      <div class="cxp cx-L cx-L1" data-s="0.01" data-d="3" data-w="720" style="width:1680px;"></div>
-      <div class="cxp cx-L cx-L2" data-s="0.03" data-d="5" data-w="288" style="width:1248px;"></div>
-      <div class="cxp cx-L cx-L3" data-s="0.07" data-d="7" data-w="360" style="width:1320px;"></div>
-      <div class="cxp cx-L cx-L4" data-s="0.14" data-d="9" data-w="720" style="width:1680px;"></div>
-      <div class="cxp cx-L cx-L5" data-s="0.05" data-d="11" data-w="324" style="width:1284px;"></div>
+      <div class="cxp cx-L cx-L1" data-s="0.01" data-d="0" data-w="720" style="width:1680px;"></div>
+      <div class="cxp cx-L cx-L2" data-s="0.03" data-d="14" data-w="288" style="width:1248px;"></div>
+      <div class="cxp cx-L cx-L3" data-s="0.07" data-d="0.8" data-w="360" style="width:1320px;"></div>
+      <div class="cxp cx-L cx-L4" data-s="0.14" data-d="0.4" data-w="720" style="width:1680px;"></div>
+      <div class="cxp cx-L cx-L5" data-s="0.05" data-d="26" data-w="324" style="width:1284px;"></div>
       <div class="cxp cx-L cx-L6" data-s="0.26" data-d="0" data-w="540" style="width:1500px;"></div>
       <div class="cxp" data-s="0" data-d="0" data-w="960" style="width:960px; overflow:hidden;"><i class="cx-bird" style="top:90px; animation-delay:0s,0s;"></i><i class="cx-bird" style="top:120px; animation-delay:-15s,0s;"></i><i class="cx-bird" style="top:70px; animation-delay:-31s,0s;"></i></div>
       <div class="cx-haze"></div>
@@ -2345,11 +2345,11 @@ const ROOMS = {
       <div class="room-bg"></div>
       <div class="wall cx-skybg"></div>
       <div class="cxp cx-stars" data-s="0" data-d="0" data-w="960" style="width:960px;"></div>
-      <div class="cxp cx-L cx-L1" data-s="0.01" data-d="3" data-w="720" style="width:1680px;"></div>
-      <div class="cxp cx-L cx-L2" data-s="0.03" data-d="5" data-w="288" style="width:1248px;"></div>
-      <div class="cxp cx-L cx-L3" data-s="0.07" data-d="7" data-w="360" style="width:1320px;"></div>
-      <div class="cxp cx-L cx-L4" data-s="0.14" data-d="9" data-w="720" style="width:1680px;"></div>
-      <div class="cxp cx-L cx-L5" data-s="0.05" data-d="11" data-w="324" style="width:1284px;"></div>
+      <div class="cxp cx-L cx-L1" data-s="0.01" data-d="0" data-w="720" style="width:1680px;"></div>
+      <div class="cxp cx-L cx-L2" data-s="0.03" data-d="14" data-w="288" style="width:1248px;"></div>
+      <div class="cxp cx-L cx-L3" data-s="0.07" data-d="0.8" data-w="360" style="width:1320px;"></div>
+      <div class="cxp cx-L cx-L4" data-s="0.14" data-d="0.4" data-w="720" style="width:1680px;"></div>
+      <div class="cxp cx-L cx-L5" data-s="0.05" data-d="26" data-w="324" style="width:1284px;"></div>
       <div class="cxp cx-L cx-L6" data-s="0.26" data-d="0" data-w="540" style="width:1500px;"></div>
       <div class="cxp" data-s="0" data-d="0" data-w="960" style="width:960px; overflow:hidden;"><i class="cx-bird" style="top:90px; animation-delay:0s,0s;"></i><i class="cx-bird" style="top:120px; animation-delay:-15s,0s;"></i><i class="cx-bird" style="top:70px; animation-delay:-31s,0s;"></i></div>
       <div class="cx-haze"></div>
@@ -2835,8 +2835,8 @@ window.cxCam = function(x){
   const tt = cxReduce ? 0 : performance.now() / 1000;
   for (let i = 0; i < cxLayers.length; i++) {
     const l = cxLayers[i], w = l._w, off = (((x * l._s + tt * l._d) % w) + w) % w;
-    const v = (x - Math.round(off));
-    if (v !== l._v) { l._v = v; l.style.transform = 'translate3d(' + v + 'px,0,0)'; }
+    const v = l._d >= 4 ? (x - off) : (x - Math.round(off));
+    if (v !== l._v) { l._v = v; l.style.transform = 'translate3d(' + (l._d >= 4 ? v.toFixed(2) : v) + 'px,0,0)'; }
   }
 };
 if (!cxReduce) (function cxDrift(){
