@@ -2122,14 +2122,18 @@ const ROOMS = {
       <div class="vtree vt-2" style="left:832px; width:186px; height:318px;"></div>
       <div class="vtree vt-1" style="left:1585px; width:187px; height:326px;"></div>
       <div class="vtree vt-2" style="left:1992px; width:184px; height:316px;"></div>
-      <div class="crossroads-sign" style="left:22px;">
-        <div class="post"></div>
-        <div class="arrow" data-goto="300" style="top:0px; transform:rotate(-8deg);">Biblioteca</div>
-        <div class="arrow" data-goto="660" style="top:38px; transform:rotate(6deg);">Ferreiro</div>
-        <div class="arrow" data-goto="990" style="top:76px; transform:rotate(-5deg);">Saloon</div>
-        <div class="arrow" data-goto="1378" style="top:114px; transform:rotate(8deg);">Cinema</div>
-        <div class="arrow" data-goto="1780" style="top:152px; transform:rotate(-4deg);">Tenda</div>
-        <div class="arrow" data-goto="2150" style="top:190px; transform:rotate(7deg);">Locadora</div>
+      <div class="crossroads-sign cs2" style="left:14px;">
+        <div class="post"></div><div class="cs-base"></div>
+        <div class="cs-title" role="img" aria-label="iamT World, Cidade dos Lugares"><i class="cs-lamp l1"></i><i class="cs-lamp l2"></i><b>iamT WORLD</b><span>Cidade dos Lugares</span></div>
+        <div class="arrow" role="button" tabindex="0" data-goto="300" style="top:66px; --ac:#e8b84a; transform:rotate(-2deg);">Biblioteca</div>
+        <div class="arrow" role="button" tabindex="0" data-goto="660" style="top:100px; --ac:#ff8a3c; transform:rotate(2deg);">Ferreiro</div>
+        <div class="arrow" role="button" tabindex="0" data-goto="990" style="top:134px; --ac:#c46af0; transform:rotate(-2deg);">Saloon</div>
+        <div class="arrow" role="button" tabindex="0" data-goto="1378" style="top:168px; --ac:#ff4a4a; transform:rotate(2deg);">Cinema</div>
+        <div class="arrow" role="button" tabindex="0" data-goto="1780" style="top:202px; --ac:#4fcf6a; transform:rotate(-2deg);">Tenda</div>
+        <div class="arrow" role="button" tabindex="0" data-goto="2150" style="top:236px; --ac:#4f9bff; transform:rotate(2deg);">Locadora</div>
+      </div>
+      <div class="avisos-board" role="button" tabindex="0" aria-label="Quadro de Avisos" style="left:186px;">
+        <div class="legs"></div><div class="bd"><div class="hd">AVISOS</div><i class="pp p1"></i><i class="pp p2"></i><i class="pp p3"></i></div><span class="bg">0</span>
       </div>
       <i class="vb-sh" style="left:136px; width:316px; bottom:128px;"></i>
       <div class="vb vb-bib" style="left:144px; width:300px; height:258px; bottom:136px;">
@@ -4282,7 +4286,7 @@ world.addEventListener('click', (e) => {
    clique não caiu em nenhum elemento interativo específico (porta, banca, correio, estação,
    livro/fita, seta da placa) — esses já tratam o próprio clique e retornam antes de chegar aqui. */
 world.addEventListener('click', (e) => {
-  if (e.target.closest('.hotspot, .newsstand, .mailbox, .game-table, .forge-station, .media-station, .book[data-tape], .crossroads-sign .arrow, .npc')) return;
+  if (e.target.closest('.hotspot, .newsstand, .mailbox, .game-table, .forge-station, .media-station, .book[data-tape], .crossroads-sign .arrow, .avisos-board, .npc')) return;
   const p = toLocal(e.clientX, e.clientY);
   const x = p.x + camX;
   const y = p.y;
@@ -8251,24 +8255,7 @@ function createShinobi(assets,done){
   const WPOOL = { espada:['w13','w26','w23','w31','w14','w34','w02','w22','w11','w12','w30','w29'], machado:['w16','w08','w36','w10','w09'], martelo:['w33','w38','w15','w18'], cajado:['w39','w07','w06','w25','w24'], tocha:['w28','w40','w21'] };
   const FX2AURA = { fire:'fogo', ice:'gelo', void:'sombra', glow:'sagrada', aurora:'cosmica', rainbow:'vento' };
   function palEnsure(key){ const id = 'x_' + key; if (rig.pal[id]) return id; const p = PAL[key] || PAL.iron; rig.pal[id] = { d:HEX(p.d), m:HEX(p.m), l:HEX(p.l), a:HEX(p.a) }; return id; }
-  function toShinobi(eq){
-    const e = { outfit:'orig', hair:'orig', head:'none', back:'none', aura:'none', weapon:'none', top:'none', pants:'none', shoes:'none', face:'none' };
-    if (!rig) return e;
-    const g = s => eq && eq[s] ? ITEM_BY_ID[eq[s]] : null;
-    const c = g('chest'); if (c) e.top = palEnsure(c.pal);
-    const l = g('legs'); if (l) { e.pants = palEnsure(l.pal); e.shoes = e.pants; }
-    const h = g('helm');
-    if (h) {
-      if (h.shape === 'elmo' || h.shape === 'crista' || h.shape === 'chifres') e.head = 'kabuto';
-      else if (h.shape === 'mago') e.head = 'palha';
-      else if (h.shape === 'coroa') e.head = 'band_ouro';
-      else { const p = PAL[h.pal] || PAL.iron, k = 'hb_' + h.pal; if (!SH_BANDS[k]) SH_BANDS[k] = { c:p.m, d:p.d, t:p.l, e:p.a }; e.head = k; }
-    }
-    const b = g('back'); if (b) { if (b.shape === 'capa') e.back = (b.pal === 'royal' || b.pal === 'void' || b.pal === 'midnight') ? 'capaV' : 'capaR'; else e.aura = 'sagrada'; }
-    const w = g('weapon'); if (w) { const pool = WPOOL[w.shape] || WPOOL.espada; e.weapon = pool[hashStr(w.id) % pool.length]; }
-    const fx = (w && w.fx) || (h && h.fx) || (c && c.fx) || (b && b.fx) || ''; if (FX2AURA[fx]) e.aura = FX2AURA[fx];
-    return e;
-  }
+  function toShinobi(){ return shEq(); }
 
   /* ----- montagem do canvas dentro dos avatares (herói, floresta, inventário) ----- */
   const FPS = { idle:6, walk:10, run:13, attack:11 };
@@ -8368,7 +8355,7 @@ function createShinobi(assets,done){
   /* ----- laço de desenho ----- */
   let lastDraw = 0;
   function stateOf(m, now){
-    if (m.kind === 'inv') return { anim:'idle', f:Math.floor((now / 1000) * FPS.idle) % 6, off:0 };
+    if (m.kind === 'inv') { if (m.demo && now < m.demo) return { anim:'attack', f:Math.min(4, Math.floor((1 - (m.demo - now) / (5 / FPS.attack * 1000)) * 5)), off:0 }; return { anim:'idle', f:Math.floor((now / 1000) * FPS.idle) % 6, off:0 }; }
     const dt = Math.min(.05, (now - (m.lt || now)) / 1000); m.lt = now;
     let anim = 'idle', f = 0, off = 0, moving = false, atkNow = false;
     if (m.kind === 'main') moving = !!(player.walking && player.mode !== 'idle');
@@ -8403,7 +8390,241 @@ function createShinobi(assets,done){
     const pv = document.getElementById('invPv'); if (pv) shMount(pv);
     shRefresh(); requestAnimationFrame(loop);
   });
+  /* =====================================================================
+     INVENTÁRIO NOVO — itens do Shinobi (roupa, cabelo, cabeça, rosto, aura, arma) + pets.
+     Sem drops por enquanto: tudo liberado (UNLOCK_ALL). Para ativar drops depois: UNLOCK_ALL=false e preencher GS.sh.own[slot+':'+id].
+     ===================================================================== */
+  const UNLOCK_ALL = true;
+  const BASE = { outfit:'orig', hair:'orig', head:'none', back:'none', aura:'none', weapon:'none', top:'none', pants:'none', shoes:'none', face:'none' };
+  const DEFAULTS = { outfit:'orig', hair:'orig', head:'none', face:'none', aura:'none', weapon:'none' };
+  const STAT_KEY = { Velocidade:'vel', Tempo:'tempo', Dicas:'dica', Vidas:'vida', Sorte:'sorte' };
+  const RARS = ['comum', 'raro', 'epico', 'lendario'];
+  const ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+  const WT = {}; const WNAME = { espada:'Espada', machado:'Machado', martelo:'Martelo', cajado:'Cajado', tocha:'Tocha' };
+  Object.keys(WPOOL).forEach(k => WPOOL[k].forEach((id, i) => { WT[id] = WNAME[k] + ' ' + ROMAN[i]; }));
+  const WLIST = [{ id:'none', n:'Desarmado' }];
+  Object.keys(WPOOL).forEach(k => WPOOL[k].forEach(id => WLIST.push({ id, n:WT[id] })));
+  for (let i = 1; i <= 40; i++) { const id = 'w' + String(i).padStart(2, '0'); if (!WT[id]) WLIST.push({ id, n:'Arma ' + String(i).padStart(2, '0') }); }
+  function mkItem(slot, o) {
+    const stars = (o.n.match(/★/g) || []).length, b = o.b && o.b !== '—' ? o.b : '';
+    return { slot, id:o.id, nome:o.n.replace(/\s*★.*$/, ''), rar:RARS[Math.min(3, stars)], bt:b, stat:b ? STAT_KEY[b.replace('+', '')] || null : null, def:o.id === DEFAULTS[slot] };
+  }
+  const CAT = [
+    ['outfit', 'Roupa', SH_OUTFITS], ['hair', 'Cabelo', SH_HAIRS], ['head', 'Cabeça', SH_HEADS],
+    ['face', 'Rosto', SH_FACES], ['aura', 'Aura', SH_AURAS], ['weapon', 'Arma', WLIST]
+  ].map(([slot, label, list]) => ({ slot, label, items:list.map(o => mkItem(slot, o)) }));
+  const CATS = {}; CAT.forEach(c => { CATS[c.slot] = c; });
+  GS.sh = GS.sh || {}; GS.sh.eq = Object.assign({}, DEFAULTS, GS.sh.eq || {}); GS.sh.own = GS.sh.own || {};
+  CAT.forEach(c => { if (!c.items.some(i => i.id === GS.sh.eq[c.slot])) GS.sh.eq[c.slot] = DEFAULTS[c.slot]; });
+  /* migração única: some o inventário antigo (itens/equip) — pets ficam liberados */
+  if (!GS.events.inv_v2) { GS.events.inv_v2 = 1; GS.owned = {}; GS.equip = {}; }
+  ITEMS.filter(i => i.slot === 'pet').forEach(p => { if (!GS.owned[p.id]) GS.owned[p.id] = 1; });
+  gsSave();
+  const shEq = () => Object.assign({}, BASE, GS.sh.eq);
+  const isOwned = (slot, id) => UNLOCK_ALL || DEFAULTS[slot] === id || !!GS.sh.own[slot + ':' + id];
+  const curItem = slot => CATS[slot].items.find(i => i.id === GS.sh.eq[slot]);
+  /* bônus */
+  const AURA_FX = { fogo:'fire', gelo:'ice', sombra:'void', sagrada:'glow', cosmica:'void', raio:'glow' };
+  totals = function () {
+    const t = { vel:0, dica:0, vida:0, tempo:0, sorte:0 };
+    CAT.forEach(c => { const it = curItem(c.slot); if (it && it.stat) t[it.stat] += RAR_PTS[it.rar]; });
+    const p = GS.equip && GS.equip.pet && ITEM_BY_ID[GS.equip.pet]; if (p && p.pst) t[p.pst] += RAR_PTS[p.rar];
+    return t;
+  };
+  hasFx = function (fx) { const p = GS.equip && GS.equip.pet && ITEM_BY_ID[GS.equip.pet]; return AURA_FX[GS.sh.eq.aura] === fx || !!(p && p.fx === fx); };
+  grantItem = function () { return false; };      /* sem drops por enquanto */
+  bonusDrop = function () { return false; };
+  if (typeof applyStats === 'function') applyStats();
+
+  /* miniaturas (renderizadas pelo próprio rig) */
+  const thumbs = {};
+  function thumbCanvas(slot, it) {
+    const key = slot + ':' + it.id; if (thumbs[key]) return thumbs[key];
+    const out = document.createElement('canvas'); out.width = 130; out.height = 130; const g = out.getContext('2d'); g.imageSmoothingEnabled = false;
+    if (slot === 'weapon' && it.id !== 'none' && rig.wicons[it.id]) { const ic = rig.wicons[it.id]; g.drawImage(ic, 0, 0, ic.width || 32, ic.height || 32, 1, 1, 128, 128); }
+    else {
+      const tmp = document.createElement('canvas'); tmp.width = 256; tmp.height = 200; rig.render('idle', 0, 1.2, Object.assign({}, BASE, { [slot]:it.id }), tmp.getContext('2d'));
+      const M = rig.metrics.idle[0], H = M.maxY - M.minY + 1, cx = 64 + M.cx; let side = H + 12, cy = 40 + (M.minY + M.maxY) / 2;
+      if (slot === 'head' || slot === 'face' || slot === 'hair') { side = Math.round(H * 0.5); cy = 40 + M.minY + H * 0.25; }
+      g.drawImage(tmp, Math.round(cx - side / 2), Math.round(cy - side / 2), side, side, 0, 0, 130, 130);
+    }
+    return (thumbs[key] = out);
+  }
+  function cloneThumb(src, px) { const c = document.createElement('canvas'); c.width = 130; c.height = 130; c.getContext('2d').drawImage(src, 0, 0); c.style.width = c.style.height = px + 'px'; return c; }
+  const st = document.createElement('style');
+  st.textContent = '.inv-tabs{flex-wrap:wrap}.inv-tab{flex:1 1 auto;font-size:15px;padding:5px 6px}.inv-slots{grid-template-columns:repeat(7,1fr)!important}.inv-slot canvas{image-rendering:pixelated}.inv-note{font-size:12px;color:#8a7b9e;margin-top:4px;line-height:1.15}.inv-grid{grid-template-columns:repeat(4,1fr)!important}.inv-item .bn{font-size:11px;color:#8fc77a;line-height:1}';
+  document.head.appendChild(st);
+  let tab = 'outfit';
+  const PETS = () => ITEMS.filter(i => i.slot === 'pet').sort((a, b) => RAR_ORD[a.rar] - RAR_ORD[b.rar]);
+  function chooseItem(slot, it) {
+    GS.sh.eq[slot] = (GS.sh.eq[slot] === it.id && !it.def) ? DEFAULTS[slot] : it.id;
+    gsSave(); shRefresh(); if (typeof applyStats === 'function') applyStats();
+    if (slot === 'weapon' && GS.sh.eq.weapon !== 'none') mounts.forEach(m => { if (m.kind === 'inv') m.demo = performance.now() + 5 / FPS.attack * 1000; });
+    renderInv();
+  }
+  renderInv = function () {
+    const pv = document.getElementById('invPv');
+    if (pv && rig && (!pv.querySelector('.sh-cv') || !pv.classList.contains('sh-on'))) shMount(pv);
+    shRefresh();
+    const slots = document.getElementById('invSlots'), tabs = document.getElementById('invTabs'), grid = document.getElementById('invGrid'), stats = document.getElementById('invStats');
+    if (!rig || !rig.ready) { grid.innerHTML = '<div style="color:#bdb3d8;padding:10px">Carregando o Shinobi…</div>'; setTimeout(() => { if (invOpen) renderInv(); }, 400); return; }
+    const all = CAT.map(c => ({ slot:c.slot, label:c.label })).concat([{ slot:'pet', label:'Pet' }]);
+    slots.innerHTML = '';
+    all.forEach(s => {
+      const d = mkEl('div', { className:'inv-slot' + (tab === s.slot ? ' sel' : '') });
+      if (s.slot === 'pet') { const id = GS.equip && GS.equip.pet, p = id && ITEM_BY_ID[id]; if (p) { d.style.borderColor = RAR_COR[p.rar]; d.appendChild(itemThumb(p, 32)); d.title = p.nome; } }
+      else { const it = curItem(s.slot); if (it && !it.def) { d.style.borderColor = RAR_COR[it.rar]; d.appendChild(cloneThumb(thumbCanvas(s.slot, it), 36)); d.title = it.nome; } }
+      d.appendChild(mkEl('span', { className:'lbl' }, s.label));
+      d.addEventListener('click', () => { tab = s.slot; renderInv(); });
+      slots.appendChild(d);
+    });
+    tabs.innerHTML = '';
+    all.forEach(s => { const b = mkEl('button', { className:'inv-tab' + (tab === s.slot ? ' on' : '') }, s.label); b.addEventListener('click', () => { tab = s.slot; renderInv(); }); tabs.appendChild(b); });
+    grid.innerHTML = '';
+    if (tab === 'pet') {
+      PETS().forEach(p => {
+        const on = GS.equip && GS.equip.pet === p.id, d = mkEl('div', { className:'inv-item' + (on ? ' eq-on' : '') });
+        d.style.setProperty('--rar', RAR_COR[p.rar]); d.appendChild(itemThumb(p, 48));
+        d.appendChild(mkEl('div', { className:'nm' }, esc(p.nome))); d.appendChild(mkEl('div', { className:'bn' }, '+' + STAT_INFO[p.pst].n));
+        d.addEventListener('click', () => equipToggle(p.id)); grid.appendChild(d);
+      });
+    } else {
+      CATS[tab].items.forEach(it => {
+        const own = isOwned(tab, it.id), on = GS.sh.eq[tab] === it.id;
+        const d = mkEl('div', { className:'inv-item' + (own ? '' : ' locked') + (on ? ' eq-on' : '') });
+        d.style.setProperty('--rar', RAR_COR[it.rar]);
+        d.appendChild(cloneThumb(thumbCanvas(tab, it), 48));
+        d.appendChild(mkEl('div', { className:'nm' }, esc(own ? it.nome : '???')));
+        d.appendChild(mkEl('div', { className:'rr' }, it.def ? 'padrão' : it.rar));
+        if (it.bt) d.appendChild(mkEl('div', { className:'bn' }, esc(it.bt)));
+        d.title = on && !it.def ? 'Clique para tirar' : 'Clique para equipar';
+        if (own) d.addEventListener('click', () => chooseItem(tab, it));
+        grid.appendChild(d);
+      });
+    }
+    const t = totals(); let bs = '';
+    Object.keys(STAT_INFO).forEach(k => { if (t[k]) bs += '<br>' + STAT_INFO[k].ic + ' <b>' + STAT_INFO[k].n + ':</b> +' + t[k]; });
+    const nItens = CAT.reduce((n, c) => n + c.items.filter(i => !i.def).length, 0) + PETS().length;
+    stats.innerHTML = '<b>Tempo no mundo:</b> ' + Math.floor(GS.t / 60) + ' min<br><b>Itens liberados:</b> ' + nItens + (bs ? '<br><b>Bônus ativos:</b>' + bs : '<br><b>Bônus ativos:</b> nenhum') +
+      '<div class="inv-note">A arma aparece quando você ataca (botão direito).</div>';
+  };
+
   window.__sh = { toShinobi, mounts, rig: () => rig };
+})();
+
+/* ---------- PLACA DA CIDADE (polida) + QUADRO DE AVISOS ---------- */
+(function(){
+  const css = document.createElement('style');
+  css.textContent = `
+  .crossroads-sign.cs2{width:136px; height:316px; z-index:6;}
+  .cs2 .post{left:20px !important; transform:none !important; width:14px !important; border-radius:2px 2px 0 0 !important;}
+  .cs2 .cs-base{position:absolute; left:6px; bottom:-6px; width:42px; height:14px; border-radius:50% 50% 30% 30%/60% 60% 40% 40%;
+    background:linear-gradient(180deg,#8d8a92,#5a5760); box-shadow:0 3px 4px rgba(0,0,0,.5), inset 0 2px 0 rgba(255,255,255,.18);}
+  .cs2 .cs-base::after{content:""; position:absolute; left:6px; top:-4px; width:12px; height:5px; border-radius:50%; background:#4f8a3c; box-shadow:14px 1px 0 #3e7230;}
+  .cs2 .cs-title{position:absolute; left:2px; top:0; width:132px; height:52px; box-sizing:border-box; text-align:center; padding-top:6px;
+    font-family:'VT323',monospace; color:#ffe39a; letter-spacing:1px;
+    background:repeating-linear-gradient(90deg,rgba(0,0,0,.16) 0 2px,transparent 2px 8px),linear-gradient(180deg,#5a3a1c,#3a2410);
+    border:2px solid #1c1208; border-radius:5px; box-shadow:0 4px 6px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,214,130,.3);}
+  .cs2 .cs-title b{display:block; font-size:24px; line-height:20px; font-weight:400; text-shadow:0 2px 0 #000, 0 0 8px rgba(255,200,90,.45);}
+  .cs2 .cs-title span{display:block; margin-top:3px; font-size:13px; line-height:12px; color:#e9d8b0; letter-spacing:.8px; white-space:nowrap; text-transform:uppercase;}
+  .cs2 .cs-title::before,.cs2 .cs-title::after{content:""; position:absolute; top:-9px; width:3px; height:10px; background:#2a1a0c;}
+  .cs2 .cs-title::before{left:20px;} .cs2 .cs-title::after{right:20px;}
+  .cs2 .cs-lamp{position:absolute; top:-26px; width:12px; height:16px; border-radius:3px 3px 5px 5px; background:#ffd470; border:2px solid #2a1a0c; box-sizing:border-box;
+    box-shadow:0 0 14px 6px rgba(255,190,80,.5); animation:csFlick 2.6s ease-in-out infinite;}
+  .cs2 .cs-lamp.l1{left:16px;} .cs2 .cs-lamp.l2{right:16px; animation-delay:-1.3s;}
+  @keyframes csFlick{0%,100%{box-shadow:0 0 14px 6px rgba(255,190,80,.5);} 45%{box-shadow:0 0 18px 8px rgba(255,200,100,.65);} 70%{box-shadow:0 0 10px 4px rgba(255,170,60,.4);}}
+  .cs2 .arrow{left:8px !important; width:122px !important; max-width:none !important; height:30px !important; padding:0 22px 0 10px !important; font-size:19px !important; letter-spacing:.8px !important;
+    color:#fbefd0 !important; outline:none; transition:transform .12s ease, filter .12s ease;
+    clip-path:polygon(0 0,86% 0,100% 50%,86% 100%,0 100%) !important;}
+  .cs2 .arrow::before{content:""; flex:0 0 8px; height:8px; margin-right:7px; background:var(--ac,#e8c060); box-shadow:0 0 0 1px rgba(0,0,0,.6), 0 0 6px var(--ac,#e8c060);}
+  .cs2 .arrow:hover,.cs2 .arrow:focus-visible{transform:translateX(4px) rotate(0deg) !important; filter:brightness(1.25);}
+  .cs2 .arrow:focus-visible{box-shadow:0 0 0 2px #ffd24d;}
+  .cs2 .arrow .tg{margin-left:auto; padding:0 4px; font-size:12px; line-height:13px; letter-spacing:.4px; border-radius:2px; color:#fff; background:#d12b2b; text-shadow:none; animation:csPulse 1.4s ease-in-out infinite;}
+  .cs2 .arrow .tg.mk{background:#8a5fd0;}
+  @keyframes csPulse{50%{opacity:.55;}}
+  .avisos-board{position:absolute; bottom:20%; width:132px; height:150px; z-index:6; cursor:pointer; outline:none;}
+  .rv .avisos-board{bottom:140px;}
+  .avisos-board .legs{position:absolute; left:14px; right:14px; bottom:0; height:62px;
+    background:linear-gradient(90deg,#3a2410 0 12px,transparent 12px calc(100% - 12px),#3a2410 calc(100% - 12px));}
+  .avisos-board .bd{position:absolute; left:0; top:0; width:132px; height:96px; box-sizing:border-box; border:3px solid #1c1208; border-radius:4px;
+    background:repeating-linear-gradient(90deg,rgba(0,0,0,.13) 0 2px,transparent 2px 9px),linear-gradient(180deg,#9a6a3a,#6f4826);
+    box-shadow:0 5px 8px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,220,160,.18); transition:transform .12s ease, filter .12s ease;}
+  .avisos-board:hover .bd,.avisos-board:focus-visible .bd{transform:translateY(-2px); filter:brightness(1.15);}
+  .avisos-board:focus-visible .bd{box-shadow:0 0 0 3px #ffd24d, 0 5px 8px rgba(0,0,0,.5);}
+  .avisos-board .hd{position:absolute; left:-3px; right:-3px; top:-18px; height:20px; text-align:center; font:400 16px/20px 'VT323',monospace; letter-spacing:1.5px; color:#ffe39a;
+    background:linear-gradient(180deg,#5a3a1c,#3a2410); border:2px solid #1c1208; border-radius:4px; text-shadow:0 1px 0 #000;}
+  .avisos-board .pp{position:absolute; width:34px; height:40px; background:#efe4c4; box-shadow:0 2px 3px rgba(0,0,0,.4); border-top:3px solid #c9b78a;}
+  .avisos-board .pp::before{content:""; position:absolute; left:5px; right:5px; top:8px; height:2px; background:#8a7a56; box-shadow:0 6px 0 #8a7a56, 0 12px 0 #8a7a56, 0 18px 0 #8a7a56;}
+  .avisos-board .pp::after{content:""; position:absolute; left:50%; top:-5px; width:6px; height:6px; margin-left:-3px; border-radius:50%; background:#d12b2b; box-shadow:0 1px 0 #000;}
+  .avisos-board .p1{left:8px; top:14px; transform:rotate(-5deg);} .avisos-board .p2{left:48px; top:10px; transform:rotate(3deg); background:#f6edd2;} .avisos-board .p3{left:88px; top:16px; transform:rotate(-2deg);}
+  .avisos-board .bg{position:absolute; right:-8px; top:-30px; min-width:20px; height:20px; padding:0 5px; box-sizing:border-box; border-radius:10px; background:#d12b2b; color:#fff; font:400 15px/18px 'VT323',monospace; text-align:center; border:2px solid #1c1208; display:none;}
+  .avisos-board.has .bg{display:block; animation:csPulse 1.4s ease-in-out infinite;}
+  #avPanel .xbox{width:min(560px,94%);}
+  #avBody{padding:12px 14px 14px; max-height:360px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;}
+  .av-card{display:flex; gap:10px; align-items:flex-start; padding:8px 10px; background:#0d0816; border:2px solid #3a2a55; border-left:5px solid var(--ac,#8a5fd0); border-radius:6px;}
+  .av-card .ic{font-size:24px; line-height:1; flex:0 0 28px; text-align:center;}
+  .av-card h4{margin:0 0 2px; font-size:19px; font-weight:400; color:#fff; letter-spacing:.4px;}
+  .av-card p{margin:0; font-size:16px; line-height:1.15; color:#bdb3d8;}
+  .av-card a{color:#9ad0ff; text-decoration:none;} .av-card a:hover{text-decoration:underline;}
+  .av-card.hot{border-color:#ffd24d;}
+  .av-date{font-size:17px; color:#d8cfee; padding:0 2px 2px;}
+  @media (prefers-reduced-motion:reduce){.cs-lamp,.tg,.avisos-board .bg{animation:none !important;}}
+  `;
+  document.head.appendChild(css);
+
+  const panel = mkEl('div', { id:'avPanel', className:'xpanel' }, '<div class="xback"></div><div class="xbox"><button class="xclose" aria-label="Fechar">✕</button><div class="xhead">📜 Quadro de Avisos</div><div id="avBody"></div></div>');
+  stage.appendChild(panel);
+  const hide = () => panel.classList.remove('show');
+  panel.addEventListener('click', e => { if (e.target.classList.contains('xback') || e.target.classList.contains('xclose')) hide(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hide(); });
+
+  const fmtDia = n => new Date(n * 86400000).toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', timeZone:'UTC' });
+  function notices() {
+    const L = [];
+    try { const on = (typeof CANAIS_CINEMA !== 'undefined' ? CANAIS_CINEMA : []).filter(c => c.live);
+      L.push(on.length ? { ic:'📺', ac:'#e21212', hot:1, t:'Cinema — ao vivo agora', h:on.map(c => esc(c.n)).join(', ') + '. Entre pelo portal do Cinema e escolha o canal.' }
+                       : { ic:'📺', ac:'#6a6a7a', t:'Cinema', h:'Nenhuma live no momento. A lista atualiza sozinha a cada poucos minutos.' }); } catch (e) {}
+    try { const m = estadoMercado();
+      if (m.hoje) L.push({ ic:'🛒', ac:'#8a5fd0', hot:1, t:'Mercado Misterioso — aberto hoje', h:'O Mercador Sem Rosto está na cidade e some à meia-noite. Procure-o na Tenda.' });
+      else if (m.vespera) L.push({ ic:'🛒', ac:'#8a5fd0', hot:1, t:'Mercado Misterioso — amanhã', h:'Boatos de que o Mercador Sem Rosto chega amanhã.' });
+      else { const t = dnum(dayKey()), seg = segunda(t), m0 = diaMercado(seg), nx = m0 > t ? m0 : diaMercado(seg + 7);
+        L.push({ ic:'🛒', ac:'#8a5fd0', t:'Mercado Misterioso', h:'Próxima visita do Mercador Sem Rosto: ' + fmtDia(nx) + '.' }); } } catch (e) {}
+    try { if (luaCheia()) L.push({ ic:'🌕', ac:'#cfd8ff', hot:1, t:'Lua cheia', h: luaAberta() ? 'A noite está aberta: as dungeons noturnas estão disponíveis agora.' : 'As dungeons noturnas abrem a partir das 18h.' });
+      else L.push({ ic:'🌙', ac:'#cfd8ff', t:'Lua', h:'Lua cheia em ' + diasAteCheia() + (diasAteCheia() === 1 ? ' dia' : ' dias') + ' · iluminação ' + iluminacao() + '%.' }); } catch (e) {}
+    try { const d = dataHoje(); if (d) L.push({ ic:d.d.em, ac:'#ffb42e', hot:1, t:d.d.nome, h:'Data comemorativa! Procure o presente perto da banca de jornal.' }); } catch (e) {}
+    return L;
+  }
+  function renderNotices() {
+    const body = document.getElementById('avBody');
+    const hoje = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', timeZone:'America/Sao_Paulo' });
+    body.innerHTML = '<div class="av-date">Hoje · ' + esc(hoje) + '</div>' + notices().map(n =>
+      '<div class="av-card' + (n.hot ? ' hot' : '') + '" style="--ac:' + n.ac + '"><div class="ic">' + n.ic + '</div><div><h4>' + n.t + '</h4><p>' + n.h + '</p></div></div>').join('') +
+      '<div class="av-card" id="avNews" style="--ac:#4f9bff"><div class="ic">📰</div><div><h4>Últimas notícias</h4><p>Carregando…</p></div></div>';
+    fetch('https://iamtgames.github.io/colecao/news.json', { cache:'no-store' }).then(r => { if (!r.ok) throw 0; return r.json(); }).then(j => {
+      const it = (Array.isArray(j.items) ? j.items : []).slice(0, 3); const el = document.getElementById('avNews'); if (!el) return;
+      el.querySelector('p').innerHTML = it.length ? it.map(n => '• <a href="' + esc(n.link) + '" target="_blank" rel="noopener noreferrer">' + esc(n.title) + '</a>').join('<br>') : 'Sem notícias agora.';
+    }).catch(() => { const el = document.getElementById('avNews'); if (el) el.querySelector('p').textContent = 'Não foi possível carregar agora. A banca de jornal tem a lista completa.'; });
+  }
+  function openAvisos() { if (typeof hideMapPanel === 'function') hideMapPanel(); renderNotices(); panel.classList.add('show'); }
+  window.openAvisos = openAvisos;
+  world.addEventListener('click', e => { if (e.target.closest('.avisos-board')) { e.stopPropagation(); openAvisos(); } });
+  document.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.cs2 .arrow, .avisos-board')) { e.preventDefault(); e.target.click(); }
+  });
+
+  /* selos dinâmicos: AO VIVO no Cinema, MERCADO na Tenda, contador de avisos no quadro */
+  function paint() {
+    if (typeof currentRoomId === 'undefined' || currentRoomId !== 'rua') return;
+    const tag = (sel, cls, txt, on) => { const a = document.querySelector(sel); if (!a) return; let t = a.querySelector('.tg'); if (!on) { if (t) t.remove(); return; } if (!t) { t = document.createElement('span'); t.className = 'tg ' + cls; a.appendChild(t); } t.textContent = txt; };
+    let live = false, mk = false;
+    try { live = CANAIS_CINEMA.some(c => c.live); } catch (e) {}
+    try { mk = estadoMercado().hoje; } catch (e) {}
+    tag('.cs2 .arrow[data-goto="1378"]', '', 'AO VIVO', live);
+    tag('.cs2 .arrow[data-goto="1780"]', 'mk', 'MERCADO', mk);
+    const b = document.querySelector('.avisos-board'); if (b) { const n = notices().filter(x => x.hot).length; b.classList.toggle('has', n > 0); const g = b.querySelector('.bg'); if (g) g.textContent = n; }
+  }
+  setInterval(paint, 4000); setTimeout(paint, 600);
+  window.__avPaint = paint;
 })();
 
 /*EXTRAS_JS_END*/
