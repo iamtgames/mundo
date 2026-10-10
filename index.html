@@ -46,7 +46,7 @@
      Com isso aqui o conteúdo do mundo (portas, banca, correio, estações...) passa a ficar acima
      do #floorclick, que só continua funcionando pro clique-pra-andar genérico (ver fallback de
      clique abaixo, registrado por último no #world). */
-  #world{position:absolute; top:0; left:0; height:100%; will-change:transform; z-index:10;}
+  #world{position:absolute; top:0; left:0; height:100%; will-change:transform; z-index:10; transform-origin:0 0;}
   #roomlayer{position:absolute; inset:0;}
 
   /* ---------- cena base: quarto/sala estilo VGA pintado (reaproveitado por cômodo) ----------
@@ -2226,10 +2226,14 @@ const world = document.getElementById('world');
    nunca do tamanho real da janela. viewScale só existe pra converter coordenadas de
    clique/mouse (que chegam em pixels REAIS de tela) de volta pra essa régua fixa. */
 const STAGE_W = 960, STAGE_H = 540;
-let viewScale = 1;
+let viewScale = 1, baseScale = 1, camZoom = 1, camY = 0;
 function fitStage(){
-  viewScale = Math.min(window.innerWidth / STAGE_W, window.innerHeight / STAGE_H);
-  stage.style.transform = 'scale(' + viewScale + ')';
+  baseScale = Math.min(window.innerWidth / STAGE_W, window.innerHeight / STAGE_H);
+  viewScale = baseScale * camZoom;   // escala EFETIVA: toda a matemática de clique/retângulo continua valendo com zoom
+  stage.style.transform = 'scale(' + baseScale + ')';
+}
+function applyCam(){
+  world.style.transform = 'translate3d(' + (-Math.round(camX * camZoom)) + 'px,' + (-Math.round(camY * camZoom)) + 'px,0) scale(' + camZoom + ')';
 }
 fitStage();
 window.addEventListener('resize', fitStage);
@@ -3699,6 +3703,7 @@ function sfxPortal(up){
 }
 function cxTpGo(t){
   tpBusy = true; tpArmed = false;
+  try { CAMX.hardReset(); } catch (e) {}
   keys.up = keys.down = keys.left = keys.right = false;
   player.mode = 'idle'; player.walking = false; player.targetX = player.x; player.targetY = player.y;
   avatar.classList.remove('walking');
@@ -3714,7 +3719,7 @@ function cxTpGo(t){
     player.x = t.toX; player.targetX = t.toX; player.y = (t.toY || CX_PAD_Y); player.targetY = (t.toY || CX_PAD_Y);
     player.mode = 'idle'; player.walking = false;
     camX = Math.max(0, Math.min(t.toX - STAGE_W / 2, Math.max(0, WORLD_W - STAGE_W)));
-    world.style.transform = 'translateX(' + (-camX) + 'px)';
+    applyCam();
     avatar.style.left = (player.x - 36.5) + 'px'; avatar.style.top = (player.y - 78) + 'px';
     try { window.cxCam(camX); } catch (e) {}
     cv.style.left = camX + 'px'; px = player.x - camX; py = player.y; tpBuild(px, py);
@@ -4549,10 +4554,11 @@ function enterRoom(targetId, spawnSide){
     const spawnX = typeof spawnSide === 'number' ? spawnSide : (spawnSide === 'left' ? 90 : WORLD_W - 90);
     player.x = spawnX; player.targetX = spawnX;
     player.y = bounds.maxY - 10; player.targetY = player.y;
-    player.mode = 'idle'; player.walking = false;
+    player.mode = 'idle'; player.walking = false; player.vx = 0; player.vy = 0;
+    try { CAMX.hardReset(); CAMX.open(1.5); } catch (e) {}
     const vw = STAGE_W;
     camX = Math.max(0, Math.min(spawnX - vw / 2, Math.max(0, WORLD_W - vw)));
-    world.style.transform = 'translateX(' + (-camX) + 'px)';
+    applyCam();
     fadeEl.classList.remove('show');
   }, 260);
 }
@@ -4569,7 +4575,7 @@ const player = {
   x: 0, y: 0, targetX: 0, targetY: 0,
   dir: 1, walking: false, mode: 'idle',
   phase: 0, idleT: 0, lastFootBucket: 0,
-  speed: 250,
+  speed: 250, vx: 0, vy: 0,
 };
 let onArriveCb = null;
 let lastTs = null;
@@ -4683,46 +4689,196 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keyup', (e) => { const k = KEYMAP[e.key.toLowerCase()]; if (k) keys[k] = false; });
 window.addEventListener('blur', () => { keys.up = keys.down = keys.left = keys.right = false; });
 
-function tick(ts){
-  if (lastTs === null) lastTs = ts;
-  const dt = Math.min(0.05, (ts - lastTs) / 1000);
-  lastTs = ts;
+/* =====================================================================
+   CAMX — câmera inteligente + acabamento "filme antigo" para o mundo todo.
+   Baseado no protótipo aprovado da Cripta: mola amortecida (SmoothDamp, sem tranco),
+   antecipação, moldura de segurança do herói, zoom por proximidade (NPC/porta),
+   desfoque de transição + abertura com foco puxado, e filme (grão, riscos, vinheta,
+   gradação de cor, contorno nos personagens). Tudo aplicado em CSS/DOM por cima do
+   motor existente — a escala efetiva (viewScale = base × zoom) mantém intacta toda a
+   matemática de clique/retângulo do jogo.
+   ===================================================================== */
+const CAMX = (function(){
+  const BZ = 1.0;
+  const C = { z:1, x:0, y:0, fx:480, fy:300, tfx:480, tfy:300, tz:1, vz:0, vfx:0, vfy:0, ts:.7, why:'', hold:0,
+              bl:0, ob:0, opT:1, opD:1, rx:0, px:0, py:0, pz:1, list:[], scanT:0, lastOp:-1 };
+  /* ---- estilos do acabamento ---- */
+  const st = document.createElement('style'); st.id = 'camxcss';
+  st.textContent = `
+  #camblur{position:absolute; inset:0; z-index:46; pointer-events:none; opacity:0; backdrop-filter:blur(4.5px); -webkit-backdrop-filter:blur(4.5px); will-change:opacity;}
+  #moodveil{position:absolute; inset:0; z-index:43; pointer-events:none; mix-blend-mode:multiply;
+    background:radial-gradient(ellipse at 50% 58%, #e0eae7 30%, #6f7e79 100%);}
+  #herolight{position:absolute; width:440px; height:440px; margin:-220px 0 0 -220px; z-index:39; pointer-events:none; mix-blend-mode:screen;
+    background:radial-gradient(circle at 50% 50%, rgba(255,190,120,.20), rgba(255,160,90,.07) 42%, rgba(255,150,80,0) 70%);}
+  #avatar:not(.ghost), .resident, .npc{
+    filter:drop-shadow(1px 0 0 #0b0907) drop-shadow(-1px 0 0 #0b0907) drop-shadow(0 1px 0 #0b0907) drop-shadow(0 -1px 0 #0b0907);}
+  #gradefx{position:fixed; inset:0; z-index:2147483000; pointer-events:none;
+    backdrop-filter:sepia(.14) contrast(1.1) saturate(.86) brightness(1.03); -webkit-backdrop-filter:sepia(.14) contrast(1.1) saturate(.86) brightness(1.03);
+    background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 52%, rgba(0,0,0,.34) 100%);}
+  #filmfx,#scratchfx{position:fixed; inset:0; width:100vw; height:100vh; z-index:2147483001; pointer-events:none;}
+  #filmfx{mix-blend-mode:overlay; opacity:.13; image-rendering:pixelated;}
+  #scratchfx{opacity:.5;}
+  `;
+  document.head.appendChild(st);
+  const blurEl = document.createElement('div'); blurEl.id = 'camblur';
+  const mood = document.createElement('div'); mood.id = 'moodveil';
+  const fadeEl2 = document.getElementById('fade');
+  stage.insertBefore(mood, fadeEl2); stage.insertBefore(blurEl, fadeEl2);
+  const hl = document.createElement('div'); hl.id = 'herolight';
+  world.insertBefore(hl, document.getElementById('avatar'));
+  const grade = document.createElement('div'); grade.id = 'gradefx'; document.body.appendChild(grade);
+  const fc = document.createElement('canvas'); fc.id = 'filmfx'; fc.width = 240; fc.height = 135; document.body.appendChild(fc);
+  const sc = document.createElement('canvas'); sc.id = 'scratchfx'; sc.width = 960; sc.height = 540; document.body.appendChild(sc);
+  const fg = fc.getContext('2d'), sg = sc.getContext('2d');
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let filmT = 0;
+  function film(now){
+    if (now - filmT > (reduce ? 400 : 90)) {
+      filmT = now;
+      const d = fg.createImageData(240, 135), a = d.data;
+      for (let i = 0; i < a.length; i += 4) { const v = Math.random() * 255; a[i] = a[i+1] = a[i+2] = v; a[i+3] = 255; }
+      fg.putImageData(d, 0, 0);
+      sg.clearRect(0, 0, 960, 540);
+      if (!reduce) {
+        if (Math.random() < .45) { sg.fillStyle = 'rgba(235,225,200,' + (.1 + Math.random() * .22) + ')'; sg.fillRect(Math.random() * 960, 0, 1, 540); }
+        for (let i = 0; i < 5; i++) { sg.fillStyle = 'rgba(240,230,200,.5)'; sg.fillRect(Math.random() * 960, Math.random() * 540, 2, 2); }
+      }
+    }
+    requestAnimationFrame(film);
+  }
+  requestAnimationFrame(film);
 
+  /* ---- mola amortecida (SmoothDamp) ---- */
+  function sd(cur, tgt, vel, stt, dt){ stt = Math.max(.0001, stt); const o = 2 / stt, x = o * dt, e = 1 / (1 + x + .48 * x * x + .235 * x * x * x), ch = cur - tgt, t = (vel + o * ch) * dt; return [tgt + (ch + t) * e, (vel - o * t) * e]; }
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  /* ---- alvos de interesse (NPCs/portas/estações) lidos do DOM, em coordenadas de mundo ---- */
+  function scan(){
+    try {
+      const sr = stage.getBoundingClientRect(), out = [];
+      world.querySelectorAll('.hotspot[data-door], .hotspot[data-open], .resident, .npc').forEach(el => {
+        const r = el.getBoundingClientRect(); if (!r.width || !r.height) return;
+        const x = (r.left - sr.left) / viewScale + camX + (r.width / viewScale) / 2;
+        const yb = (r.top - sr.top) / viewScale + camY + r.height / viewScale;
+        out.push({ x, y: yb - 34, k: el.classList.contains('hotspot') ? 'obj' : 'npc' });
+      });
+      C.list = out;
+    } catch (e) {}
+  }
+
+  function target(dt){
+    let tz = BZ, why = '', o = null;
+    const look = clamp(player.vx * .22, -52, 52);
+    let fx = player.x + look, fy = player.y - 70, ts = .5;
+    if (!(typeof tpBusy !== 'undefined' && tpBusy)) {
+      let best = null, bd = 1e9;
+      for (const t of C.list) {
+        const d = Math.hypot(player.x - t.x, (player.y - t.y) * 1.3);
+        const lim = t.k === 'npc' ? (C.why === 'npc' ? 270 : 190) : (C.why === 'obj' ? 215 : 150);
+        if (d < lim && d < bd) { bd = d; best = t; }
+      }
+      if (best) { why = best.k; o = best; tz = best.k === 'npc' ? 1.38 : 1.28; fx = (player.x + best.x) / 2; fy = Math.min(player.y - 70, best.y - 30); ts = .7; }
+    }
+    if (o) {
+      const zx = .74 * STAGE_W / (Math.abs(player.x - o.x) + 170), zy = .74 * STAGE_H / (Math.abs(player.y - 70 - o.y) + 190);
+      tz = Math.max(BZ, Math.min(tz, zx, zy));
+    }
+    if (why) { if (why !== C.why) C.hold = 1.0; C.why = why; }
+    else if (C.hold > 0) { C.hold -= dt; tz = C.tz; fx = C.tfx; fy = C.tfy; ts = C.ts; }
+    else C.why = '';
+    C.tz = tz; C.tfx = fx; C.tfy = fy; C.ts = ts;
+  }
+
+  function step(dt){
+    if (Math.abs(camX - C.rx) > 1.5) {          // mudança externa (entrar sala, teleporte)
+      const vw = STAGE_W / C.z; C.x = camX; C.fx = camX + vw / 2; C.tfx = C.fx; C.vfx = 0; C.vz = 0;
+    }
+    C.px = C.x; C.py = C.y; C.pz = C.z;
+    C.scanT -= dt; if (C.scanT <= 0) { scan(); C.scanT = .35; }
+    target(dt);
+    if (C.opT < C.opD) { C.opT += dt; }
+    let r = sd(C.z, C.tz, C.vz, C.ts, dt); C.z = r[0]; C.vz = r[1];
+    const vw = STAGE_W / C.z, vh = STAGE_H / C.z, ws = C.why ? C.ts : .36;
+    r = sd(C.fx, C.tfx, C.vfx, ws, dt); C.fx = r[0]; C.vfx = r[1];
+    r = sd(C.fy, C.tfy, C.vfy, ws, dt); C.fy = r[0]; C.vfy = r[1];
+    C.x = clamp(C.fx - vw / 2, 0, Math.max(0, WORLD_W - vw));
+    C.y = clamp(C.fy - vh / 2, 0, STAGE_H - vh);
+    // moldura de segurança: o herói nunca sai da tela
+    { const hx = (player.x - C.x) * C.z, hy = (player.y - 72 - C.y) * C.z, mx = STAGE_W * .26, my = STAGE_H * .26; let sx = 0, sy = 0;
+      if (hx < mx) sx = (hx - mx) / C.z; else if (hx > STAGE_W - mx) sx = (hx - (STAGE_W - mx)) / C.z;
+      if (hy < my) sy = (hy - my) / C.z; else if (hy > STAGE_H - my) sy = (hy - (STAGE_H - my)) / C.z;
+      if (sx || sy) { C.x = clamp(C.x + sx, 0, Math.max(0, WORLD_W - vw)); C.y = clamp(C.y + sy, 0, STAGE_H - vh); C.fx = C.x + vw / 2; C.fy = C.y + vh / 2; C.vfx *= .5; C.vfy *= .5; } }
+    const zv = Math.abs(C.z - C.pz) / Math.max(dt, .001);
+    C.bl += (Math.min(1, zv / .5) - C.bl) * (1 - Math.exp(-dt * 9));
+    const oe = 1 - Math.min(1, C.opT / C.opD); C.ob = oe * oe;
+  }
+
+  function render(a){
+    const x = C.px + (C.x - C.px) * a, y = C.py + (C.y - C.py) * a, z = C.pz + (C.z - C.pz) * a;
+    camX = x; camY = y; camZoom = z; viewScale = baseScale * z; C.rx = x;
+    applyCam();
+    const op = Math.min(1, Math.max(C.ob, C.bl * .8));
+    if (Math.abs(op - C.lastOp) > .02) { C.lastOp = op; blurEl.style.opacity = op.toFixed(2); }
+  }
+  function hardReset(){ C.z = C.pz = C.tz = 1; C.vz = 0; C.y = C.py = 0; C.fy = C.tfy = STAGE_H / 2; C.vfy = 0; C.why = ''; C.hold = 0; camZoom = 1; camY = 0; viewScale = baseScale; applyCam(); }
+  function open(d){ C.opT = 0; C.opD = d || 1.5; }
+  return { step, render, hardReset, open, scan, herolight: hl, state: C };
+})();
+
+/* ===== Passo fixo (120 Hz) + interpolação no desenho, velocidade com aceleração/atrito ===== */
+const FIXSTEP = 1 / 120;
+let accT = 0, prevPX = null, prevPY = null;
+function physStep(dt){
   const anyKey = keys.up || keys.down || keys.left || keys.right;
-  let moved = 0, dirX = 0;
-
+  let tvx = 0, tvy = 0, dirX = 0, wantMove = false;
   if (anyKey) {
-    player.mode = 'free';
-    player.walking = true;
-    avatar.classList.add('walking');
-    let vx = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
-    let vy = (keys.down ? 1 : 0) - (keys.up ? 1 : 0);
-    const len = Math.hypot(vx, vy) || 1;
-    vx /= len; vy /= len;
-    const step = player.speed * dt;
-    const nx = Math.max(bounds.minX, Math.min(bounds.maxX, player.x + vx * step));
-    const ny = Math.max(bounds.minY, Math.min(bounds.maxY, player.y + vy * step));
-    moved = Math.hypot(nx - player.x, ny - player.y);
-    player.x = nx; player.y = ny;
-    if (vx !== 0) dirX = vx;
+    player.mode = 'free'; player.walking = true; avatar.classList.add('walking');
+    let vx = (keys.right ? 1 : 0) - (keys.left ? 1 : 0), vy = (keys.down ? 1 : 0) - (keys.up ? 1 : 0);
+    const len = Math.hypot(vx, vy) || 1; vx /= len; vy /= len;
+    tvx = vx * player.speed; tvy = vy * player.speed; wantMove = true;
   } else if (player.mode === 'path' && player.walking) {
-    const dx = player.targetX - player.x;
-    const dy = player.targetY - player.y;
-    const dist = Math.hypot(dx, dy);
-    if (dist < 1.2) {
-      player.x = player.targetX; player.y = player.targetY;
+    const dx = player.targetX - player.x, dy = player.targetY - player.y, dist = Math.hypot(dx, dy);
+    if (dist < 1.2 || (dist < 6 && Math.hypot(player.vx, player.vy) < 40)) {
+      player.x = player.targetX; player.y = player.targetY; player.vx = player.vy = 0;
       arrive();
     } else {
-      const spd = player.speed * (dist < 42 ? Math.max(0.22, dist / 42) : 1);
-      const step = Math.min(spd * dt, dist);
-      const ux = dx / dist, uy = dy / dist;
-      player.x += ux * step; player.y += uy * step;
-      moved = step;
-      if (Math.abs(ux) > 0.08) dirX = ux;
+      const sp = Math.min(player.speed, dist * 7);          // freia proporcional à distância: chegada suave
+      tvx = dx / dist * sp; tvy = dy / dist * sp; wantMove = true;
     }
-  } else {
-    player.mode = 'idle';
   }
+  // aceleração (mais forte ao inverter) e atrito sempre ativo
+  const rev = (player.vx * tvx + player.vy * tvy) < 0;
+  const rate = wantMove ? (rev ? 3400 : 1700) : 2100;
+  const ex = tvx - player.vx, ey = tvy - player.vy, em = Math.hypot(ex, ey), st = rate * dt;
+  if (em <= st) { player.vx = tvx; player.vy = tvy; } else { player.vx += ex / em * st; player.vy += ey / em * st; }
+  const ox = player.x, oy = player.y;
+  let nx = player.x + player.vx * dt, ny = player.y + player.vy * dt;
+  if (nx < bounds.minX) { nx = bounds.minX; player.vx = 0; } else if (nx > bounds.maxX) { nx = bounds.maxX; player.vx = 0; }
+  if (ny < bounds.minY) { ny = bounds.minY; player.vy = 0; } else if (ny > bounds.maxY) { ny = bounds.maxY; player.vy = 0; }
+  player.x = nx; player.y = ny;
+  const spd = Math.hypot(player.vx, player.vy);
+  if (Math.abs(player.vx) > 14) dirX = player.vx > 0 ? 1 : -1;
+  if (!wantMove && player.mode !== 'path') {
+    if (spd > 22) { player.walking = true; if (player.mode === 'idle') player.mode = 'free'; }
+    else { player.vx = player.vy = 0; player.walking = false; player.mode = 'idle'; }
+  }
+  return { moved: Math.hypot(player.x - ox, player.y - oy), dirX };
+}
+
+function tick(ts){
+  if (lastTs === null) lastTs = ts;
+  const raw = Math.min(0.1, (ts - lastTs) / 1000); lastTs = ts;
+  const dt = Math.min(0.05, raw);
+  if (prevPX === null) { prevPX = player.x; prevPY = player.y; }
+  accT += raw; let n = 0, moved = 0, dirX = 0;
+  while (accT >= FIXSTEP && n < 14) {
+    prevPX = player.x; prevPY = player.y;
+    const r = physStep(FIXSTEP); moved += r.moved; if (r.dirX) dirX = r.dirX;
+    CAMX.step(FIXSTEP); accT -= FIXSTEP; n++;
+  }
+  if (n >= 14) accT = 0;
+  const al = accT / FIXSTEP;
+  const rx = prevPX + (player.x - prevPX) * al, ry = prevPY + (player.y - prevPY) * al;
 
   if (player.mode !== 'idle' && player.walking) {
     if (dirX !== 0) { player.dir = dirX > 0 ? 1 : -1; facing.classList.toggle('flip', player.dir < 0); }
@@ -4743,28 +4899,24 @@ function tick(ts){
     bodywrap.style.transform = 'translateY(' + (Math.sin(player.idleT * 2) * 1.4 - 1.4) + 'px)';
   }
 
-  // câmera: segue o avatar em X com suavização, presa aos limites do cômodo
-  const vw = STAGE_W;
-  const camTarget = Math.max(0, Math.min(player.x - vw / 2, Math.max(0, WORLD_W - vw)));
-  camX += (camTarget - camX) * Math.min(1, dt * 6);
-  world.style.transform = 'translateX(' + (-camX) + 'px)';
+  CAMX.render(al);                                   // aplica câmera interpolada (camX/camY/camZoom/viewScale)
   if (window.cxCam) window.cxCam(camX);
   if (window.cxTpCheck) window.cxTpCheck();
 
-  // profundidade simples: mais perto da base do chão = mais perto da câmera = maior
-  const depthT = bounds.maxY > bounds.minY ? (player.y - bounds.minY) / (bounds.maxY - bounds.minY) : 1;
+  const depthT = bounds.maxY > bounds.minY ? (ry - bounds.minY) / (bounds.maxY - bounds.minY) : 1;
   const scale = 0.88 + depthT * 0.18;
   avatar.style.transform = 'scale(' + scale.toFixed(3) + ')';
   avatar.style.zIndex = String(40 + Math.round(depthT * 20));
-  avatar.style.left = (player.x - 36.5) + 'px';   // metade da largura nova (73px)
-  avatar.style.top = (player.y - 78) + 'px';   // altura do sprite (78px) — pés ficam em player.y
+  avatar.style.left = Math.round(rx - 36.5) + 'px';
+  avatar.style.top = Math.round(ry - 78) + 'px';
+  if (CAMX.herolight) { CAMX.herolight.style.left = Math.round(rx) + 'px'; CAMX.herolight.style.top = Math.round(ry - 44) + 'px'; }
   requestAnimationFrame(tick);
 }
 
 function showBubble(x, y, text, ms){
   bubble.textContent = text;
-  bubble.style.left = x + 'px';
-  bubble.style.top = y + 'px';
+  bubble.style.left = (x * camZoom) + 'px';
+  bubble.style.top = ((y - camY) * camZoom) + 'px';
   bubble.classList.add('show');
   clearTimeout(showBubble._t);
   showBubble._t = setTimeout(() => bubble.classList.remove('show'), ms || 2600);
@@ -4785,8 +4937,8 @@ function showBookBubble(x, y, jogo, ms){
       '</div>' +
     '</div>';
   bubble.classList.add('book-bubble');
-  bubble.style.left = x + 'px';
-  bubble.style.top = y + 'px';
+  bubble.style.left = (x * camZoom) + 'px';
+  bubble.style.top = ((y - camY) * camZoom) + 'px';
   bubble.classList.add('show');
   clearTimeout(showBubble._t);
   showBubble._t = setTimeout(() => {
@@ -4816,8 +4968,8 @@ function showNpcBubble(x, y, v, ms){
       '</div>' +
     '</div>';
   bubble.classList.add('npc-bubble');
-  bubble.style.left = x + 'px';
-  bubble.style.top = y + 'px';
+  bubble.style.left = (x * camZoom) + 'px';
+  bubble.style.top = ((y - camY) * camZoom) + 'px';
   bubble.classList.add('show');
   clearTimeout(showBubble._t);
   showBubble._t = setTimeout(() => {
@@ -4840,7 +4992,7 @@ document.getElementById('winlayer').addEventListener('click', (e) => {
 document.getElementById('floorclick').addEventListener('click', (e) => {
   const p = toLocal(e.clientX, e.clientY);
   const x = p.x + camX;
-  const y = p.y;
+  const y = p.y + camY;
   hint.style.display = 'none';
   walkTo(x, y);
 });
@@ -4855,7 +5007,7 @@ world.addEventListener('click', (e) => {
   // r e sr vêm em pixels reais de tela (já com a escala do #stage aplicada);
   // dividir por viewScale traz tudo de volta pra régua interna fixa (0..960/0..540).
   const rLocalLeft = (r.left - sr.left) / viewScale;
-  const rLocalTop = (r.top - sr.top) / viewScale;
+  const rLocalTop = ((r.top - sr.top) / viewScale + camY);
   const rLocalW = r.width / viewScale, rLocalH = r.height / viewScale;
   const approachX = rLocalLeft + camX + rLocalW / 2;
   const approachY = Math.max(bounds.minY, Math.min(bounds.maxY, (rLocalTop + rLocalH) + 16));
@@ -4893,7 +5045,7 @@ world.addEventListener('click', (e) => {
   const sr = stage.getBoundingClientRect();
   const r = book.getBoundingClientRect();
   const bx = (r.left - sr.left) / viewScale + (r.width / viewScale) / 2;
-  const by = (r.top - sr.top) / viewScale - 4;
+  const by = ((r.top - sr.top) / viewScale + camY) - 4;
   showBookBubble(bx, by, jogo, 3400);
 });
 
@@ -4912,7 +5064,7 @@ world.addEventListener('click', (e) => {
   const sr = stage.getBoundingClientRect();
   const r = npc.getBoundingClientRect();
   const nx = (r.left - sr.left) / viewScale + (r.width / viewScale) / 2;
-  const ny = (r.top - sr.top) / viewScale - 4;
+  const ny = ((r.top - sr.top) / viewScale + camY) - 4;
   showNpcBubble(nx, ny, v, 4200);
 });
 
@@ -4989,7 +5141,7 @@ world.addEventListener('click', (e) => {
   const sr = stage.getBoundingClientRect();
   const r = tape.getBoundingClientRect();
   const bx = (r.left - sr.left) / viewScale + (r.width / viewScale) / 2;
-  const by = (r.top - sr.top) / viewScale - 4;
+  const by = ((r.top - sr.top) / viewScale + camY) - 4;
   showBubble(bx, by, label, 2800);
 });
 
@@ -5003,7 +5155,7 @@ world.addEventListener('click', (e) => {
   if (e.target.closest('.hotspot, .newsstand, .mailbox, .game-table, .forge-station, .media-station, .book[data-tape], .crossroads-sign .arrow, .avisos-board, .npc')) return;
   const p = toLocal(e.clientX, e.clientY);
   const x = p.x + camX;
-  const y = p.y;
+  const y = p.y + camY;
   hint.style.display = 'none';
   walkTo(x, y);
 });
@@ -5658,7 +5810,7 @@ world.addEventListener('click', e => {
   e.stopPropagation();
   const sec = SECRETS.find(s => s.key === el.dataset.secret); if (!sec || GS.found[sec.key]) return;
   const sr = stage.getBoundingClientRect(); const r = el.getBoundingClientRect();
-  const lx = (r.left - sr.left) / viewScale, lt = (r.top - sr.top) / viewScale, lw = r.width / viewScale, lh = r.height / viewScale;
+  const lx = (r.left - sr.left) / viewScale, lt = ((r.top - sr.top) / viewScale + camY), lw = r.width / viewScale, lh = r.height / viewScale;
   const ax = lx + camX + lw / 2, ay = Math.max(bounds.minY, Math.min(bounds.maxY, lt + lh + 16));
   hint.style.display = 'none';
   walkTo(ax, ay, () => {
@@ -6465,7 +6617,7 @@ renderRoom = function(id){
 
 function aproxima(elm){
   const sr = stage.getBoundingClientRect(), r = elm.getBoundingClientRect();
-  const lx = (r.left - sr.left) / viewScale, lt = (r.top - sr.top) / viewScale, lw = r.width / viewScale, lh = r.height / viewScale;
+  const lx = (r.left - sr.left) / viewScale, lt = ((r.top - sr.top) / viewScale + camY), lw = r.width / viewScale, lh = r.height / viewScale;
   return { ax:lx + camX + lw / 2, ay:Math.max(bounds.minY, Math.min(bounds.maxY, lt + lh + 16)), bx:lx + lw / 2, by:lt - 4 };
 }
 world.addEventListener('click', e => {
@@ -7190,7 +7342,7 @@ clockTag.addEventListener('click', e => {
 let carinhos = 0;
 world.addEventListener('click', e => {
   if (typeof petPos === 'undefined' || !petEl || !GS.equip.pet) return;
-  const sr = stage.getBoundingClientRect(); const wx = (e.clientX - sr.left) / viewScale + camX, wy = (e.clientY - sr.top) / viewScale;
+  const sr = stage.getBoundingClientRect(); const wx = (e.clientX - sr.left) / viewScale + camX, wy = (e.clientY - sr.top) / viewScale + camY;
   if (Math.abs(wx - (petPos.x + 20)) < 34 && Math.abs(wy - (petPos.y + 20)) < 34) { carinhos++; if (carinhos >= 10) { carinhos = -9999; descobre('carinho', 'Seu pet adorou o carinho!', 'gatinho_estelar'); } }
 }, true);
 const _renderRoom7a = renderRoom;
@@ -8899,7 +9051,7 @@ function createShinobi(assets,done){
     e.preventDefault();
     if (typeof F !== 'undefined' && F.open) return;
     const r = stage.getBoundingClientRect(), sx = STAGE_W / r.width;
-    const wx = (e.clientX - r.left) * sx + camX;
+    const wx = (e.clientX - r.left) * sx / camZoom + camX;
     window.heroAttack(wx);
   });
   document.getElementById('fPanel') && document.getElementById('fPanel').addEventListener('contextmenu', e => { e.preventDefault(); if (typeof F !== 'undefined' && F.open && typeof window.heroAttack === 'function') window.heroAttack(); });
@@ -9187,9 +9339,10 @@ player.x = bootRoom === 'rua' ? WORLD_W * 0.42 : 90;
 player.y = bounds.maxY - 10;
 player.targetX = player.x; player.targetY = player.y;
 camX = Math.max(0, Math.min(player.x - STAGE_W / 2, Math.max(0, WORLD_W - STAGE_W)));
-world.style.transform = 'translateX(' + (-camX) + 'px)';
+applyCam();
 avatar.style.left = (player.x - 36.5) + 'px';
 avatar.style.top = (player.y - 78) + 'px';
+try { CAMX.open(3.2); CAMX.scan(); } catch (e) {}
 requestAnimationFrame(tick);
 </script>
 </body>
