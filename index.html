@@ -3064,7 +3064,7 @@ function cloudLifeInit(box){
   if (t > CLV.ventoUntil) { CLV.ventoT = (Math.random() < .8 ? 1 : -1) * (4 + Math.random() * 14); CLV.ventoUntil = t + 40 + Math.random() * 70; }
   if (t > CLV.rajadaUntil) {                                   /* rajadas: de vez em quando o vento aperta por alguns segundos */
     if (CLV.rajadaT > 1) { CLV.rajadaT = 1; CLV.rajadaUntil = t + 20 + Math.random() * 50; }
-    else if (Math.random() < .45) { CLV.rajadaT = 1.8 + Math.random() * 1.4; CLV.rajadaUntil = t + 4 + Math.random() * 5; }
+    else if (Math.random() < .22) { CLV.rajadaT = 1.8 + Math.random() * 1.4; CLV.rajadaUntil = t + 4 + Math.random() * 5; }
     else CLV.rajadaUntil = t + 10 + Math.random() * 20;
   }
   CLV.vento += (CLV.ventoT - CLV.vento) * Math.min(1, dt / 6);
@@ -4555,7 +4555,7 @@ function enterRoom(targetId, spawnSide){
     player.x = spawnX; player.targetX = spawnX;
     player.y = bounds.maxY - 10; player.targetY = player.y;
     player.mode = 'idle'; player.walking = false; player.vx = 0; player.vy = 0;
-    try { CAMX.hardReset(); CAMX.open(1.5); } catch (e) {}
+    try { CAMX.hardReset(); CAMX.open(1.0); } catch (e) {}
     const vw = STAGE_W;
     camX = Math.max(0, Math.min(spawnX - vw / 2, Math.max(0, WORLD_W - vw)));
     applyCam();
@@ -4705,19 +4705,19 @@ const CAMX = (function(){
   /* ---- estilos do acabamento ---- */
   const st = document.createElement('style'); st.id = 'camxcss';
   st.textContent = `
-  #camblur{position:absolute; inset:0; z-index:46; pointer-events:none; opacity:0; backdrop-filter:blur(4.5px); -webkit-backdrop-filter:blur(4.5px); will-change:opacity;}
+  #camblur{position:absolute; inset:0; z-index:46; pointer-events:none; opacity:0; backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); will-change:opacity;}
   #moodveil{position:absolute; inset:0; z-index:43; pointer-events:none; mix-blend-mode:multiply;
-    background:radial-gradient(ellipse at 50% 58%, #e0eae7 30%, #6f7e79 100%);}
+    background:radial-gradient(ellipse at 50% 56%, #f4f7f5 36%, #9aa7a2 100%);}
   #herolight{position:absolute; width:440px; height:440px; margin:-220px 0 0 -220px; z-index:39; pointer-events:none; mix-blend-mode:screen;
-    background:radial-gradient(circle at 50% 50%, rgba(255,190,120,.20), rgba(255,160,90,.07) 42%, rgba(255,150,80,0) 70%);}
+    background:radial-gradient(circle at 50% 50%, rgba(255,196,130,.26), rgba(255,170,100,.09) 44%, rgba(255,150,80,0) 70%);}
   #avatar:not(.ghost), .resident, .npc{
-    filter:drop-shadow(1px 0 0 #0b0907) drop-shadow(-1px 0 0 #0b0907) drop-shadow(0 1px 0 #0b0907) drop-shadow(0 -1px 0 #0b0907);}
+    filter:drop-shadow(1px 0 0 rgba(10,7,5,.95)) drop-shadow(-1px 0 0 rgba(10,7,5,.95)) drop-shadow(0 1px 0 rgba(10,7,5,.95)) drop-shadow(0 -1px 0 rgba(10,7,5,.95)) drop-shadow(0 0 1.5px rgba(255,205,140,.35));}
   #gradefx{position:fixed; inset:0; z-index:2147483000; pointer-events:none;
-    backdrop-filter:sepia(.14) contrast(1.1) saturate(.86) brightness(1.03); -webkit-backdrop-filter:sepia(.14) contrast(1.1) saturate(.86) brightness(1.03);
-    background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 52%, rgba(0,0,0,.34) 100%);}
+    backdrop-filter:sepia(.1) contrast(1.07) saturate(.95) brightness(1.08); -webkit-backdrop-filter:sepia(.1) contrast(1.07) saturate(.95) brightness(1.08);
+    background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 58%, rgba(0,0,0,.24) 100%);}
   #filmfx,#scratchfx{position:fixed; inset:0; width:100vw; height:100vh; z-index:2147483001; pointer-events:none;}
-  #filmfx{mix-blend-mode:overlay; opacity:.13; image-rendering:pixelated;}
-  #scratchfx{opacity:.5;}
+  #filmfx{mix-blend-mode:soft-light; opacity:.16; image-rendering:pixelated;}
+  #scratchfx{opacity:.32;}
   `;
   document.head.appendChild(st);
   const blurEl = document.createElement('div'); blurEl.id = 'camblur';
@@ -4727,7 +4727,7 @@ const CAMX = (function(){
   const hl = document.createElement('div'); hl.id = 'herolight';
   world.insertBefore(hl, document.getElementById('avatar'));
   const grade = document.createElement('div'); grade.id = 'gradefx'; document.body.appendChild(grade);
-  const fc = document.createElement('canvas'); fc.id = 'filmfx'; fc.width = 240; fc.height = 135; document.body.appendChild(fc);
+  const fc = document.createElement('canvas'); fc.id = 'filmfx'; fc.width = 480; fc.height = 270; document.body.appendChild(fc);
   const sc = document.createElement('canvas'); sc.id = 'scratchfx'; sc.width = 960; sc.height = 540; document.body.appendChild(sc);
   const fg = fc.getContext('2d'), sg = sc.getContext('2d');
   const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -4735,13 +4735,13 @@ const CAMX = (function(){
   function film(now){
     if (now - filmT > (reduce ? 400 : 90)) {
       filmT = now;
-      const d = fg.createImageData(240, 135), a = d.data;
+      const d = fg.createImageData(480, 270), a = d.data;
       for (let i = 0; i < a.length; i += 4) { const v = Math.random() * 255; a[i] = a[i+1] = a[i+2] = v; a[i+3] = 255; }
       fg.putImageData(d, 0, 0);
       sg.clearRect(0, 0, 960, 540);
       if (!reduce) {
-        if (Math.random() < .45) { sg.fillStyle = 'rgba(235,225,200,' + (.1 + Math.random() * .22) + ')'; sg.fillRect(Math.random() * 960, 0, 1, 540); }
-        for (let i = 0; i < 5; i++) { sg.fillStyle = 'rgba(240,230,200,.5)'; sg.fillRect(Math.random() * 960, Math.random() * 540, 2, 2); }
+        if (Math.random() < .22) { sg.fillStyle = 'rgba(235,225,200,' + (.1 + Math.random() * .22) + ')'; sg.fillRect(Math.random() * 960, 0, 1, 540); }
+        for (let i = 0; i < 3; i++) { sg.fillStyle = 'rgba(240,230,200,.4)'; sg.fillRect(Math.random() * 960, Math.random() * 540, 2, 2); }
       }
     }
     requestAnimationFrame(film);
@@ -4817,7 +4817,7 @@ const CAMX = (function(){
     const x = C.px + (C.x - C.px) * a, y = C.py + (C.y - C.py) * a, z = C.pz + (C.z - C.pz) * a;
     camX = x; camY = y; camZoom = z; viewScale = baseScale * z; C.rx = x;
     applyCam();
-    const op = Math.min(1, Math.max(C.ob, C.bl * .8));
+    const op = Math.min(1, Math.max(C.ob, C.bl * .6)) * .85;
     if (Math.abs(op - C.lastOp) > .02) { C.lastOp = op; blurEl.style.opacity = op.toFixed(2); }
   }
   function hardReset(){ C.z = C.pz = C.tz = 1; C.vz = 0; C.y = C.py = 0; C.fy = C.tfy = STAGE_H / 2; C.vfy = 0; C.why = ''; C.hold = 0; camZoom = 1; camY = 0; viewScale = baseScale; applyCam(); }
@@ -9342,7 +9342,7 @@ camX = Math.max(0, Math.min(player.x - STAGE_W / 2, Math.max(0, WORLD_W - STAGE_
 applyCam();
 avatar.style.left = (player.x - 36.5) + 'px';
 avatar.style.top = (player.y - 78) + 'px';
-try { CAMX.open(3.2); CAMX.scan(); } catch (e) {}
+try { CAMX.open(2.2); CAMX.scan(); } catch (e) {}
 requestAnimationFrame(tick);
 </script>
 </body>
