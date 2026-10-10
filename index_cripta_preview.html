@@ -9202,7 +9202,7 @@ requestAnimationFrame(tick);
 (function (root) {
 'use strict';
 const T = 16, W = 140, H = 64;
-const GRAV = 900, MOVE = 84, JUMP = -292, MAXFALL = 420, PW = 10, PH = 15;
+const GRAV = 900, MOVE = 84, JUMP = -322, MAXFALL = 420, PW = 10, PH = 15;
 
 /* ------------------------------ ITENS ------------------------------ */
 const ITEMS = {
@@ -9946,7 +9946,7 @@ function create(saved, opts) {
     if (P.on) P.coy = 0.1; else if (P.coy > 0) P.coy -= dt;
     if (P.jb > 0 && P.coy > 0) {
       if (inp.d && P.onOneWay) { P.dropT = 0.22; P.y += 1; P.on = false; P.coy = 0; P.jb = 0; }
-      else { P.vy = JUMP * (P.water ? 0.82 : 1); P.on = false; P.coy = 0; P.jb = 0; em('sfx', { n: 'jump' }); }
+      else { P.vy = JUMP * (P.water ? 0.97 : 1); P.on = false; P.coy = 0; P.jb = 0; em('sfx', { n: 'jump' }); }
     }
     if (!inp.jump && P.vy < -110) P.vy = -110;       // pulo variável
     P.vy = Math.min(MAXFALL, P.vy + GRAV * dt * (P.water && P.vy > 0 ? 0.55 : 1));
