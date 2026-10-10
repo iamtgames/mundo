@@ -5598,16 +5598,6 @@ const RESIDENTS = {
       'Os bancos do Saloon já guardaram muita coisa esquecida...',
       'Campo Minado e Paciência: vença um e leve uma peça de armadura.'
     ] }],
-  cinema: [{ x:900, yf:0.4, nome:'Lanterninha Caio',
-    look:{ helm:'elmo_carmesim', chest:'arm_carmesim', legs:'grevas_carmesim', weapon:'tocha' },
-    falas: () => {
-      const vivos = CANAIS_CINEMA.filter(c => c.live).map(c => c.n);
-      return [
-        vivos.length ? 'Ao vivo agora: ' + vivos.join(', ') + '.' : 'Nenhuma live agora. As telas ligam sozinhas quando começar!',
-        'Atrás das cortinas costuma ficar esquecida uma coisa brilhante...',
-        'São ' + CANAIS_CINEMA.length + ' canais monitorados nesta sala.'
-      ];
-    } }],
   tenda: [{ x:500, yf:0.4, nome:'Mercador Zé',
     look:{ helm:'capuz_floresta', chest:'couro', legs:'perneiras_floresta' },
     falas: () => {
@@ -5829,31 +5819,9 @@ SHAPES.pet = {
   estrela:  ['...mm...','...mm...','mmmllmmm','.memmem.','..mmmm..','..mmmm..','.mm..mm.','mm....mm'],
   caveira:  ['.mmmmmm.','mmmmmmmm','maammaam','maammaam','mmmmmmmm','.mmddmm.','.mlmmlm.','.d.dd.d.']
 };
-SLOT_NOME.pet = 'Pet'; SLOT_ORDEM.push('pet');
 
-function addPet(id, nome, shape, pal, rar, hint, fx, stat){ const it = addItem(id, 'pet', nome, shape, pal, rar, hint, fx); it.pst = stat; return it; }
-addPet('gato_aldeao','Gatinho Aldeão','gato','cloth','comum','Fique 4 min no mundo','','vel');
-addPet('cao_guarda','Cão de Guarda','cachorro','leather','comum','Fique 25 min no mundo','','vida');
-addPet('slime_verde','Slime Verde','slime','forest','incomum','Vença o Campo Minado','','dica');
-addPet('coruja_biblio','Coruja da Biblioteca','coruja','cloth','incomum','Dorme no alto das estantes da Biblioteca','','dica');
-addPet('cogumelo','Cogumelo Saltitante','cogumelo','crimson','incomum','Escondido perto de uma placa da rua','','tempo');
-addPet('robo_ferro','Robozinho de Ferro','robo','iron','raro','Vença a Paciência','','sorte');
-addPet('pintinho_bronze','Pintinho de Bronze','ave','bronze','raro','Fique 2 horas no mundo','','vel');
-addPet('gato_real','Gato Real','gato','royal','raro','Esquecido num banco do Saloon','','sorte');
-addPet('lobo_gelo','Lobo de Gelo','cachorro','ice','epico','Conclua a Cripta do Arquivista','ice','vel');
-addPet('fantasma_anjo','Fantasminha','fantasma','angel','epico','Jogue à noite (22h às 5h)','glow','tempo');
-addPet('slime_lava','Slime de Lava','slime','fire','epico','Conclua a Forja Esquecida','fire','vida');
-addPet('estrela_solar','Estrelinha Solar','estrela','solar','epico','Jogue por volta do meio-dia','glow','sorte');
-addPet('caveira_vazio','Caveirinha do Vazio','caveira','void','epico','Conclua a Portal do Vazio','void','dica');
-addPet('coruja_meia_noite','Coruja da Meia-Noite','coruja','midnight','lendario','Reúna 25 itens','void','dica');
-addPet('dragao_fogo','Dragãozinho','dragao','fire','lendario','Venza 7 jogos no Saloon','fire','vida');
-addPet('robo_trovao','Robô Trovão','robo','storm','lendario','Jogue 10 min sob chuva real','glow','vel');
-addPet('fenix_filhote','Fênix Filhote','ave','fire','mitico','Fique 8 horas no mundo','fire','tempo');
-addPet('espectro_aurora','Espectro da Aurora','fantasma','aurora','mitico','Resolva 25 puzzles das dungeons','aurora','dica');
-addPet('dragao_gelo','Dragão do Gelo','dragao','ice','mitico','Conclua uma dungeon sem usar dicas','ice','vida');
-addPet('gato_arcoiris','Gato Arco-Íris','gato','rainbow','ultra','Conclua as 4 dungeons','rainbow','sorte');
-addPet('estrela_cosmica','Estrela Cósmica','estrela','rainbow','ultra','Conclua o Santuário Prisma','rainbow','tempo');
-addPet('dragao_vazio','Dragão do Vazio','dragao','void','ultra','Reúna todos os outros pets','void','vel');
+
+function addPet(){ return null; }  /* pets removidos */
 
 /* ---------- itens simples (drop por tempo) + prêmios de dungeon ---------- */
 addItem('capuz_couro','helm','Capuz de Couro','capuz','leather','comum','Fique 2 min no mundo');
@@ -5874,16 +5842,12 @@ addItem('tunica_gelo','chest','Túnica de Gelo','manto','ice','raro','Conclua a 
 addItem('grevas_brasa','legs','Grevas de Brasa','grevas','fire','epico','Conclua a Forja Esquecida','fire');
 addItem('capa_vazio','back','Capa do Vazio','capa','void','epico','Conclua a Portal do Vazio','void');
 addItem('cetro_prisma','weapon','Cetro Prisma','cajado','rainbow','ultra','Conclua o Santuário Prisma','rainbow');
-[[120,'capuz_couro'],[180,'adaga'],[240,'tunica_azul'],[240,'gato_aldeao'],[420,'botas_ferro'],[540,'capa_cinza'],[660,'elmo_osso'],
- [780,'cajado_madeira'],[1000,'botas_verdes'],[1500,'colete_couro'],[1500,'cao_guarda'],[2100,'capa_verde'],[2400,'machado_ferro'],
- [3000,'capuz_real'],[4200,'espada_bronze'],[6300,'botas_bronze'],[7200,'pintinho_bronze'],[28800,'fenix_filhote']
-].forEach(p => TIME_DROPS.push(p));
+[[120,'capuz_couro'],[180,'adaga'],[240,'tunica_azul'],[420,'botas_ferro'],[540,'capa_cinza'],[660,'elmo_osso'],
+ [780,'cajado_madeira'],[1000,'botas_verdes'],[1500,'colete_couro'],[2100,'capa_verde'],[2400,'machado_ferro'],
+ [3000,'capuz_real'],[4200,'espada_bronze'],[6300,'botas_bronze'],].forEach(p => TIME_DROPS.push(p));
 
 /* ---------- segredos novos ---------- */
 SECRETS.push(
-  { key:'bib_estante', room:'biblioteca', sel:'.shelf-tag',      idx:2, item:'coruja_biblio', msg:'Uma coruja dormia no alto da estante PS5!' },
-  { key:'rua_placa',   room:'rua',        sel:'.prop-signpost',  idx:0, item:'cogumelo',      msg:'Um cogumelo saltitante saiu de trás da placa!' },
-  { key:'saloon_gato', room:'salajogos',  sel:'.saloon-stool',   idx:1, item:'gato_real',     msg:'Um gato de coroa dormia debaixo do banco!' }
 );
 
 /* ---------- bônus reais ---------- */
@@ -6150,7 +6114,7 @@ function showDgList(i){
     list.appendChild(b);
   });
   dgBody.appendChild(list);
-  const prem = dg.reward.map(id => ITEM_BY_ID[id]);
+  const prem = dg.reward.map(id => ITEM_BY_ID[id]).filter(Boolean);
   dgBody.appendChild(el('div', 'dg-rew', '<b>Prêmios ao concluir:</b> ' + prem.map(it => '<span style="color:' + RAR_COR[it.rar] + '">' + esc(it.nome) + (GS.owned[it.id] ? ' ✔' : '') + '</span>').join(' · ')));
   dgFlash(rec.clear ? '✔ Dungeon concluída' + (rec.best ? ' — melhor tempo total: ' + rec.best + 's' : '') + '. Você pode rejogar os puzzles.' : 'Resolva os puzzles em ordem para abrir a câmara final.', rec.clear ? 'good' : '');
 }
@@ -6214,7 +6178,7 @@ function winPuzzle(){
     if (rec.hu === 0) GS.noHint = 1;
     gsSave();
     box.insertAdjacentHTML('afterbegin', '<div class="big gold">🏆 ' + esc(dg.nome) + ' concluída!</div>');
-    dg.reward.forEach((id, k) => setTimeout(() => grantItem(id), 700 + k * 900));
+    dg.reward.filter(id => ITEM_BY_ID[id]).forEach((id, k) => setTimeout(() => grantItem(id), 700 + k * 900));
     if (d + 1 < MAIN_DG.length) box.insertAdjacentHTML('beforeend', '<div class="dg-next">Nova dungeon liberada: <b>' + esc(DUNGEONS[d + 1].nome) + '</b>' + (DUNGEONS[d + 1].gate ? ' — exige itens de ' + DUNGEONS[d + 1].gate.map(f => FX_NOME[f]).join(' + ') + '.' : '.') + '</div>');
     setTimeout(checkMeta, 2600);
   } else setTimeout(checkMeta, 100);
@@ -6521,13 +6485,6 @@ const _checkMeta3 = checkMeta;
 checkMeta = function(){
   _checkMeta3();
   const w = (GS.wins.pc || 0) + (GS.wins.ms || 0);
-  if (w >= 7) grantItem('dragao_fogo');
-  if (Object.keys(GS.owned).length >= 25) grantItem('coruja_meia_noite');
-  if ((GS.puz || 0) >= 25) grantItem('espectro_aurora');
-  if (GS.noHint) grantItem('dragao_gelo');
-  if (MAIN_DG.every((_, i) => dgCleared(i))) grantItem('gato_arcoiris');
-  const pets = ITEMS.filter(i => i.slot === 'pet' && i.id !== 'dragao_vazio');
-  if (pets.every(i => GS.owned[i.id])) grantItem('dragao_vazio');
 };
 if (GS.room === 'criptas' && !ROOMS.criptas) GS.room = 'rua';
 checkMeta();
@@ -6587,7 +6544,7 @@ const G = [
   () => 'Em Mariana são ' + D.hora() + ' e o tempo está com ' + D.clima() + '.',
   () => 'Você já juntou ' + D.itens() + ' de ' + D.totalItens() + ' itens.',
   () => 'Você concluiu ' + D.dungs() + ' de ' + MAIN_DG.length + ' dungeons e resolveu ' + D.puz() + ' puzzles.',
-  () => 'Você tem ' + plural(D.pets(), 'pet', 'pets') + ' e achou ' + D.seg() + ' de ' + D.nSeg() + ' segredos.'
+  () => 'Você achou ' + D.seg() + ' de ' + D.nSeg() + ' segredos.'
 ];
 /* assunto das conversas entre moradores (dados reais) */
 const TOPICOS = {
@@ -6598,7 +6555,7 @@ const TOPICOS = {
   lancamento: () => { const p = D.prox(0); return p ? 'O próximo lançamento do calendário é ' + p.n + ', em ' + dt(p.data) + '.' : 'Ainda não vi lançamentos no calendário.'; },
   anime: () => 'A Locadora tem ' + D.nAnime() + ' animes dublados.',
   loja: () => 'A Tenda tem ' + plural(D.nVend(), 'vendedor', 'vendedores') + '.',
-  aventureiro: () => 'Aquele aventureiro já tem ' + D.itens() + ' itens e ' + plural(D.pets(), 'pet', 'pets') + '.'
+  aventureiro: () => 'Aquele aventureiro já tem ' + D.itens() + ' itens.'
 };
 
 const NPC_TXT = {};
@@ -6643,16 +6600,6 @@ NPC_TXT.bruno = {
   t: { dawn: `Cedinho assim só o café está aberto.`, morn: `Manhã é hora de arrumar o Saloon.`, noon: `Meio-dia: primeira rodada de suco!`, aft: `Tarde é de partida lenta e conversa boa.`, eve: `Entardece e o Saloon começa a encher.`, night: `Noite é o horário nobre do Saloon!`, mad: `Madrugada? Os últimos clientes ainda estão aqui.`, rain: `Chuva é bom negócio para taverna.`, cloud: `Nublado traz freguês para dentro.`, clear: `Dia bonito, mas sempre tem lugar à sombra.`, wk: `Fim de semana: casa cheia!` }
 };
 
-NPC_TXT.caio = {
-  w: ['', 'Com a luz baixa: ', 'Na penumbra da sala: ', 'Bem baixinho: '],
-  f: [`Shh... o filme está quase começando.`, `Gosto da escuridão do cinema. Tudo parece possível.`, `Minha lanterna já guiou muita gente até a poltrona certa.`, `Cada tela aqui mostra um canal diferente. São vários mundos ao mesmo tempo.`, `Quando uma live começa, a tela acende sozinha. Parece mágica.`, `Pipoca fria é o terror dos cinéfilos.`, `Prefiro as cenas silenciosas. Dizem mais que mil falas.`, `Atrás das cortinas costuma haver surpresas.`, `Quem chega atrasado perde o começo. Quem chega cedo ganha a melhor poltrona.`, `A luz do projetor tem cheiro de nostalgia.`, `Já vi mais finais do que consigo lembrar.`, `Não existe filme ruim para quem sabe prestar atenção.`, `O som baixo é o respeito máximo no cinema.`, `Gosto de ficar no fundo da sala, olhando o brilho nos rostos.`, `Sabe o que é bonito? Quando todos riem juntos da mesma cena.`, `Cinema é a única casa onde o escuro acolhe.`, `Cada canal monitorado é uma janela para outro lugar.`, `Às vezes uma transmissão ao vivo vale mais que um clássico.`, `Eu cuido da sala. O resto é com a imaginação.`, `A melhor poltrona é a do meio, nem muito perto nem muito longe.`, `Já me emocionei com cena de desenho animado. Sem vergonha nenhuma.`, `Meu trabalho é discreto. Meu amor pelo cinema é barulhento.`, `Se a tela piscou, não é defeito: é suspense.`, `Existe um cheiro de começo quando a sala escurece.`, `Sempre fico até o último crédito. Por respeito.`, `Uma boa live é como um filme que ninguém sabe o final.`, `A cortina vermelha é a coisa mais teatral que existe.`, `Por aqui, o intervalo é sagrado.`, `Gosto de gente que sussurra dentro do cinema.`, `Dizem que há uma coisa brilhante atrás da cortina. Não olhe. Ou olhe.`, `Nunca confunda silêncio com tédio.`, `Quando a sala está cheia, eu quase aplaudo.`, `A melhor história é a que a gente assiste junto.`, `Meu sonho é ver o dia em que todos os canais estejam ao vivo.`, `O brilho da tela é o meu sol particular.`, `Cinema é paciência com recompensa.`, `Na dúvida, escolha a poltrona do canto.`, `Boa sessão, aventureiro. Aproveite a luz.`],
-  d: [() => { const v = D.vivos(); return v.length ? 'Telas acesas: ' + v.join(', ') + '.' : 'Todas as telas estão em repouso.'; }, () => 'Monitoramos ' + D.canais() + ' canais. Cada um com sua luz.', () => 'São ' + D.hora() + '. A sessão da noite começa sempre cedo.', () => D.vivos().length ? 'Tem ' + plural(D.vivos().length, 'canal', 'canais') + ' ao vivo agora. A sala está boa!' : 'Quando uma live começar, a tela acende sozinha.', () => D.chove() ? 'Chuva e cinema: combinação perfeita.' : 'Dia claro, mas a sala está sempre escura e aconchegante.', () => D.filme() ? 'Na Locadora, o filme da semana é ' + D.filme() + '. Boa pedida.' : null, () => 'A Locadora tem ' + D.nAnime() + ' animes dublados. Eu só tenho telas.', () => 'Hoje é ' + D.dia() + '. Sempre tem sessão.', () => 'Você ficou ' + D.min() + ' minutos no mundo. Dá para alguns episódios.', () => 'Vi você com ' + D.itens() + ' itens. Parece figurino de filme de aventura.', () => { const j = D.jogo(); return 'Será que ' + j.n + ' daria um bom filme? É só um palpite.'; }, () => 'Você visitou ' + D.salas() + ' salas. O Cinema é a melhor, claro.'],
-  r: { hora: `A sessão já vai começar.`, clima: `Bom clima para uma sessão.`, live: `Já fui conferir: a tela acendeu mesmo.`, jogos: `Dava um bom catálogo de filmes.`, lancamento: `Vou procurar na grade de sessões.`, anime: `Uma sessão dupla, quem sabe?`, loja: `Eu só entendo de telas.`, aventureiro: `Parece o herói de um filme de aventura.` },
-  rg: [`Entendi.`, `Interessante...`, `Shh, a sessão vai começar.`, `Prometo manter a sala silenciosa.`],
-  s: [`Quando {n} entra no Cinema, sempre há um silêncio respeitoso.`, `Já vi {n} rindo numa sessão. Foi bonito.`, `{n} merece uma poltrona reservada.`],
-  t: { dawn: `Antes do sol, ensaio a sessão no escuro.`, morn: `Manhã: sala vazia, perfeita para pensar.`, noon: `Meio-dia: a sessão da tarde se aproxima.`, aft: `Tarde é a sessão mais tranquila.`, eve: `Entardece e a sala começa a encher.`, night: `A noite é a melhor sessão.`, mad: `Madrugada: só os mais fiéis ficam.`, rain: `Chuva e cinema, combinação perfeita.`, cloud: `Nublado combina com sala escura.`, clear: `Dia claro? A sala continua escura. Gosto disso.`, wk: `Fim de semana: sala cheia de gente feliz.` }
-};
-
 NPC_TXT.ze = {
   w: ['', 'Psiu, freguês: ', 'Olha a oportunidade: ', 'Vou te contar, amigo: '],
   f: [`Olha só quem chegou! Meu melhor cliente do dia!`, `Aqui tem de tudo um pouco e um pouco de tudo.`, `Barganhar é uma arte, e eu sou o artista.`, `Dizem que eu falo demais. Eu digo que vendo bem.`, `Cada barraca tem uma história, e eu conheço todas.`, `Preço bom é o que agrada os dois lados.`, `Não existe produto ruim, só cliente mal informado.`, `Pesquise, compare e depois volte aqui.`, `Já negociei até com o vento. Perdi.`, `Meu balcão é pequeno, mas a vontade de ajudar é gigante.`, `Quem passa pela Tenda sempre leva uma boa conversa de brinde.`, `Sabe o que vale mais que ouro? Confiança.`, `Cliente satisfeito é anúncio que anda.`, `Todo comerciante honesto tem uma pilha de recibos e um coração leve.`, `Se o preço não agrada, a conversa continua.`, `Cada vendedor aqui tem seu jeito. Vale visitar todos.`, `Uma boa feira é aquela que cheira a novidade.`, `Embaixo do meu balcão sempre tem uma surpresa. Sempre.`, `A melhor oferta é a que você ainda não viu.`, `Não tenha pressa. Mercado é para ser passeado.`, `Quem compra com calma compra duas vezes.`, `A palavra vale mais que qualquer moeda.`, `Hoje o movimento está bom. Amanhã, quem sabe?`, `Já fui chamado de pão-duro. Prefiro "econômico".`, `Fiado só amanhã. E amanhã nunca chega.`, `Mercado bom é mercado que ri.`, `Gosto de gente curiosa. Curiosidade vende.`, `Sabe o que mais rende? Uma boa indicação.`, `Toda barraca começa com um sonho e uma lona.`, `Aprendi a ler cliente só pelo olhar.`, `Meu negócio é gente. O resto é consequência.`, `O segredo está no atendimento. E um pouquinho de teatro.`, `Faço o possível para você sair sorrindo.`, `Se não achar o que procura, pergunte. Eu acho.`, `A Tenda nunca fecha de verdade. Ela só cochila.`, `Mais vale um bom amigo que uma venda ruim.`, `Troca justa não é roubo, é arte.`, `Volte sempre! A casa é pequena, mas a porta é grande.`],
@@ -6683,50 +6630,6 @@ NPC_TXT.ptolomeu = {
   t: { dawn: `O amanhecer chega devagar às criptas.`, morn: `Pela manhã, os puzzles estão mais claros.`, noon: `Ao meio-dia a mente está afiada.`, aft: `À tarde, as perguntas ficam mais difíceis.`, eve: `Ao entardecer, as sombras se alongam entre as galerias.`, night: `À noite, as criptas sussurram mais alto.`, mad: `Na madrugada, os enigmas dormem... ou fingem.`, rain: `A chuva lá fora ecoa nas galerias.`, cloud: `Dias nublados, mentes concentradas.`, clear: `Sol lá fora, mas aqui embaixo é sempre o mesmo.`, wk: `Fim de semana: boa hora para uma cripta.` }
 };
 
-NPC_TXT.rosa = {
-  w: ['', 'Com perfume de lavanda: ', 'Colhendo novidade: ', 'Petalinhas de fofoca: '],
-  f: [`Flores não falam, mas dizem muito sem abrir a boca.`, `Cada pétala tem um jeito de agradecer o sol.`, `Hoje as margaridas acordaram de bom humor.`, `Uma rua sem flores é uma rua sem sorriso.`, `Regar de manhã é o segredo de tudo.`, `O cheiro de terra molhada é o meu perfume favorito.`, `Gosto de enfeitar as esquinas, mesmo as mais sérias.`, `Rosas têm espinhos para ensinar respeito.`, `Cada buquê tem uma história que só quem recebe conhece.`, `Já fiz coroa de flores para guarda e até para taverneiro.`, `Vento forte é inimigo das minhas pétalas.`, `Se uma flor murchar, converse com ela. Funciona.`, `Plantei um jardim inteiro dentro de um vaso.`, `As abelhas e eu temos um acordo de paz.`, `Quer ver a rua mais bonita? Plante algo.`, `Girassol sempre sabe onde está o sol.`, `Gosto de cores vivas: elas espantam a tristeza.`, `Tem flor que só abre à noite. Eu admiro a coragem.`, `Um vaso na janela muda o dia de quem passa.`, `Aprendi cedo: paciência é o adubo de tudo.`, `Meu avental vive sujo de terra e orgulhoso disso.`, `Tem dias que a rua inteira cheira a lavanda.`, `Flor de plástico não conta. Nem tente.`, `Ouvi dizer que o Ferreiro forjou uma pá de jardinagem. Preciso ver.`, `Sempre guardo uma flor para quem parece cansado.`, `Ninguém é tão rabugento que resista a um buquê.`, `A chuva faz meu trabalho pela metade.`, `Amo o momento em que o botão abre.`, `Nada como o primeiro raio de sol sobre as pétalas.`, `Leve uma flor no coração, aventureiro.`],
-  d: [() => 'Já são ' + D.hora() + '. Hora de regar.', () => D.chove() ? 'A chuva rega meu jardim de graça.' : 'Hoje o tempo está com ' + D.clima() + '. Bom para as flores.', () => 'Você juntou ' + D.itens() + ' itens. Que coleção florida!', () => 'Dizem que há ' + D.nSeg() + ' segredos escondidos pelo mundo. Você achou ' + D.seg() + '.', () => D.pets() ? 'Seu pet é fofo; só não deixe pisar nos canteiros.' : 'Um pet seria uma boa companhia para passear entre as flores.', () => 'Hoje é ' + D.dia() + '. Dia de flor fresca.', () => 'Você visitou ' + D.salas() + ' de ' + D.nSalas() + ' lugares. Algum deles tem jardim?', () => 'Você passou ' + D.min() + ' minutos por aqui. As flores agradecem a visita.'],
-  r: { hora: `Já? As flores nem perceberam.`, clima: `O clima é o patrão do jardim.`, live: `Só flores ao vivo para mim.`, jogos: `Quantos jogos! Um canteiro de aventuras.`, lancamento: `Vou preparar um buquê para essa data.`, anime: `Anime com jardim? Quero ver.`, loja: `Se algum vendedor tiver sementes, me avise.`, aventureiro: `Aventureiro que cuida do pet merece uma flor.` },
-  rg: [`Que bonito!`, `Gostei de saber.`, `Que notícia boa.`, `Vou guardar isso como um botão.`],
-  s: [`{n} merece um buquê. Ainda vou fazer.`, `Todo mundo cuida de algo. {n} cuida bem do que faz.`, `Sobre {n}: sempre sorri quando passo com flores.`],
-  t: { dawn: `Cedo assim, o orvalho ainda está nas pétalas.`, morn: `Manhã é hora de regar tudo.`, noon: `Meio-dia: sombra para as flores sensíveis.`, aft: `Tarde dourada: as cores ficam mais fortes.`, eve: `Entardecer: as flores fecham devagar.`, night: `A noite guarda o perfume das flores noturnas.`, mad: `Madrugada: só os vaga-lumes e eu.`, rain: `Chuva! O jardim agradece.`, cloud: `Nublado é bom para as flores. Menos sol, menos sede.`, clear: `Sol aberto: tudo desabrocha.`, wk: `Fim de semana: todo mundo quer um buquê.` }
-};
-
-NPC_TXT.nico = {
-  w: ['', 'Com a vara na mão: ', 'Olhando o lago: ', 'Devagar, sem pressa: '],
-  f: [`Pescar é a arte de esperar sem pressa.`, `O lago ensina mais que muita escola.`, `Hoje o lago está calmo. Bom sinal.`, `Peixe esperto sabe quando é hora de ir embora.`, `Minha vara é velha, mas conhece todos os cantos do lago.`, `Se o peixe não morde, o dia ainda rende uma boa conversa.`, `Linha firme, mão leve, coração calmo.`, `Já peguei um peixe tão grande que ninguém acredita. Nem eu.`, `As montanhas ao fundo são testemunhas das minhas histórias.`, `Aprendi a ficar em silêncio com o lago. Funciona com gente também.`, `Um bom pescador nunca conta o tamanho exato do peixe.`, `A isca importa, mas a paciência importa mais.`, `Cada onda traz uma notícia diferente.`, `A névoa da manhã é o melhor momento para pescar.`, `Peixe pega quem não tem pressa.`, `Quando o vento muda, o lago também muda de humor.`, `Gosto de companhia, mas gosto mais de silêncio.`, `Dizem que há criptas sob a cidade. Prefiro a água.`, `Já fisguei uma bota velha. Foi o meu melhor presente.`, `Tenho uma teoria: peixe gosta de música.`, `O Bardo toca perto do lago, e o peixe vem ouvir.`, `Um bom chapéu vale mais que um bom anzol.`, `De manhã, o lago parece um espelho.`, `O silêncio é a melhor isca.`, `Já pesquei, já esperei, já dormi. Tudo no mesmo dia.`, `Se vir um peixe dourado, finja que não viu.`, `A chuva espanta peixe, mas atrai pensamento.`, `Pescar não é sobre peixe. É sobre tempo.`, `Meu balde está vazio, mas meu dia está cheio.`, `Boa pescaria, aventureiro. Volte para me contar.`],
-  d: [() => 'Para o lago, ' + D.hora() + ' é só uma ideia. Mas anotei.', () => D.chove() ? 'Chuva é ruim para pesca, mas ótima para pensar.' : 'Tempo com ' + D.clima() + ': o lago está de bom humor.', () => 'Há ' + D.nJ() + ' jogos na biblioteca. Tem história para toda vida de pescador.', () => D.vivos().length ? 'Dizem que há live no Cinema. Eu prefiro a vara.' : 'Nenhuma live agora. O lago é mais calmo que a tela.', () => 'Você tem ' + D.itens() + ' itens. Dá para encher um balde grande.', () => 'Hoje é ' + D.dia() + '. Dia bom para esperar.', () => 'Faz ' + D.min() + ' minutos que você está por aqui. Bom tempo de espera.', () => 'Você viu ' + D.salas() + ' lugares. O lago é o mais calmo.'],
-  r: { hora: `Para o lago, a hora é só uma ideia.`, clima: `O lago sente o clima antes de todo mundo.`, live: `Ao vivo é rápido demais para mim.`, jogos: `Muito jogo. Eu prefiro uma vara.`, lancamento: `Boa data. Vou pescar nesse dia.`, anime: `Peixe também aparece em anime.`, loja: `Vendedor bom vende isca.`, aventureiro: `Aventureiro paciente chega longe.` },
-  rg: [`Hmm.`, `Entendi, sem pressa.`, `Faz sentido.`, `Vou pensar com a vara na mão.`],
-  s: [`{n} passa aqui às vezes. Conversa boa, silêncio melhor.`, `Se {n} quiser pescar, eu empresto a vara.`, `Sobre {n}: nunca me apressou. Respeito.`],
-  t: { dawn: `A névoa do amanhecer é a melhor hora do lago.`, morn: `Manhã é hora de preparar a isca.`, noon: `Meio-dia: peixe descansa, eu também.`, aft: `Tarde calma: ideal para esperar.`, eve: `Entardecer pinta o lago de laranja.`, night: `À noite o lago guarda os segredos.`, mad: `Madrugada: só o lago e eu.`, rain: `Chuva no lago faz a melhor música.`, cloud: `Dia nublado, peixe desatento.`, clear: `Sol alto: o lago brilha como moeda.`, wk: `Fim de semana: mais gente tenta pescar. Poucos conseguem.` }
-};
-
-NPC_TXT.orfeu = {
-  w: ['', 'Cantarolando: ', 'Em forma de verso: ', 'Dedilhando: '],
-  f: [`Toda melodia começa com um silêncio corajoso.`, `Minha flauta conta histórias que as palavras esqueceram.`, `Cada rua tem seu ritmo, basta escutar.`, `Cordas afinadas, coração afinado.`, `Uma canção boa dura mais que um castelo.`, `Já compus uma balada para cada porta desta rua.`, `A música medieval é feita de poucas notas e muita alma.`, `Tocar baixo é uma arte. Quase ninguém percebe.`, `O vento é meu melhor acompanhante.`, `Sem plateia, eu toco para os pássaros.`, `Cada tom tem uma cor, se você prestar atenção.`, `Já toquei para reis, ferreiros e um gato muito exigente.`, `A melodia da biblioteca é lenta como página virando.`, `A do Saloon é rápida como passo de dança.`, `Há música no martelo do Ferreiro, se ouvir bem.`, `A Locadora tem uma abertura que me emociona.`, `As criptas têm uma melodia sombria, quase um suspiro.`, `Dizem que a melodia certa abre portas. Eu acredito.`, `Compor é pescar notas no ar.`, `Um bardo sem história não é bardo.`, `Já errei uma nota em público. A plateia aplaudiu.`, `Tocar de dia aquece, tocar de noite acolhe.`, `O compasso da rua é feito de passos.`, `Nenhuma música é pequena demais para ser bonita.`, `Uma canção é uma conversa sem pressa.`, `Se o dia estiver feio, cante. Se estiver lindo, cante também.`, `Aprendi a tocar com um velho de barba longa e paciência infinita.`, `Minha lira tem uma corda rebelde. Combinamos bem.`, `Quando a música acaba, o silêncio fica mais bonito.`, `Assobie uma melodia, aventureiro. O mundo agradece.`],
-  d: [() => 'São ' + D.hora() + '. Hora de afinar para a próxima canção.', () => D.chove() ? 'Chuva é um bom tambor.' : 'Com ' + D.clima() + ', a melodia sai leve.', () => 'Você já tem ' + D.itens() + ' itens. Dá para compor uma balada.', () => 'A coleção de ' + D.nJ() + ' jogos também tem trilha sonora.', () => D.vivos().length ? 'Há ' + plural(D.vivos().length, 'canal', 'canais') + ' ao vivo. Lives também têm trilha.' : 'Sem lives agora. O silêncio também é música.', () => 'Hoje é ' + D.dia() + '. Dia de cantiga.', () => 'Você visitou ' + D.salas() + ' salas. Cada uma tem sua melodia.', () => 'Você resolveu ' + D.puz() + ' puzzles. A melodia das criptas deve ter sido difícil.'],
-  r: { hora: `O tempo é compasso, só isso.`, clima: `O clima muda o tom da canção.`, live: `Live sem trilha é triste.`, jogos: `Tantos jogos, tantas melodias.`, lancamento: `Vou compor algo para essa data.`, anime: `Abertura de anime é minha paixão.`, loja: `Se algum vendedor tiver cordas, me avise.`, aventureiro: `Esse aventureiro ainda vira lenda de canção.` },
-  rg: [`Bela história!`, `Que interessante.`, `Isso rende uma canção.`, `Vou guardar isso para uma estrofe.`],
-  s: [`Vou escrever uma balada sobre {n}.`, `{n} tem um ritmo próprio. Dá para ouvir de longe.`, `Sobre {n}: a melhor plateia que já tive.`],
-  t: { dawn: `Ao amanhecer, os pássaros são meus parceiros.`, morn: `Manhã pede flauta e café.`, noon: `Meio-dia: pausa para a cantiga.`, aft: `Tarde pede cordas suaves.`, eve: `O entardecer pede balada.`, night: `À noite, a melodia é mais honesta.`, mad: `Madrugada é hora de compor.`, rain: `Chuva é o melhor tambor.`, cloud: `Nublado combina com uma canção melancólica.`, clear: `Sol alto pede uma música alegre.`, wk: `Fim de semana é festa de cantiga.` }
-};
-
-NPC_TXT.pedrinho = {
-  w: ['', 'Psiu, escuta: ', 'Adivinha só: ', 'Eu ouvi dizer: '],
-  f: [`Você sabia que a rua é enorme? Dá para correr o dia todo!`, `Meu galho é uma espada. Só que de galho.`, `Eu vou ser guarda quando crescer. Ou pirata.`, `Pega-pega é o melhor jogo do mundo!`, `Já contei todos os barris da rua. São muitos!`, `Quando ninguém olha, eu tento entrar na caixa.`, `O Guarda Tadeu diz que eu sou o futuro da cidade!`, `Quer brincar de esconde-esconde? Eu conto até dez.`, `Os prédios são tão altos! Parece que tocam as nuvens.`, `Eu já vi um gato fantasma. Ou foi um lençol.`, `Minha mãe disse para não falar com estranhos, mas você parece legal.`, `Tem formiga no meu sapato? Não, só meu pé coçando.`, `Eu pulei uma poça gigante hoje!`, `Sabe por que o lago é azul? Porque o céu tem inveja.`, `Tem um segredo atrás do barril. Não conta que fui eu!`, `Eu quero um pet. Pode ser um dragão pequeno.`, `Amo quando chove: dá para pisar nas poças.`, `Na biblioteca tem uma moça que manda eu fazer silêncio.`, `Eu descobri que a lua me segue. Sempre!`, `Meu sorvete derreteu. Era de morango.`, `Tem um cheiro de pão vindo de algum lugar!`, `Eu sei assobiar! Quer ouvir? Ah, esqueci.`, `Uma vez eu corri tanto que perdi o chapéu.`, `O Ferreiro deixa eu olhar a forja de longe.`, `Você já tentou pular a calçada sem pisar nas linhas?`, `Quando eu crescer vou ter uma loja só de doces!`, `Eu gosto das poças, dos gatos e de você!`, `Hoje eu não quero dormir. Ainda não.`, `Cada porta é uma aventura diferente!`, `Corre, aventureiro! A rua é nossa!`],
-  d: [() => 'Já são ' + D.hora() + '? O tempo voa quando eu brinco!', () => D.chove() ? 'Está chovendo! Posso pisar na poça?' : 'Hoje o tempo está com ' + D.clima() + '. Bom para correr!', () => 'Você tem ' + D.itens() + ' itens! Posso ver? Posso?', () => 'Tem ' + D.nJ() + ' jogos na biblioteca! Eu queria jogar todos.', () => 'Você tem ' + plural(D.pets(), 'pet', 'pets') + '! Que sorte!', () => 'Hoje é ' + D.dia() + '! Dia de brincar!', () => 'Você já visitou ' + D.salas() + ' lugares? Eu só conheço a rua.', () => D.vivos().length ? 'Dizem que tem live no Cinema! Posso assistir?' : 'Nenhuma live agora. Que chato!'],
-  r: { hora: `Ah, já é tarde? Quero brincar mais!`, clima: `Posso pisar na poça?`, live: `Eu quero ver a live!`, jogos: `Quantos jogos! Posso jogar um?`, lancamento: `Eu quero ser o primeiro a jogar!`, anime: `Anime! Eu adoro anime!`, loja: `Tem doce na Tenda?`, aventureiro: `Eu quero ser aventureiro também!` },
-  rg: [`Nossa!`, `Que legal!`, `Hehe!`, `Conta mais!`],
-  s: [`{n} é muito legal! Sempre me deixa fazer perguntas.`, `Eu quero brincar com {n}!`, `Sobre {n}: me deu bronca uma vez. Só uma.`],
-  t: { dawn: `Eu acordei cedo! O sol ainda está sonolento.`, morn: `Manhã é a melhor hora de correr!`, noon: `Já é meio-dia? Estou com fome!`, aft: `Tarde é hora de pega-pega!`, eve: `Já está escurecendo? Só mais um pouquinho!`, night: `Já é de noite e eu ainda quero brincar.`, mad: `Madrugada?! Eu devia estar dormindo...`, rain: `Chuva! Poça! Poça!`, cloud: `Nuvens com formato de dragão!`, clear: `Dia lindo! Vamos correr!`, wk: `Fim de semana! Zero lição!` }
-};
-
-NPC_TXT.rosa.f.push(`Já tentou cheirar uma flor de olhos fechados? Muda tudo.`, `Cada cor de flor tem um recado diferente.`, `Cravos são teimosos; margaridas, simpáticas.`, `Ontem uma abelha me seguiu o dia inteiro. Acho que gostou de mim.`, `Plantar é acreditar no amanhã.`, `Um buquê simples vale mais que um jardim esquecido.`, `Não existe flor feia, só vaso mal escolhido.`, `Trago sementes no bolso para qualquer emergência.`, `A Bibliotecária Lúcia gosta de lavanda na estante. Ajuda a espantar traças.`, `O Ferreiro finge que não gosta de flor, mas guarda uma no balcão.`, `Quando alguém sorri para uma flor, o dia melhora.`, `Se a flor virar para o sol, ela está agradecendo.`);
-NPC_TXT.nico.f.push(`Peixe bom se reconhece pelo brilho no olho. O dele, não o meu.`, `Um dia desses eu pesquei uma nuvem refletida. Quase desmaiei.`, `A água sempre sabe o que está pensando, só não conta.`, `Tenho três varas: uma para peixe, uma para esperar, uma para conversar.`, `Quem pesca com pressa acaba com o balde cheio de ar.`, `As montanhas guardam o lago como um segredo bem escondido.`, `Já vi o sol se pôr dentro do lago. Foi o melhor espetáculo.`, `Não se preocupe com as horas. O lago não se preocupa.`, `Pescador conta peixe e história com o mesmo capricho.`, `Um chapéu velho e uma vara boa: o resto é detalhe.`, `O Guarda Tadeu passa por aqui e finge que não vê meu balde vazio.`, `Se o vento soprar do norte, o peixe come melhor. Ou é só impressão.`);
-NPC_TXT.orfeu.f.push(`Uma estrofe por manhã mantém o mau humor longe.`, `Gosto de improvisar. Erros viram refrão.`, `Há sons que só a rua faz: passos, portas e sinos distantes.`, `Cantei para o Guarda Tadeu e ele marchou no ritmo. Sem querer.`, `A Florista Rosa me inspirou uma valsa. Ainda falta o final.`, `Minha lira é herança de um tio que nunca soube tocar. Eu aprendi por ele.`, `Quando o Pescador Nico escuta, até o lago parece afinar.`, `Toda taverna precisa de uma boa cantiga. O Saloon que o diga.`, `Dizem que cantar espanta o medo. Experimente nas criptas.`, `Ritmo é a respiração da música.`, `Um bom refrão gruda como cola de ferreiro.`, `O silêncio entre duas notas também é música.`);
-NPC_TXT.pedrinho.f.push(`Eu já corri a rua inteira sem parar! Quase.`, `Se eu fosse mágico, transformava todo barril em doce.`, `A Florista Rosa me deu uma flor. Eu comi. Era de enfeite.`, `O Bardo Orfeu toca e eu danço. Ele diz que eu danço mal, mas é com carinho.`, `Eu tenho um segredo: sei onde fica o melhor lugar para se esconder.`, `Você sabia que a lua também brinca de esconde-esconde com o sol?`, `Eu sou muito rápido. Ninguém me pega! Só a hora do banho.`, `Um dia eu vou ver as criptas. Só por fora, prometo.`, `Queria um cavalo. Ou uma vaca. Qualquer bicho grande!`, `O Pescador Nico não conversa muito, mas me deixa segurar a vara!`, `Eu desenhei um mapa do mundo na terra. A rua é do tamanho de um dedo.`, `Tem uma nuvem com cara de coelho ali. Olha lá!`);
 
 /* ---------- monta o conjunto de falas de um morador ---------- */
 const NPC_RECENT = {};
@@ -6767,28 +6670,13 @@ function falaDe(id){
    visitam uns aos outros e conversam (balões). 12 moradores, simulação
    contínua mesmo com o jogador em outra sala. Falas vêm de extras4.js.
    ===================================================================== */
-RESIDENTS.rua.push(
-  { x:700, yf:0.45, nome:'Florista Rosa', gift:'coroa_flores', giftMsg:'Fiz esta coroa de flores para você. Use com orgulho!',
-    look:{ helm:'coroa_flores', chest:'tunica', legs:'perneiras_floresta' } },
-  { x:2000, yf:0.5, nome:'Pescador Nico', gift:'vara_pesca', giftMsg:'Esta vara já pescou muita história. É sua agora.',
-    look:{ helm:'capuz_floresta', chest:'couro', legs:'botas_couro', weapon:'cajado_madeira' } },
-  { x:1150, yf:0.4, nome:'Bardo Orfeu', gift:'lira_bardo', giftMsg:'Aceite minha lira. Toque e o mundo ouvirá.',
-    look:{ helm:'chapeu_mago', chest:'tunica', legs:'botas_reais' } },
-  { x:1500, yf:0.7, nome:'Pedrinho', gift:'chapeu_menino', giftMsg:'É meu chapéu da sorte! Pode ficar, eu tenho outro!', small:true,
-    look:{ helm:'capuz_couro', chest:'tunica', legs:'botas_couro' } }
-);
 
 const HOME_ENTRY_X = 90;
 const NPC_DEF = {
   tadeu:    { room:'rua', idx:0, street:true, range:[180, 2380], speed:46 },
-  rosa:     { room:'rua', idx:1, street:true, range:[260, 2300], speed:40, off:[19, 6] },
-  nico:     { room:'rua', idx:2, street:true, range:[1550, 2420], speed:34, off:[21, 5] },
-  orfeu:    { room:'rua', idx:3, street:true, range:[300, 2300], speed:42, off:[0, 7] },
-  pedrinho: { room:'rua', idx:4, street:true, range:[120, 2440], speed:78, off:[20, 7] },
   lucia:    { room:'biblioteca', idx:0, door:300, speed:44, fixed:true },
   ferreiro: { room:'office', idx:0, door:660, speed:44, fixed:true },
   bruno:    { room:'salajogos', idx:0, door:990, speed:46, fixed:true },
-  caio:     { room:'cinema', idx:0, door:1378, speed:40 },
   ze:       { room:'tenda', idx:0, door:1780, speed:50, fixed:true },
   marina:   { room:'locadora', idx:0, door:2150, speed:48, fixed:true },
   ptolomeu: { room:'criptas', idx:0, fixed:true, speed:26 }
@@ -6815,7 +6703,7 @@ Object.keys(NPC_DEF).forEach(id => {
   NP[id] = n; NPC_LIST.push(n);
   r._y = yOf(n);
 });
-NPC_TXT_IDS = Object.keys(NPC_TXT);
+NPC_TXT_IDS = Object.keys(NPC_TXT).filter(id => NPC_DEF[id]);
 /* quem está em horário de folga começa fora da cena */
 NPC_LIST.forEach(n => { if (isOff(n)) { n.loc = 'off'; } });
 /* os moradores de casa começam, em parte, passeando pela rua (depende do horário real) */
@@ -7098,10 +6986,6 @@ addItem('diadema_prata','helm','Diadema de Prata','coroa','iron','raro','Fique 1
 addItem('asas_corvo','back','Asas de Corvo','asas','midnight','epico','Fique 6 horas no mundo','void');
 addItem('martelo_runico','weapon','Martelo Rúnico','martelo','royal','epico','Fique 10 horas no mundo','glow');
 /* presentes dos novos moradores (4) */
-addItem('coroa_flores','helm','Coroa de Flores','coroa','forest','incomum','Presente da Florista Rosa');
-addItem('vara_pesca','weapon','Vara de Pesca','cajado','leather','incomum','Presente do Pescador Nico');
-addItem('lira_bardo','weapon','Lira do Bardo','cajado','gold','raro','Presente do Bardo Orfeu','glow');
-addItem('chapeu_menino','helm','Chapéu do Pedrinho','capuz','crimson','comum','Presente do Pedrinho');
 /* conversas entre moradores (3) */
 addItem('capa_fofoqueiro','back','Capa do Fofoqueiro','capa','crimson','comum','Presencie 5 conversas entre moradores');
 addItem('manto_orador','chest','Manto do Orador','manto','royal','comum','Presencie 25 conversas entre moradores');
@@ -7129,7 +7013,6 @@ addItem('elmo_campeao','helm','Elmo do Campeão','crista','gold','lendario','Ven
 /* coleção e exploração (5) */
 addItem('capa_colecionador','back','Capa do Colecionador','capa','gold','epico','Reúna 50 itens');
 addItem('armadura_mestre','chest','Armadura do Mestre Colecionador','placa','rainbow','mitico','Reúna 70 itens','rainbow');
-addItem('asas_cristal','back','Asas de Cristal','asas','ice','mitico','Reúna 15 pets','ice');
 addItem('capuz_neblina','helm','Capuz da Neblina','capuz','cloth','incomum','Visite todos os lugares do mundo');
 addItem('bastao_explorador','weapon','Bastão do Explorador','tocha','iron','raro','Encontre 9 segredos escondidos');
 
@@ -7149,7 +7032,6 @@ function checkExtras6(){
   const own = Object.keys(g.owned).length;
   if (own >= 50) grantItem('capa_colecionador');
   if (own >= 70) grantItem('armadura_mestre');
-  if (ITEMS.filter(i => i.slot === 'pet' && g.owned[i.id]).length >= 15) grantItem('asas_cristal');
   if (Object.keys(ROOMS).every(r => g.rooms[r])) grantItem('capuz_neblina');
   if (Object.keys(g.found).length >= 9) grantItem('bastao_explorador');
 }
@@ -7184,21 +7066,15 @@ addItem('capa_horizonte','back','Capa do Horizonte','capa','solar','raro','Camin
 addItem('capuz_horizonte','helm','Capuz do Horizonte','capuz','midnight','raro','Caminhe até a borda leste da rua');
 addItem('elmo_ampulheta','helm','Elmo da Ampulheta','elmo','gold','epico','Há algo estranho no relógio do mundo','glow');
 addItem('manto_silencio','chest','Manto do Silêncio','manto','cloth','epico','Fique em silêncio absoluto na Biblioteca');
-addPet('gatinho_estelar','Gatinho Estelar','gato','midnight','epico','Faça carinho no seu pet','glow','sorte');
 addItem('faixa_embaixador','back','Faixa do Embaixador','capa','royal','epico','Converse com todos os moradores no mesmo dia');
 addItem('botas_veloz','legs','Botas do Maratonista','botas','aurora','epico','Visite todos os lugares da cidade em poucos minutos','aurora');
 /* dungeons da lua */
 addItem('elmo_lunar','helm','Elmo Lunar','mago','angel','lendario','Conclua a Portal da Lua','glow');
-addPet('coruja_lunar','Coruja Lunar','coruja','angel','epico','Conclua a Portal da Lua','glow','dica');
 addItem('cota_lunar','chest','Cota Lunar','placa','angel','lendario','Conclua a Adega Lunar','glow');
-addPet('raposa_lunar','Raposa Lunar','cachorro','angel','epico','Conclua a Adega Lunar','glow','vel');
 addItem('cetro_lunar','weapon','Cetro Lunar','cajado','angel','lendario','Conclua a Sala Escarlate','glow');
-addPet('fantasma_lunar','Fantasma Lunar','fantasma','angel','epico','Conclua a Sala Escarlate','glow','tempo');
 /* dungeons de chave */
 addItem('espada_naipes','weapon','Espada dos Naipes','espada','crimson','epico','Conclua a Câmara do Baralho');
-addPet('carta_viva','Carta Viva','estrela','crimson','raro','Conclua a Câmara do Baralho','','sorte');
 addItem('picareta_minas','weapon','Picareta das Minas','martelo','iron','epico','Conclua a Galeria das Minas');
-addPet('robo_minas','Robô Mineiro','robo','gold','raro','Conclua a Galeria das Minas','','vida');
 /* mercado misterioso (compra com moedas) */
 addItem('turbante_mercador','helm','Turbante do Mercador','mago','gold','raro','Compre no Mercado Misterioso');
 addItem('manto_mercador','chest','Manto do Mercador','manto','crimson','raro','Compre no Mercado Misterioso');
@@ -7212,9 +7088,8 @@ addItem('armadura_nomade','chest','Armadura Nômade','placa','gold','epico','Com
 addItem('tomo_do_mundo','weapon','Tomo do Mundo','cajado','aurora','lendario','Desbloqueie todos os capítulos do Diário','aurora');
 
 /* ---------- regra: drop por tempo = só comuns, a cada 5 h acumuladas ---------- */
-const TEMPO_5H = ['capuz_couro','gato_aldeao','adaga','tunica_azul','boina_verde','botas_ferro','capa_cinza','laco_festa','elmo_osso','cajado_madeira',
-  'calca_xadrez','botas_verdes','gorro_la','chapeu_palha','calcas_linho','estilingue','capa_remendada','machado_pedra','capa_chuva','colete_feltro',
-  'cao_guarda','botinas_lama','tunica_festiva','bengala_madeira','lanterna_papel'];
+const TEMPO_5H = ['capuz_couro','adaga','tunica_azul','boina_verde','botas_ferro','capa_cinza','laco_festa','elmo_osso','cajado_madeira',
+  'calca_xadrez','botas_verdes','gorro_la','chapeu_palha','calcas_linho','estilingue','capa_remendada','machado_pedra','capa_chuva','colete_feltro','botinas_lama','tunica_festiva','bengala_madeira','lanterna_papel'];
 TIME_DROPS.length = 0;
 TEMPO_5H.forEach((id, i) => {
   TIME_DROPS.push([18000 * (i + 1), id]);
@@ -7222,8 +7097,8 @@ TEMPO_5H.forEach((id, i) => {
 });
 /* itens que eram por tempo/horário e agora dependem de AÇÕES */
 const PA_ITEMS = ['espada_ferro','cota_malha','elmo_ferro','capa_viajante','grevas_ferro','colete_couro','capa_verde','martelo','machado_ferro','chifres',
-  'elmo_cobre','cota_cobre','grevas_cobre','manto_viajante2','capuz_real','placa_ferro','espada_bronze','botas_bronze','diadema_prata','pintinho_bronze',
-  'martelo_trovao','coroa_gelo','asas_corvo','martelo_runico','coroa','cajado_aurora','fenix_filhote','asas_anjo'];
+  'elmo_cobre','cota_cobre','grevas_cobre','manto_viajante2','capuz_real','placa_ferro','espada_bronze','botas_bronze','diadema_prata',
+  'martelo_trovao','coroa_gelo','asas_corvo','martelo_runico','coroa','cajado_aurora','asas_anjo'];
 const PA_DROPS = [];
 (function(){
   const base = { incomum:6, raro:45, epico:110, lendario:260, mitico:450, ultra:800 }, step = { incomum:5, raro:10, epico:18, lendario:40, mitico:150, ultra:200 };
@@ -7237,11 +7112,8 @@ const PA_DROPS = [];
 })();
 const JANELAS = [
   { id:'manto_noite', k:'madrugada', n:3, txt:'Faça 3 ações de madrugada (0h às 5h)' },
-  { id:'fantasma_anjo', k:'noite', n:5, txt:'Faça 5 ações à noite (22h às 5h)' },
   { id:'armadura_solar', k:'meiodia', n:4, txt:'Faça 4 ações por volta do meio-dia' },
-  { id:'estrela_solar', k:'meiodia', n:6, txt:'Faça 6 ações por volta do meio-dia' },
   { id:'botas_tempestade', k:'chuva', n:3, txt:'Faça 3 ações num dia de chuva real' },
-  { id:'robo_trovao', k:'chuva', n:10, txt:'Faça 10 ações num dia de chuva real' },
   { id:'capa_alvorada', k:'alvorada', n:2, txt:'Faça 2 ações entre 5h e 6h' },
   { id:'elmo_luar', k:'luar', n:2, txt:'Faça 2 ações entre 3h e 4h' },
   { id:'botas_domingo', k:'domingo', n:3, txt:'Faça 3 ações num domingo' },
@@ -7488,14 +7360,9 @@ const LORE_NPC = {
   lucia: ['O alçapão da Biblioteca foi escondido por mim, há muito tempo.', 'Os livros escutam. Por isso exijo silêncio.', 'Cada cripta é uma lição. A primeira ensina a ler as portas.', 'Há capítulos do mundo escritos só para quem for paciente.'],
   ferreiro: ['A forja nunca apaga: há uma fornalha esquecida sob o chão que depende dela.', 'Forjei as grevas dos primeiros exploradores das criptas.', 'Ferro que viu a lua cheia fica mais teimoso. E mais bonito.', 'Debaixo da forja há uma galeria. Só abre para quem tem a chave certa.'],
   bruno: ['As mesas do Saloon eram trancas antes de serem jogos.', 'Quem joga muito Paciência acaba abrindo coisas que não sabia que existiam.', 'Na adega do Saloon, sob a lua cheia, ouço música que ninguém toca.', 'Campo Minado também guarda segredos, para quem tiver a mão firme.'],
-  caio: ['Atrás da tela, em noites de lua cheia, há uma sala escarlate.', 'Tudo que é transmitido ao vivo ganha um eco aqui no Cinema.', 'Já vi um brilho atrás da cortina que não era projetor.', 'Cada canal é uma janela. Algumas dão para lugares que não existem.'],
   ze: ['O Mercador Sem Rosto não tem dia fixo. Só avisa na véspera, em sussurros.', 'Moeda de quem só espera não vale nada para ele. Só a de quem agiu.', 'A Tenda é mais velha que as lojas da região. O mercador sabe o motivo.', 'Quando ele chega, o ar cheira a especiaria e a tinta velha.'],
   marina: ['Cada episódio é uma porta pequena. A maratona abre todas.', 'Tenho uma fita sem rótulo que só mostra o que você precisa ver.', 'Dizem que o Cinema tem uma sala secreta. Eu prefiro a minha TV.', 'Anime bom é o que te faz querer abrir portas.'],
   ptolomeu: ['O Arquivo nunca foi sobre guardar coisas, e sim quem as procura.', 'Sob a lua cheia surgem câmaras que eu mesmo não construí.', 'Há chaves que ninguém fabrica: elas nascem de tentativa e paciência.', 'Os quatro selos formam um ciclo. Fechar o ciclo é só o começo.'],
-  rosa: ['Plantei lavanda na borda da rua. Dizem que ela abre portas de noite.', 'A lua cheia faz as flores brilharem. Juro.', 'Já vi uma estrela cadente cair no meu canteiro.', 'Flor que nasce perto de uma cripta cheira a poeira e a hortelã.'],
-  nico: ['O lago reflete portas que a rua não mostra.', 'Em noite de lua cheia, o lago vira um espelho de prata.', 'Já vi uma estrela cadente cair no lago. Tentei pescá-la.', 'Há algo na borda oeste. Nunca me aproximei. Peixe não me dá medo, mas isso sim.'],
-  orfeu: ['Compus uma canção para a lua cheia. Só toco nessas noites.', 'A melodia das criptas é a mais antiga que conheço.', 'O mercador sem rosto assobia uma nota só. Já a escutei.', 'Dizem que quem toca na rua de madrugada acorda o que dorme embaixo.'],
-  pedrinho: ['Eu vi uma luz azul na borda da rua! Foi na lua cheia!', 'O mercador chega no dia que ninguém espera. Eu espero todo dia!', 'Se você achar uma estrela cadente, faça um pedido pra mim!', 'Eu fui até a borda oeste uma vez. Corri de volta.']
 };
 Object.keys(LORE_NPC).forEach(id => { if (NPC_TXT[id]) NPC_TXT[id].f.push(...LORE_NPC[id]); });
 
@@ -7539,7 +7406,7 @@ const LORE = [
   { t:'Os Livros que Respiram', u:() => nTalked('lucia'), h:'Converse com a Bibliotecária Lúcia', x:'A Bibliotecária Lúcia cataloga a coleção por plataformas, mas guarda um caderno à parte, o das passagens. Foi ela quem escondeu o alçapão sob a estante e quem aprendeu a decifrar as placas das criptas. Ela pede silêncio porque os livros escutam.' },
   { t:'O Ferro Lembra', u:() => nTalked('ferreiro'), h:'Converse com o Mestre Ferreiro', x:'O Mestre Ferreiro forjou, há muito tempo, as grevas e os elmos de quem desce às criptas. A forja nunca apaga por um motivo: uma fornalha esquecida sob o chão depende do calor da superfície para não congelar de vez.' },
   { t:'A Mesa da Sorte', u:() => totalWins() >= 1, h:'Vença uma partida no Saloon', x:'Bruno jura que as mesas do Saloon são mais velhas que a taverna. Cartas e minas não eram jogos no começo: eram trancas. Quem vencia provava ser digno de abrir o que estava escondido. Por isso cada vitória rende um prêmio, e algumas jogadas abrem algo mais.' },
-  { t:'Telas Acesas', u:() => nTalked('caio'), h:'Converse com o Lanterninha Caio', x:'As telas do Cinema acendem sozinhas quando alguém transmite ao vivo, e Caio diz que isso é um eco do Arquivo: tudo que é contado ao vivo ganha uma cópia ali. Atrás da cortina, nas noites de lua cheia, ele já viu um brilho que não era da tela.' },
+  { t:'Telas Acesas', u:() => GS.rooms.cinema, h:'Visite o Cinema', x:'As telas do Cinema acendem sozinhas quando alguém transmite ao vivo, e dizem que isso é um eco do Arquivo: tudo que é contado ao vivo ganha uma cópia ali. Atrás da cortina, nas noites de lua cheia, já viram um brilho que não era da tela.' },
   { t:'O Mercado de Estrelas', u:() => nTalked('ze') && GS.rooms.tenda, h:'Visite a Tenda e converse com o Mercador Zé', x:'A Tenda existia antes das lojas. Zé conta que um mercador sem rosto aparecia em dias que ninguém conseguia prever, e só depois de um aviso sussurrado na véspera. Quem ignora os sussurros perde o negócio.' },
   { t:'Fitas Sem Fim', u:() => nTalked('marina'), h:'Converse com a Atendente Marina', x:'Marina acredita que cada episódio é uma porta pequena. Quando o anime acaba, a porta fecha, e só reabre na próxima maratona. Ela guarda uma fita sem rótulo; diz que só mostra o que o espectador precisa ver.' },
   { t:'A Primeira Cripta', u:() => dgCleared(0), h:'Conclua a Cripta do Arquivista', x:'O Arquivista não montou as criptas para ocultar tesouros, mas para treinar quem quisesse herdar o arquivo. Cada puzzle é uma lição: observar, lembrar, ordenar, confiar. Concluir a primeira cripta é só aprender a linguagem das portas.' },
@@ -7632,14 +7499,9 @@ const Q_ITENS = {
   lucia:'oculos_sabio', ferreiro:'avental_forja', bruno:'chapeu_xerife', caio:'jaqueta_cineasta', ze:'turbante_ze', marina:'capa_locadora', ptolomeu:'coroa_cripta'
 };
 addItem('insignia_guarda','chest','Insígnia do Guarda','placa','iron','raro','Missão do Guarda Tadeu');
-addItem('tiara_petalas','helm','Tiara de Pétalas','coroa','forest','raro','Missão da Florista Rosa');
-addItem('chapeu_pescador','helm','Chapéu do Pescador','capuz','ice','raro','Missão do Pescador Nico');
-addItem('capa_menestrel','back','Capa do Menestrel','capa','royal','raro','Missão do Bardo Orfeu');
-addItem('bandana_aventura','helm','Bandana da Aventura','capuz','crimson','raro','Missão do Pedrinho');
 addItem('oculos_sabio','helm','Óculos do Sábio','mago','gold','raro','Missão da Bibliotecária Lúcia');
 addItem('avental_forja','chest','Avental da Forja','malha','bronze','raro','Missão do Ferreiro');
 addItem('chapeu_xerife','helm','Chapéu do Xerife','crista','leather','raro','Missão do Bruno');
-addItem('jaqueta_cineasta','chest','Jaqueta do Cineasta','manto','midnight','raro','Missão do Caio');
 addItem('turbante_ze','helm','Turbante do Zé','capuz','solar','raro','Missão do Zé');
 addItem('capa_locadora','back','Capa da Locadora','capa','fire','raro','Missão da Marina');
 addItem('coroa_cripta','helm','Coroa da Cripta','coroa','void','epico','Missão do Ptolomeu','void');
@@ -7652,23 +7514,13 @@ const QM = {
 const QABS = { salas:1, owned:1, talked:1 };
 const QUESTS = [
   { id:'tadeu1', npc:'tadeu', t:'Olhos de Guarda', d:'A cidade precisa de rostos conhecidos. Converse com 4 moradores diferentes.', m:'talked', n:4, r:{ coins:20, ap:5 } },
-  { id:'tadeu2', npc:'tadeu', t:'Ronda Completa', d:'Quero que você conheça todo mundo. Converse com 10 moradores diferentes.', m:'talked', n:10, r:{ coins:50, ap:12 } },
-  { id:'rosa1', npc:'rosa', t:'Mente Florida', d:'Quem resolve enigmas tem a cabeça cheia de flores. Resolva 3 puzzles das dungeons.', m:'puz', n:3, r:{ coins:20, ap:5 } },
-  { id:'rosa2', npc:'rosa', t:'Jardim de Enigmas', d:'Mais 8 puzzles e o jardim das criptas floresce.', m:'puz', n:8, r:{ coins:50, ap:12 } },
-  { id:'nico1', npc:'nico', t:'Isca de Sorte', d:'Pesca-se com paciência... e com cartas. Vença 2 jogos no Saloon.', m:'wins', n:2, r:{ coins:20, ap:5 } },
-  { id:'nico2', npc:'nico', t:'Grande Pescaria', d:'Vença 5 jogos no Saloon e eu conto onde o peixe grande se esconde.', m:'wins', n:5, r:{ coins:50, ap:12 } },
-  { id:'orfeu1', npc:'orfeu', t:'Plateia Atenta', d:'Toda canção nasce de uma boa fofoca. Presencie 3 conversas entre moradores.', m:'chats', n:3, r:{ coins:20, ap:5 } },
-  { id:'orfeu2', npc:'orfeu', t:'Balada da Cidade', d:'Preciso de verso novo: presencie mais 8 conversas.', m:'chats', n:8, r:{ coins:50, ap:12 } },
-  { id:'pedrinho1', npc:'pedrinho', t:'Caça ao Tesouro', d:'Achei um mapa! Encontre 1 segredo escondido pelo mundo.', m:'found', n:1, r:{ coins:20, ap:5 } },
-  { id:'pedrinho2', npc:'pedrinho', t:'Mestre Explorador', d:'Agora encontre mais 3 segredos. Vale olhar atrás de tudo!', m:'found', n:3, r:{ coins:50, ap:12 } },
+  { id:'tadeu2', npc:'tadeu', t:'Ronda Completa', d:'Quero que você conheça todo mundo. Converse com 6 moradores diferentes.', m:'talked', n:6, r:{ coins:50, ap:12 } },
   { id:'lucia1', npc:'lucia', t:'Prova de Fogo', d:'Os livros guardam provas. Conclua 1 dungeon por inteiro.', m:'clears', n:1, r:{ coins:25, ap:6 } },
   { id:'lucia2', npc:'lucia', t:'Arquivista de Verdade', d:'Conclua mais 2 dungeons e o arquivo é seu.', m:'clears', n:2, r:{ coins:60, ap:14 } },
   { id:'ferreiro1', npc:'ferreiro', t:'Aço e Sorte', d:'Mão firme na forja, sorte na mesa. Vença 3 jogos no Saloon.', m:'wins', n:3, r:{ coins:20, ap:5 } },
   { id:'ferreiro2', npc:'ferreiro', t:'Martelo da Mente', d:'Resolva 12 puzzles para provar que também forja ideias.', m:'puz', n:12, r:{ coins:55, ap:13 } },
   { id:'bruno1', npc:'bruno', t:'Primeira Rodada', d:'Quem entra no Saloon tem que ganhar. Vença 1 jogo.', m:'wins', n:1, r:{ coins:15, ap:4 } },
   { id:'bruno2', npc:'bruno', t:'Lenda do Saloon', d:'Dez vitórias e seu nome vai pro quadro.', m:'wins', n:10, r:{ coins:55, ap:13 } },
-  { id:'caio1', npc:'caio', t:'Circuito de Salas', d:'Cinema bom é o de quem viaja. Já pisou em 6 salas diferentes?', m:'salas', n:6, r:{ coins:20, ap:5 } },
-  { id:'caio2', npc:'caio', t:'Mapa Completo', d:'Conheça todas as salas do mundo.', m:'salas', n:'ALL', r:{ coins:50, ap:12 } },
   { id:'ze1', npc:'ze', t:'Visita ao Mercador', d:'Uma boa venda começa com um cliente curioso. Visite um Mercado Misterioso.', m:'markets', n:1, r:{ coins:25, ap:6 } },
   { id:'ze2', npc:'ze', t:'Colecionador de Tenda', d:'Reúna 30 itens diferentes para eu te chamar de cliente VIP.', m:'owned', n:30, r:{ coins:55, ap:13 } },
   { id:'marina1', npc:'marina', t:'Prateleira Cheia', d:'Quem aluga muito, guarda bastante. Reúna 20 itens.', m:'owned', n:20, r:{ coins:20, ap:5 } },
@@ -7773,7 +7625,7 @@ const DATAS = [
   { id:'halloween', nome:'Halloween', em:'🎃', deco:['🎃','🦇','🕸️','👻'], item:'mascara_abobora', win:y => [dmd(y,10,24), dmd(y,11,2)],
     falas:['Uuuh! Noite de Halloween na cidade!', 'As abóboras sorriem mais do que o normal esta semana.', 'Procure o presente de Halloween perto do quadro de avisos!'] },
   { id:'criancas', nome:'Dia das Crianças', em:'🎈', deco:['🎈','🧸','🍭','🎁'], item:'chapeu_balao', win:y => [dmd(y,10,10), dmd(y,10,12)],
-    falas:['Feliz Dia das Crianças! O Pedrinho está radiante.', 'Balões por toda a rua! Parece festa de verdade.', 'Tem um presente perto do quadro de avisos!'] },
+    falas:['Feliz Dia das Crianças! A rua está cheia de alegria.', 'Balões por toda a rua! Parece festa de verdade.', 'Tem um presente perto do quadro de avisos!'] },
   { id:'natal', nome:'Natal', em:'🎄', deco:['🎄','⭐','🔔','❄️'], item:'gorro_natalino', win:y => [dmd(y,12,18), dmd(y,12,26)],
     falas:['Feliz Natal, viajante!', 'Os sinos da cidade não param de tocar.', 'Deixaram um presente de Natal perto do quadro de avisos.'] },
   { id:'anonovo', nome:'Ano Novo', em:'🎆', deco:['🎆','🥂','✨','🎇'], item:'coroa_reveillon', win:y => [dmd(y,12,30), dmd(y+1,1,2)],
@@ -7781,7 +7633,7 @@ const DATAS = [
   { id:'carnaval', nome:'Carnaval', em:'🎭', deco:['🎭','🥁','🎊','🪇'], item:'mascara_carnaval', win:y => { const p = pascoa(y) - 47; return [p - 4, p + 1]; },
     falas:['É Carnaval! Até o Ferreiro cantou hoje.', 'Confete na rua inteira!', 'Achei um presente de Carnaval perto do quadro de avisos.'] },
   { id:'pascoa', nome:'Páscoa', em:'🐰', deco:['🐰','🥚','🌷','🐣'], item:'orelhas_coelho', win:y => { const p = pascoa(y); return [p - 3, p + 1]; },
-    falas:['Feliz Páscoa! Cuidado onde pisa, há ovos por aí.', 'A Florista Rosa escondeu ovos pela rua.', 'Tem um presente de Páscoa perto do quadro de avisos.'] },
+    falas:['Feliz Páscoa! Cuidado onde pisa, há ovos por aí.', 'Dizem que alguém escondeu ovos pela rua.', 'Tem um presente de Páscoa perto do quadro de avisos.'] },
   { id:'junina', nome:'Festa Junina', em:'🔥', deco:['🔥','🌽','🎏','🎵'], item:'chapeu_junino', win:y => [dmd(y,6,13), dmd(y,6,29)],
     falas:['Arraiá na rua! Anarriê!', 'Cheiro de milho cozido por toda a cidade.', 'Deixaram um presente junino perto do quadro de avisos.'] }
 ];
@@ -8472,24 +8324,6 @@ window.__f12 = { F, fGerar, fAbrir, fSair, showTravel, fAtualiza, fDesenha };
   const SH = {"blacksmith": {"n": 5, "fw": 34, "fh": 34, "b": [7, 3, 25, 33]}, "dwarf": {"n": 4, "fw": 32, "fh": 32, "b": [2, 5, 30, 32]}, "barkeep": {"n": 5, "fw": 34, "fh": 34, "b": [8, 2, 25, 33]}, "barmaid": {"n": 5, "fw": 34, "fh": 34, "b": [5, 1, 29, 33]}, "dog": {"n": 4, "fw": 32, "fh": 32, "b": [10, 11, 27, 32]}, "merchant": {"n": 5, "fw": 32, "fh": 32, "b": [3, 2, 31, 32]}, "farmer_02": {"n": 5, "fw": 32, "fh": 32, "b": [5, 5, 23, 32]}, "elder": {"n": 4, "fw": 32, "fh": 32, "b": [5, 8, 25, 32]}, "princess": {"n": 4, "fw": 32, "fh": 32, "b": [8, 7, 28, 32]}, "seer": {"n": 6, "fw": 34, "fh": 34, "b": [9, 4, 27, 32]}, "jester": {"n": 5, "fw": 34, "fh": 34, "b": [2, 2, 29, 31]}, "priestess": {"n": 5, "fw": 32, "fh": 32, "b": [3, 1, 32, 32]}, "adventurer_05": {"n": 4, "fw": 32, "fh": 32, "b": [3, 5, 27, 32]}, "minstrel": {"n": 5, "fw": 34, "fh": 34, "b": [6, 2, 30, 32]}, "villager_01": {"n": 5, "fw": 34, "fh": 34, "b": [3, 5, 33, 32]}, "farmer_01": {"n": 5, "fw": 32, "fh": 32, "b": [1, 3, 27, 30]}, "beggar": {"n": 5, "fw": 34, "fh": 34, "b": [2, 13, 31, 31]}, "witch": {"n": 5, "fw": 34, "fh": 34, "b": [6, 1, 32, 33]}, "shady_guy": {"n": 5, "fw": 34, "fh": 34, "b": [9, 2, 30, 32]}, "fairy": {"n": 4, "fw": 32, "fh": 32, "b": [8, 6, 23, 27]}, "knight1_idle": {"n": 4, "fw": 128, "fh": 128, "b": [12, 64, 55, 128]}, "knight1_walk": {"n": 8, "fw": 128, "fh": 128, "b": [13, 64, 63, 128]}, "satyr3_idle": {"n": 6, "fw": 128, "fh": 128, "b": [45, 52, 80, 128]}, "satyr3_walk": {"n": 12, "fw": 128, "fh": 128, "b": [34, 50, 91, 128]}, "satyr1_idle": {"n": 7, "fw": 128, "fh": 128, "b": [50, 53, 78, 128]}, "satyr1_walk": {"n": 12, "fw": 128, "fh": 128, "b": [34, 51, 89, 128]}, "girl2_idle": {"n": 7, "fw": 128, "fh": 128, "b": [48, 56, 80, 128]}, "girl2_walk": {"n": 12, "fw": 128, "fh": 128, "b": [45, 55, 81, 128]}, "girl3_idle": {"n": 6, "fw": 128, "fh": 128, "b": [47, 55, 79, 128]}, "girl3_walk": {"n": 12, "fw": 128, "fh": 128, "b": [46, 54, 81, 128]}, "peasant_idle": {"n": 6, "fw": 96, "fh": 96, "b": [27, 28, 62, 96]}, "peasant_walk": {"n": 8, "fw": 96, "fh": 96, "b": [26, 31, 63, 96]}, "monk_idle": {"n": 7, "fw": 96, "fh": 96, "b": [31, 25, 67, 96]}, "monk_walk": {"n": 7, "fw": 96, "fh": 96, "b": [30, 23, 88, 96]}, "mage_idle": {"n": 8, "fw": 128, "fh": 128, "b": [29, 62, 81, 128]}, "mage_walk": {"n": 7, "fw": 128, "fh": 128, "b": [38, 62, 90, 128]}, "samurai_idle": {"n": 6, "fw": 128, "fh": 128, "b": [0, 59, 128, 128]}, "samurai_walk": {"n": 9, "fw": 128, "fh": 128, "b": [25, 58, 84, 128]}, "vamp1_idle": {"n": 5, "fw": 128, "fh": 128, "b": [30, 50, 79, 128]}, "vamp1_walk": {"n": 8, "fw": 128, "fh": 128, "b": [27, 49, 75, 128]}, "vamp2_idle": {"n": 5, "fw": 128, "fh": 128, "b": [38, 55, 90, 128]}, "vamp2_walk": {"n": 6, "fw": 128, "fh": 128, "b": [36, 54, 79, 128]}, "yurei_idle": {"n": 5, "fw": 128, "fh": 128, "b": [39, 54, 77, 124]}, "yurei_walk": {"n": 5, "fw": 128, "fh": 128, "b": [31, 54, 70, 124]}};
   const DEF=[
  /* ---- moradores que ficam no posto ---- */
- {id:'brok',type:'post',idle:'dwarf',name:'Brok',role:'anao',bi:5,dx:148,y:38,fx:-1,lines:['Pedra boa é pedra velha. Como eu.','Já cavei debaixo desta rua. Tem coisas lá embaixo.','Nada como um bom machado... e uma boa cerveja.','Os humanos são altos, mas pisam sem olhar.','O Gorn faz o melhor aço. Mas nunca digo isso a ele.','Se achar ouro, divida comigo. É o costume.']},
- {id:'zeca',type:'post',idle:'barkeep',name:'Zeca',role:'taverneiro',bi:1,dx:-82,y:36,fx:1,lines:['Aqui na Sala de Jogos tem Campo Minado e Paciência.','Quer uma caneca? Hoje o hidromel está barato.','Barulho eu aguento, bagunça não.','Já vi gente chorar por perder no Campo Minado.','Se tem fila, é porque o jogo está bom.','Cuidado com a Lia, ela escuta tudo.']},
- {id:'lia',type:'post',idle:'barmaid',name:'Lia',role:'garconete',bi:1,dx:80,y:40,fx:-1,lines:['Mesa livre perto da janela, se quiser.','Eu levo cinco canecas de uma vez. Sem derramar!','O Zeca é mandão, mas tem bom coração.','Já ouviu a nova canção do Pip? É boa de verdade.','À noite a rua fica mais bonita, não acha?','Vi um vagalume entrar na Locadora ontem.']},
- {id:'pipoca',type:'pet',idle:'dog',name:'Pipoca',role:'cao',bi:1,dx:146,y:44,fx:-1,h:34,lines:['Au!','Au au!','*abana o rabo*','Grrr... brincadeira. Au!']},
- {id:'bento',type:'post',idle:'merchant',name:'Bento',role:'mercador',bi:3,dx:-30,y:38,fx:1,lines:['Tenho de tudo! Menos troco.','Na Tenda os vendedores mostram ao vivo o que têm.','Um bom preço é aquele que os dois lados reclamam.','Pechincha é arte. Eu sou o artista.','Se achar uma moeda rara, venha falar comigo.','Cuidado com o Mercado Misterioso: ele aparece sem avisar.']},
- {id:'cida',type:'post',idle:'farmer_02',name:'Dona Cida',role:'camponesa',bi:3,dx:112,y:40,fx:-1,lines:['Tenho ovos frescos, só não vendo pro Zeca, ele paga com fiado.','O vale está lindo nesta hora do dia.','Minha horta cresce melhor quando há lua cheia.','Troco legumes por boas histórias.','A Tenda sempre tem um leilão bom, vá lá.','Meus joelhos sentem a chuva antes do céu.']},
- {id:'eron',type:'post',idle:'elder',name:'Ancião Eron',role:'anciao',bi:0,dx:92,y:36,fx:-1,lines:['Esta rua já viu muitos viajantes. Todos voltam.','As portas guardam histórias. Abra uma.','Na minha época, os lampiões eram de óleo.','Quem caminha devagar enxerga mais.','Cada prédio aqui tem seu guardião.','Se ouvir sinos de noite, é só o vento.']},
- {id:'isa',type:'post',idle:'princess',name:'Dama Isa',role:'dama',bi:0,dx:44,y:42,fx:1,lines:['Dizem que a Biblioteca guarda todos os jogos do mundo.','Vim passear, mas acabei ficando por causa do cheiro de lenha.','Que bela rua! Não há outra igual.','Nunca vi tantos lampiões juntos.','Prefiro o entardecer. As cores ficam douradas.','Se encontrar meu leque, me avise.']},
- {id:'mira',type:'post',idle:'seer',name:'Mira',role:'vidente',bi:2,dx:-100,y:38,fx:1,lines:['Vejo uma porta aberta no seu futuro.','As cartas dizem: hoje é dia de explorar.','Cuidado com quem sorri demais.','Há segredos escondidos nesta rua. Procure bem.','O céu avisa tudo, se você souber ler.','Sua sorte está melhor do que você imagina.']},
- {id:'fofo',type:'post',idle:'jester',name:'Fofo',role:'bobo',bi:2,dx:104,y:42,fx:-1,lines:['Por que o ferreiro riu? Porque bateu uma boa piada!','Hihi! Pegue-me se puder!','Eu sou o único que trabalha rindo.','Vi o guarda dormindo em pé. Foi lindo.','A vida é uma peça. Eu sou o intervalo.','Quer uma piada? São três moedas. Brincadeira!']},
- {id:'alma',type:'post',idle:'priestess',name:'Alma',role:'sacerdotisa',bi:4,dx:-92,y:38,fx:1,lines:['Que a luz dos lampiões guie seus passos.','Acendi uma vela para quem anda de madrugada.','A paz também mora no silêncio.','Cada pôr do sol é uma pequena bênção.','Se estiver cansado, descanse sob o toldo.','As estrelas voltam todas as noites, não se preocupe.']},
- {id:'nilo',type:'post',idle:'adventurer_05',name:'Nilo',role:'aventureiro',bi:4,dx:98,y:42,fx:-1,lines:['Voltei de uma expedição. Perdi o mapa, mas ganhei histórias.','A Locadora tem o melhor filme da semana. Garanto.','Já enfrentei um dragão. Ok, era um lagarto grande.','Procuro um companheiro de viagem. Você topa?','Cada porta desta rua leva a um lugar diferente.','Aventura boa termina numa taverna.']},
- {id:'pip',type:'post',idle:'minstrel',name:'Pip',role:'bardo',x:1238,y:58,fx:-1,lines:['Ó rua de pedra, de luz e de pó...','Estou compondo uma balada sobre o Cinema.','Música boa não precisa de palco, só de plateia.','Toco em troca de uma caneca!','Dizem que cada porta tem sua própria melodia.','Quer ouvir? Só se me der uma rima para "lampião".']},
- {id:'marta',type:'post',idle:'villager_01',name:'Marta',role:'aldea',x:1062,y:60,fx:1,lines:['Bom dia! O pão da Cida é o melhor da rua.','Dizem que a Biblioteca recebeu jogos novos.','Cuidado com o degrau da Locadora, já tropecei ali.','Adoro quando os lampiões acendem.','Você é novo por aqui? Ande à vontade, a rua é de todos.','Se perder o caminho, siga as placas dos prédios.']},
- {id:'jonas',type:'post',idle:'farmer_01',name:'Jonas',role:'fazendeiro',x:1430,y:56,fx:1,lines:['Estou cuidando do fogo. Alguém tem que fazer isso.','A terra daqui é boa, só falta chuva.','Nunca confie em espantalho que pisca.','Já plantei de tudo. Menos paciência.']},
- {id:'mendigo',type:'post',idle:'beggar',name:'Velho Tobias',role:'mendigo',x:1596,y:56,fx:-1,lines:['Uma moedinha para quem já viu dias melhores...','Esse fogo é o único amigo que me resta.','Já fui guarda, sabia? Hoje só aqueço as mãos.','Obrigado por parar para ouvir. Poucos param.']},
- {id:'morgana',type:'post',idle:'witch',name:'Morgana',role:'bruxa',x:2244,y:46,fx:-1,lines:['Não me olhe assim. Só faço poções de tosse.','Esta rua tem mais magia do que parece.','Se sentir arrepio, é só o vento. Provavelmente.','Compro cogumelos raros. Pago bem.','A lua cheia deixa tudo mais interessante.']},
- {id:'sombra',type:'post',idle:'shady_guy',name:'Sombra',role:'sombra',x:790,y:34,fx:1,lines:['Psiu... você não me viu aqui.','Tenho informações. Custam caro.','Não, não sou ladrão. Sou... consultor.','Cuidado com quem pergunta demais.','A noite é minha melhor amiga.']},
  /* ---- andarilhos: sprites com caminhada real ---- */
  {id:'rosa',type:'walk',idle:'satyr1_idle',walk:'satyr1_walk',name:'Rosa',role:'aldea2',h:64,sp:42,lines:['Estou procurando o Davi. Ele sumiu de novo.','As flores do vale estão no auge.','Passei na Biblioteca e adorei.','Se vir meu cachorro, diga que o chamo.','Vou aproveitar a tarde antes que escureça.']},
  {id:'ana',type:'walk',idle:'girl3_idle',walk:'girl3_walk',name:'Ana',role:'estudante',h:62,sp:44,lines:['A Hana é minha melhor amiga. Mas ela é distraída!','Vamos passar na Locadora depois da aula?','Quero ser exploradora quando crescer.','Cuidado, o chão está escorregadio.','O vento hoje está gostoso.']},
@@ -8498,7 +8332,6 @@ window.__f12 = { F, fGerar, fAbrir, fSair, showTravel, fAtualiza, fDesenha };
  /* ---- só aparecem à noite ---- */
  {id:'victor',type:'night',idle:'vamp1_idle',walk:'vamp1_walk',name:'Cavalheiro Victor',role:'cavalheiro',h:68,sp:36,lines:['Boa noite. Gosto do ar da noite, é mais... fresco.','Não, não evito o sol. Apenas prefiro a lua.','Elegância nunca sai de moda.','Procuro uma boa biblioteca aberta de madrugada.']},
  {id:'yurei',type:'night',idle:'yurei_idle',walk:'yurei_walk',name:'Yurei',role:'fantasma',h:70,sp:24,float:1,lines:['...','Frio... tão frio...','Eu já morei aqui. Há muito tempo.','Não tenha medo. Eu já tive.']},
- {id:'fada',type:'float',idle:'fairy',name:'Fada',role:'fada',h:30,noTalk:1,lines:['...']}
 ];
 const GEN=[
  ['Bom dia! Já passou na Biblioteca hoje?','Ainda não. Dizem que chegaram jogos novos nas estantes.','Vale a pena. As prateleiras de PS5 estão todas em ordem.','Então vou lá agora mesmo!'],
@@ -9190,7 +9023,7 @@ function createShinobi(assets,done){
     shRefresh();
     const slots = document.getElementById('invSlots'), tabs = document.getElementById('invTabs'), grid = document.getElementById('invGrid'), stats = document.getElementById('invStats');
     if (!rig || !rig.ready) { grid.innerHTML = '<div style="color:#bdb3d8;padding:10px">Carregando o Shinobi…</div>'; setTimeout(() => { if (invOpen) renderInv(); }, 400); return; }
-    const all = CAT.map(c => ({ slot:c.slot, label:c.label })).concat([{ slot:'pet', label:'Pet' }]);
+    const all = CAT.map(c => ({ slot:c.slot, label:c.label }));
     slots.innerHTML = '';
     all.forEach(s => {
       const d = mkEl('div', { className:'inv-slot' + (tab === s.slot ? ' sel' : '') });
