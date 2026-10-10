@@ -21,8 +21,8 @@ const W=960,H=540;
 // ===== estado =====
 let film=true,t=0,last=0,toast='',toastT=0,intro=4.5;
 const keys={};
-const P={x:330,y:430,tx:null,ty:null,face:1,moving:false,fr:0};
-const Wd={minX:70,maxX:890,minY:338,maxY:500,torches:[[130,170],[390,170],[650,170],[880,170]],sam:[700,430],obst:[]};
+const P={x:330,y:430,vx:0,vy:0,tx:null,ty:null,face:1,moving:false,fr:0};
+const Wd={minX:125,maxX:835,minY:338,maxY:500,torches:[[130,170],[390,170],[650,170],[880,170]],sam:[700,430],obst:[]};
 const EV={x:470,y:430,r:70,done:false,cool:0};
 
 const NPC={name:'Samurai Abandonado',lines:['Você não deveria estar aqui, viajante.','O Ossário só responde a quem leva fogo. Apague o medo e acenda o primeiro selo.','(Protótipo: aqui entraria a missão do primeiro selo.)']};
@@ -46,16 +46,20 @@ function advance(){const L=dlg[dlgI];if(dlgC<L.length){dlgC=L.length;return}dlgI
 function blocked(x,y){for(const o of Wd.obst)if(x>o[0]&&x<o[2]&&y>o[1]&&y<o[3])return true;
  const s=Wd.sam;if(Math.hypot(x-s[0],(y-s[1])*1.6)<26)return true;return false}
 function update(dt){
- let dx=0,dy=0;if(keys['a']||keys['arrowleft'])dx-=1;if(keys['d']||keys['arrowright'])dx+=1;if(keys['w']||keys['arrowup'])dy-=1;if(keys['s']||keys['arrowdown'])dy+=1;
- if(dx||dy){P.tx=null;const l=Math.hypot(dx,dy);dx/=l;dy/=l}
- else if(P.tx!==null){const ax=P.tx-P.x,ay=P.ty-P.y,l=Math.hypot(ax,ay);if(l<4){P.tx=null}else{dx=ax/l;dy=ay/l}}
- if(dlg){dx=dy=0}
- const sp=(keys['shift']?230:150);
-  const nx=P.x+dx*sp*dt,ny=P.y+dy*sp*dt*.7;
+ let dx=0,dy=0,arr=1;if(keys['a']||keys['arrowleft'])dx-=1;if(keys['d']||keys['arrowright'])dx+=1;if(keys['w']||keys['arrowup'])dy-=1;if(keys['s']||keys['arrowdown'])dy+=1;
+ const hasKey=!!(dx||dy);
+ if(hasKey){P.tx=null;const l=Math.hypot(dx,dy);dx/=l;dy/=l}
+ else if(P.tx!==null){const ax=P.tx-P.x,ay=P.ty-P.y,l=Math.hypot(ax,ay);if(l<3&&Math.hypot(P.vx,P.vy)<40){P.tx=null}else{dx=ax/l;dy=ay/l;arr=Math.max(.2,Math.min(1,l/70))}}
+ if(dlg){dx=dy=0;P.tx=null}
+ // velocidade-alvo + aceleração (mais rápida ao inverter), atrito sempre ativo ao soltar
+ const sp=(keys['shift']?230:150)*arr,tvx=dx*sp,tvy=dy*sp*.7,moving=!!(dx||dy);
+ const rev=(P.vx*tvx+P.vy*tvy)<0,rate=moving?(rev?3200:1500):1900,ex=tvx-P.vx,ey=tvy-P.vy,em=Math.hypot(ex,ey),st=rate*dt;
+ if(em<=st){P.vx=tvx;P.vy=tvy}else{P.vx+=ex/em*st;P.vy+=ey/em*st}
+ const nx=P.x+P.vx*dt,ny=P.y+P.vy*dt;
  const cx=Math.max(Wd.minX,Math.min(Wd.maxX,nx)),cy=Math.max(Wd.minY,Math.min(Wd.maxY,ny));
- if(!blocked(cx,P.y))P.x=cx; if(!blocked(P.x,cy))P.y=cy;
- P.moving=!!(dx||dy);if(dx)P.face=dx>0?1:-1;
- P.fr+=dt*(P.moving?11:6);t+=dt;if(toastT>0)toastT-=dt;if(intro>0)intro-=dt;
+ if(!blocked(cx,P.y)&&cx===nx)P.x=cx;else P.vx=0; if(!blocked(P.x,cy)&&cy===ny)P.y=cy;else P.vy=0;
+ const spd=Math.hypot(P.vx,P.vy);P.moving=spd>12;if(Math.abs(P.vx)>14)P.face=P.vx>0?1:-1;
+ P.fr+=dt*(P.moving?3+spd/150*8:6);t+=dt;if(toastT>0)toastT-=dt;if(intro>0)intro-=dt;
  if(dlg&&dlgC<dlg[dlgI].length)dlgC+=dt*38;
 }
 // ===== câmera =====
@@ -85,6 +89,8 @@ function camTarget(dt){
  else C.why='';
  C.tz=tz;C.tfx=fx;C.tfy=fy;C.ts=ts;
 }
+const ART0=40,ART1=920;
+function clampX(x,vw){return vw>=ART1-ART0?(ART0+ART1)/2-vw/2:Math.max(ART0,Math.min(ART1-vw,x))}
 function camStep(dt){OP.t=Math.min(OP.d,OP.t+dt);camTarget(dt);
  if(OP.t<1.0){C.tz=1.0;C.ts=.6}
  const pz=C.z;let r;
@@ -92,21 +98,24 @@ function camStep(dt){OP.t=Math.min(OP.d,OP.t+dt);camTarget(dt);
  const vw=W/C.z,vh=H/C.z;
  r=sd(C.fx,C.tfx,C.vx,C.why?C.ts:.38,dt);C.fx=r[0];C.vx=r[1];
  r=sd(C.fy,C.tfy,C.vy,C.why?C.ts:.38,dt);C.fy=r[0];C.vy=r[1];
- C.x=Math.max(0,Math.min(W-vw,C.fx-vw/2));C.y=Math.max(0,Math.min(H-vh,C.fy-vh/2));
+ C.x=clampX(C.fx-vw/2,vw);C.y=Math.max(0,Math.min(H-vh,C.fy-vh/2));
+ // limite duro: herói sempre dentro de uma moldura segura
  {const hx=(P.x-C.x)*C.z,hy=(P.y-72-C.y)*C.z,mx=W*.26,my=H*.26;let sx=0,sy=0;
   if(hx<mx)sx=(hx-mx)/C.z;else if(hx>W-mx)sx=(hx-(W-mx))/C.z;
   if(hy<my)sy=(hy-my)/C.z;else if(hy>H-my)sy=(hy-(H-my))/C.z;
-  if(sx||sy){C.x=Math.max(0,Math.min(W-vw,C.x+sx));C.y=Math.max(0,Math.min(H-vh,C.y+sy));C.fx=C.x+vw/2;C.fy=C.y+vh/2;C.vx*=.5;C.vy*=.5}}
- // intensidade do blur = velocidade do zoom, suavizada (sobe e desce em sino, nunca "liga/desliga")
+  if(sx||sy){C.x=clampX(C.x+sx,vw);C.y=Math.max(0,Math.min(H-vh,C.y+sy));C.fx=C.x+vw/2;C.fy=C.y+vh/2;C.vx*=.5;C.vy*=.5}}
  C.zv=Math.abs(C.z-pz)/Math.max(dt,.001);
  const tb=Math.min(1,C.zv/.9);C.bl+=(tb-C.bl)*(1-Math.exp(-dt*9));
- const oe=1-Math.min(1,OP.t/OP.d),ob=7*oe*oe;const bq=Math.round((C.bl*1.1+ob)*8)/8;if(bq!==camStep.b){camStep.b=bq;cv.style.filter='sepia(.14) contrast(1.1) saturate(.84) brightness(1.04) blur('+(.45+bq).toFixed(2)+'px)'}}
+ const oe=1-Math.min(1,OP.t/OP.d);C.ob=oe*oe}
 function cam(){return C}
+const bw=document.createElement('canvas'),bgx=bw.getContext('2d');
+function blurMix(a,div){const w=W/div|0,h=H/div|0;if(bw.width!==w){bw.width=w;bw.height=h}bgx.imageSmoothingEnabled=true;bgx.clearRect(0,0,w,h);bgx.drawImage(cv,0,0,w,h);g.save();g.imageSmoothingEnabled=true;g.globalAlpha=a;g.drawImage(bw,0,0,W,H);g.restore()}
+let fgb=null;
 const prv=document.createElement('canvas');prv.width=W;prv.height=H;const pg=prv.getContext('2d');
 // ===== desenho =====
 const scl=y=>.88+(Math.max(0,Math.min(1,(y-Wd.minY)/(Wd.maxY-Wd.minY))))*.18;
 const sil=document.createElement('canvas');sil.width=sil.height=128;const sg=sil.getContext('2d');
-function drawChar(img,fr,fw,x,y,face,s){const w=128*s*.975,h=128*s*.975;g.save();g.translate(x,y);g.scale(face,1);
+function drawChar(img,fr,fw,x,y,face,s){x=Math.round(x);y=Math.round(y);const w=128*s*.975,h=128*s*.975;g.save();g.translate(x,y);g.scale(face,1);
  // contorno leve em tinta escura (silhueta deslocada 1px em 8 direções)
  sg.clearRect(0,0,128,128);sg.globalCompositeOperation='source-over';sg.drawImage(img,(fr%fw)*128,0,128,128,0,0,128,128);
  sg.globalCompositeOperation='source-in';sg.fillStyle='#0b0907';sg.fillRect(0,0,128,128);
@@ -122,7 +131,7 @@ function drawWorld(){
  const ents=[{y:P.y,d:()=>{drawChar(P.moving?IM.hwalk:IM.hidle,Math.floor(P.fr),P.moving?8:6,P.x,P.y,P.face,scl(P.y))}},
   {y:Wd.sam[1],d:()=>drawChar(IM.sidle,Math.floor(t*6)%6,6,Wd.sam[0],Wd.sam[1],-1,scl(Wd.sam[1]))}];
  ents.sort((a,b)=>a.y-b.y).forEach(e=>e.d());
- g.save();g.filter='blur('+(1.2+C.bl*2.5).toFixed(2)+'px)';g.drawImage(IM.latfg,0,0);g.restore();
+ g.drawImage(fgb,0,0);
 }
 const lc=document.createElement('canvas');lc.width=W;lc.height=H;const lg=lc.getContext('2d');
 function light(){
@@ -164,14 +173,24 @@ function ui(){
   g.textAlign='center';g.fillStyle='#ecdfb8';g.font='bold 44px Georgia';g.fillText('O  OSSÁRIO',W/2,272);g.fillStyle='#b89448';g.font='bold 17px Georgia';g.fillText('SALA 1  ·  PRIMEIRO SELO',W/2,305);g.textAlign='left';g.globalAlpha=1}
 }
 function wrap(s,x,y,mw,lh){const ws=s.split(' ');let ln='';for(const w of ws){const tt=ln+w+' ';if(g.measureText(tt).width>mw){g.fillText(ln,x,y);ln=w+' ';y+=lh}else ln=tt}g.fillText(ln,x,y)}
-function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);camStep(dt);
+const STEP=1/120;let acc=0;
+function frame(ts){const raw=Math.min(.1,(ts-last)/1000||0);last=ts;acc+=raw;let n=0;
+ let pp=[P.x,P.y,C.z,C.x,C.y];
+ while(acc>=STEP&&n<14){pp=[P.x,P.y,C.z,C.x,C.y];update(STEP);camStep(STEP);acc-=STEP;n++}
+ if(n>=14)acc=0;
+ // interpolação entre o estado anterior e o atual (Fix Your Timestep): movimento liso em qualquer taxa de quadros
+ const a=acc/STEP,real=[P.x,P.y,C.z,C.x,C.y];
+ P.x=pp[0]+(real[0]-pp[0])*a;P.y=pp[1]+(real[1]-pp[1])*a;C.z=pp[2]+(real[2]-pp[2])*a;C.x=pp[3]+(real[3]-pp[3])*a;C.y=pp[4]+(real[4]-pp[4])*a;
  g.save();g.fillStyle='#000';g.fillRect(0,0,W,H);
- {const c=C;g.setTransform(c.z,0,0,c.z,-c.x*c.z,-c.y*c.z)}
+ g.setTransform(C.z,0,0,C.z,-Math.round(C.x*C.z),-Math.round(C.y*C.z));
  drawWorld();g.restore();
  light();bloom();filmFx();
- // mistura com o quadro anterior durante a transição (motion blur barato, estilo película)
- if(C.bl>.04){g.save();g.globalAlpha=Math.min(.38,C.bl*.4);g.drawImage(prv,0,0);g.restore()}
+ if(C.ob>.02)blurMix(Math.min(1,C.ob*1.1),6);
+ if(C.bl>.04)blurMix(Math.min(.75,C.bl*.85),3);
+ if(C.bl>.04){g.save();g.globalAlpha=Math.min(.3,C.bl*.3);g.drawImage(prv,0,0);g.restore()}
  pg.drawImage(cv,0,0);
- ui();requestAnimationFrame(frame)}
-function start(){hud();requestAnimationFrame(frame)}
+ ui();
+ P.x=real[0];P.y=real[1];C.z=real[2];C.x=real[3];C.y=real[4];
+ requestAnimationFrame(frame)}
+function start(){fgb=document.createElement('canvas');fgb.width=W;fgb.height=H;{const x=fgb.getContext('2d');x.filter='blur(1.6px)';x.drawImage(IM.latfg,0,0)}hud();requestAnimationFrame(frame)}
 </script></html>
