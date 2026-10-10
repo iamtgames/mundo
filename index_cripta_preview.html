@@ -11145,6 +11145,53 @@ world.addEventListener('click', e => {
   const po = e.target.closest('.crypt-enter'); if (po) { e.stopPropagation(); clickPortal(po, e); return; }
 }, true);
 
+/* ---------- indicador [E] perto de fogueira, candelabros e portal ---------- */
+(function () {
+  const st = document.createElement('style');
+  st.textContent = '#crPrompt{position:absolute;z-index:96;display:none;align-items:center;gap:5px;padding:2px 8px 2px 3px;background:#1d130a;border:2px solid #c9953c;border-radius:4px;color:#ffe9b0;font-family:"VT323",monospace;font-size:16px;letter-spacing:.5px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.5);white-space:nowrap}' +
+    '#crPrompt.on{display:flex}#crPrompt b{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;background:#c9953c;color:#1d130a;font-weight:normal;border-radius:2px}';
+  document.head.appendChild(st);
+  let box = null, cur = null;
+  const near = () => {
+    if (typeof player === 'undefined' || typeof roomlayer === 'undefined') return null;
+    const s = Cr.S(); if (Cr.isOpen && Cr.isOpen()) return null;
+    let best = null, bd = 1e9;
+    const cand = [];
+    if (currentRoomId === 'rua' && s.torch !== 'lit') roomlayer.querySelectorAll('.cr-bonfire').forEach(el => cand.push([el, 'ACENDER TOCHA']));
+    if (currentRoomId === 'biblioteca') {
+      roomlayer.querySelectorAll('.cr-sconce:not(.lit)').forEach(el => { if (s.torch === 'lit') cand.push([el, 'ACENDER']); });
+      roomlayer.querySelectorAll('.crypt-enter').forEach(el => cand.push([el, s.portal ? 'ENTRAR' : 'EXAMINAR']));
+    }
+    for (const [el, lab] of cand) {
+      const cx = el.offsetLeft + el.offsetWidth / 2, cy = el.offsetTop + el.offsetHeight / 2;
+      const dx = Math.abs(cx - player.x), dy = Math.abs(cy - player.y);
+      if (dx < 90 && dy < 90 && dx + dy < bd) { bd = dx + dy; best = { el, lab, cx, top: el.offsetTop }; }
+    }
+    return best;
+  };
+  const tick = () => {
+    try {
+      const n = near();
+      if (!n) { if (box) box.classList.remove('on'); cur = null; return; }
+      if (!box || !box.isConnected) {
+        box = document.createElement('div'); box.id = 'crPrompt'; box.setAttribute('role', 'button');
+        box.addEventListener('click', ev => { ev.stopPropagation(); act(); });
+        roomlayer.appendChild(box);
+      }
+      cur = n; box.innerHTML = '<b>E</b><span>' + n.lab + '</span>';
+      box.style.left = Math.round(n.cx - 36) + 'px'; box.style.top = Math.round(n.top - 30) + 'px'; box.classList.add('on');
+    } catch (e) { }
+  };
+  const act = () => { if (!cur) return false; cur.el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); return true; };
+  setInterval(tick, 120);
+  window.addEventListener('keydown', e => {
+    if ((e.key !== 'e' && e.key !== 'E') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (typeof isTypingTarget === 'function' && isTypingTarget(document.activeElement)) return;
+    if (Cr.isOpen && Cr.isOpen()) return;
+    if (act()) e.preventDefault();
+  });
+})();
+
 /* ---------- gancho no desenho das salas ---------- */
 function onRoom(id) {
   if (id === 'rua') addBonfire();
