@@ -11192,6 +11192,55 @@ world.addEventListener('click', e => {
   });
 })();
 
+/* ---------- Samurai Abandonado substitui o Arquivista Ptolomeu ---------- */
+(function samuraiReplace() {
+  try {
+    const NAME = 'Samurai Abandonado';
+    const freed = () => { try { return !!Cr.S().flags.oath; } catch (e) { return false; } };
+    const done = () => { try { const s = Cr.S(); return [1, 2, 3, 4].filter(n => s.flags['reward_' + n]).length; } catch (e) { return 0; } };
+    if (typeof RESIDENTS !== 'undefined' && RESIDENTS.criptas && RESIDENTS.criptas[0]) {
+      RESIDENTS.criptas[0].nome = NAME;
+      RESIDENTS.criptas[0].falas = () => freed()
+        ? ['Meu nome ainda me escapa, mas o juramento voltou.', 'Obrigado por não deixar que me apagassem.']
+        : ['Os registros que me mandaram queimar ainda estão lá embaixo.', 'Há selos na Cripta. Quebre-os com o que lembra de mim.'];
+      if (typeof NPC_NOME !== 'undefined') NPC_NOME.ptolomeu = NAME;
+      if (typeof NPC_DEF !== 'undefined' && RESIDENTS.criptas[0]._n) RESIDENTS.criptas[0]._n.r.nome = NAME;
+    }
+    if (typeof NPC_TXT !== 'undefined' && NPC_TXT.ptolomeu) {
+      const T = NPC_TXT.ptolomeu;
+      T.w = ['', 'Em voz grave: ', 'Sem erguer o rosto: ', 'Escute, viajante: '];
+      T.f = ['Recusei queimar os registros. Foi minha única falha, e meu único orgulho.', 'Apagaram meu nome, mas não a lâmina que jurei guardar.', 'Um juramento quebrado pesa mais que uma espada.', 'A Cripta guarda o que me tiraram. Quatro selos, quatro fragmentos.', 'A memória, a prova, o sacrifício e o abandono: é o caminho de volta.', 'Nem toda honra tem testemunhas.', 'Ainda ouço os sinos da Biblioteca lá embaixo.', 'Quem busca a verdade acende a própria luz.', 'Há passagens que só se abrem para quem olha onde ninguém olha.', 'Não peço vingança. Peço que lembrem.', 'A tocha na mão certa vale mais que mil guardas.', 'Paciência. Foi o que me manteve inteiro.'];
+      T.d = [() => freed() ? 'O juramento foi refeito. Estou livre graças a você.' : 'Você recuperou ' + done() + ' de 4 selos. Continue.', () => 'São ' + D.hora() + '. Aqui embaixo o tempo se arrasta.', () => D.chove() ? 'A chuva lá em cima chega até mim como sussurro.' : 'Lá em cima o tempo está calmo, ' + D.clima() + '.'];
+      T.r = { hora: 'O tempo cobra seu preço.', clima: 'Lá fora o clima muda. Aqui, não.', live: 'Luzes que falam... estranho este mundo.', jogos: 'Tantos registros preservados. Isso me conforta.', lancamento: 'Novos registros. Que sejam guardados.', anime: 'Histórias merecem ser lembradas.', loja: 'Comércio de memórias, talvez.', aventureiro: 'Esse aventureiro tem coragem.' };
+      T.rg = ['Entendo.', 'Registrado. Sem queimar.', 'Hm.', 'Assim seja.'];
+      T.s = ['{n} merece ser lembrado.', 'Se {n} descer à Cripta, que leve uma tocha.', 'Ouvi falar de {n}. Bom nome.'];
+      T.t = { dawn: 'O amanhecer não chega aqui. Eu o imagino.', morn: 'Manhã lá em cima. Aqui, sempre penumbra.', noon: 'Meio-dia: as sombras daqui continuam as mesmas.', aft: 'A tarde cai devagar sobre os registros.', eve: 'Entardece. As velas parecem mais vivas.', night: 'À noite, a Cripta sussurra meu antigo nome.', mad: 'Madrugada: hora em que os selos pesam mais.', rain: 'A chuva faz eco nas pedras.', cloud: 'Nublado: combina comigo.', clear: 'Sol lá fora. Quase me lembro dele.', wk: 'Fim de semana. Os guardas folgam; eu não.' };
+    }
+    if (typeof LORE_NPC !== 'undefined' && LORE_NPC.ptolomeu) LORE_NPC.ptolomeu = ['Recusei queimar os registros e fui selado com um ritual. Apagaram meu nome.', 'Quatro selos guardam os fragmentos do meu juramento: Memória, Prova, Sacrifício e Abandono.', 'Quem refizer o juramento no altar me liberta.', 'Nem todo segredo da Cripta é obrigatório. Alguns só revelam quem sou.'];
+    if (typeof LORE !== 'undefined') LORE.forEach(e => {
+      if (e && typeof e.x === 'string') {
+        e.x = e.x.replace(/o Arquivista Ptolomeu ainda cuida do que restou/g, 'um samurai selado ainda vigia, sem nome, o que restou').replace(/Ptolomeu sorri pela primeira vez\. Ele revela que o arquivo nunca foi sobre guardar coisas, e sim sobre guardar quem as procura\./g, 'Longe dali, um samurai sem nome sente os selos cederem.').replace(/Ptolomeu/g, 'O Samurai Abandonado');
+      }
+    });
+    if (typeof QUESTS !== 'undefined') QUESTS.forEach(q => {
+      if (q.id === 'ptolomeu1') { q.t = 'Passos nas Criptas'; q.d = 'O samurai sussurra: poucos descem até aqui. Resolva 5 puzzles.'; }
+      if (q.id === 'ptolomeu2') { q.t = 'Segredos do Escuro'; q.d = 'Descubra 2 segredos escondidos do mundo e o samurai revelará o que guarda.'; }
+    });
+  } catch (e) { console.warn('[cripta] substituição do Samurai:', e); }
+})();
+
+/* depois da libertação o Samurai passa a morar na Biblioteca, de guarda */
+(function samuraiHome() {
+  const place = () => {
+    try {
+      if (typeof NP === 'undefined' || !NP.ptolomeu) return;
+      const n = NP.ptolomeu, s = Cr.S();
+      if (s.flags && s.flags.oath && n.loc === 'criptas') { n.loc = 'biblioteca'; n.x = 860; n.yf = 0.55; n.q = []; n.mode = 'free'; }
+    } catch (e) { }
+  };
+  setInterval(place, 2000); place();
+})();
+
 /* ---------- gancho no desenho das salas ---------- */
 function onRoom(id) {
   if (id === 'rua') addBonfire();
