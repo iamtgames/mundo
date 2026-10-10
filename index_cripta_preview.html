@@ -11041,6 +11041,12 @@ const CSS = `
 .crypt-enter.cr-on{opacity:1 !important;filter:none !important;z-index:12}
 .crypt-enter.cr-on .cf{display:block !important}
 .crypt-enter.cr-on .td-grid{filter:drop-shadow(0 0 12px rgba(255,120,30,.9)) brightness(1.2)}
+.crypt-enter.cr-new{width:112px !important;height:60px !important;opacity:1 !important;filter:none !important}
+.crypt-enter.cr-new::before,.crypt-enter.cr-new .td-grid,.crypt-enter.cr-new .cf,.crypt-enter.cr-new .td-lbl{display:none !important}
+.crypt-enter .cr-hatch{position:absolute;inset:0;background:center/100% 100% no-repeat;image-rendering:pixelated;filter:drop-shadow(0 4px 3px rgba(0,0,0,.55))}
+.crypt-enter.cr-new:not(.cr-open){filter:saturate(.7) brightness(.85) !important}
+.crypt-enter.cr-open::after{content:'';position:absolute;left:-18px;right:-18px;top:-14px;bottom:-10px;background:radial-gradient(ellipse at 50% 60%,rgba(255,170,70,.45),rgba(255,120,30,.14) 50%,transparent 72%);pointer-events:none;animation:crglow .9s ease-in-out infinite alternate}
+.crypt-enter.cr-new:hover .cr-hatch{filter:drop-shadow(0 0 8px rgba(255,200,120,.8)) brightness(1.15)}
 @keyframes crport{from{filter:hue-rotate(0)}to{filter:hue-rotate(40deg) brightness(1.3)}}
 #crBagBtn{right:266px;font-size:0 !important}
 #crBagBtn::before{content:'';display:block;width:24px;height:24px;background:center/100% 100% no-repeat var(--crbag);image-rendering:pixelated}
@@ -11075,7 +11081,48 @@ function lightTorch(bx, by) {
 }
 
 /* ---------- Biblioteca: escuridão, candelabros, mecanismo e portal ---------- */
-const SCONCES = [{ id: 1, x: 430, y: 205 }, { id: 2, x: 900, y: 205 }, { id: 3, x: 1320, y: 193 }];
+/* candelabros fixados nos pilares de pedra (pilares em x=289,515,741,967,1193; largura 46) */
+const SCONCES = [{ id: 1, x: 523, y: 214 }, { id: 2, x: 749, y: 214 }, { id: 3, x: 1201, y: 214 }];
+
+/* alçapão de pedra da Cripta, na paleta musgo/pedra da Biblioteca */
+function hatchArt(open) {
+  const W = 56, H = 30, c = mk(W, H), g = c.getContext('2d');
+  const R = (col, x, y, w, h) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  const rr = (x, y, w, h, col) => { R(col, x + 2, y, w - 4, h); R(col, x, y + 2, w, h - 4); R(col, x + 1, y + 1, w - 2, h - 2); };
+  // moldura de pedra
+  rr(0, 0, W, H, '#1c2c2e'); rr(1, 1, W - 2, H - 2, '#4e6c66'); rr(3, 3, W - 6, H - 6, '#2d4644');
+  for (let x = 4; x < W - 4; x += 7) { R('#5f817a', x, 1, 4, 1); R('#5f817a', x + 2, H - 2, 4, 1); }
+  if (!open) {
+    // laje selada: tijolos, runa e rachaduras
+    rr(4, 4, W - 8, H - 8, '#3e5a56'); rr(5, 5, W - 10, H - 10, '#496a64');
+    R('#2b4340', 5, 14, W - 10, 1); R('#2b4340', 18, 5, 1, 9); R('#2b4340', 38, 5, 1, 9); R('#2b4340', 28, 15, 1, 10);
+    R('#587a73', 6, 6, 11, 1); R('#587a73', 20, 6, 17, 1); R('#587a73', 7, 16, 20, 1);
+    // runa central
+    g.strokeStyle = '#8fb8ac'; g.lineWidth = 1; g.beginPath(); g.arc(28, 15, 6, 0, 7); g.stroke();
+    R('#8fb8ac', 27, 10, 2, 10); R('#8fb8ac', 24, 14, 8, 2); R('#2b4340', 28, 15, 1, 1);
+    R('#2b4340', 12, 20, 3, 1); R('#2b4340', 14, 21, 1, 2); R('#2b4340', 45, 8, 3, 1);
+  } else {
+    // aberto: escada descendo, luz quente vinda de baixo
+    R('#0a0d10', 6, 5, W - 12, H - 10);
+    const steps = ['#7a4a22', '#5e3a1c', '#432a15', '#2a1b0e'];
+    for (let i = 0; i < 4; i++) { R(steps[i], 8 + i * 2, 7 + i * 4, W - 16 - i * 4, 3); R('#c98a45', 8 + i * 2, 7 + i * 4, W - 16 - i * 4, 1); }
+    R('#ffb455', 22, 24, 12, 2); R('#ffd88a', 26, 25, 4, 1);
+    // laje deslocada à direita
+    rr(38, 5, 16, 11, '#496a64'); R('#2b4340', 38, 10, 16, 1); R('#587a73', 40, 6, 11, 1);
+    R('#1c2c2e', 38, 16, 16, 1);
+  }
+  // musgo e vinhas nas bordas
+  [[1, 1, 4, 2], [8, 0, 3, 2], [W - 8, 0, 5, 2], [W - 3, 8, 2, 4], [0, H - 5, 3, 3], [20, H - 2, 6, 2], [W - 12, H - 3, 5, 2]].forEach(m => R('#4f8a4a', m[0], m[1], m[2], m[3]));
+  [[2, 2, 2, 1], [10, 0, 1, 1], [W - 6, 0, 2, 1], [3, H - 4, 1, 2]].forEach(m => R('#78b366', m[0], m[1], m[2], m[3]));
+  return c.toDataURL();
+}
+function styleHatch(pt, open) {
+  if (!pt) return;
+  pt.classList.add('cr-new');
+  let h = pt.querySelector('.cr-hatch'); if (!h) { h = document.createElement('div'); h.className = 'cr-hatch'; pt.insertBefore(h, pt.firstChild); }
+  h.style.backgroundImage = 'url(' + hatchArt(!!open) + ')';
+  pt.classList.toggle('cr-open', !!open);
+}
 let darkRaf = 0;
 function setupLibrary() {
   const layer = roomlayer; if (layer.querySelector('.cr-sconce')) return;
@@ -11083,6 +11130,7 @@ function setupLibrary() {
   ['.bv-dark', '.bv-lantern'].forEach(q => layer.querySelectorAll(q).forEach(e => e.remove()));
   SCONCES.forEach(c => layer.insertAdjacentHTML('beforeend', '<div class="cr-sconce' + (s.sconces[c.id] ? ' lit' : '') + '" data-id="' + c.id + '" style="left:' + c.x + 'px;top:' + c.y + 'px;" title="Candelabro apagado"></div>'));
   const pt = layer.querySelector('.crypt-enter'); if (pt && s.portal) pt.classList.add('cr-on');
+  styleHatch(pt, s.portal);
   if (pt) pt.title = s.portal ? 'Portal da Cripta' : 'Uma laje de pedra selada';
   if (!s.libLit) startDark(); else stopDark(true);
 }
@@ -11122,7 +11170,7 @@ function clickSconce(el) {
     bubble(p.bx, p.by, '🕯️ A Biblioteca inteira se ilumina...', 3000);
     setTimeout(() => {
       Cr.sfx('gate'); stage.classList.add('cr-quake'); setTimeout(() => stage.classList.remove('cr-quake'), 600);
-      const pt = roomlayer.querySelector('.crypt-enter'); if (pt) pt.classList.add('cr-on');
+      const pt = roomlayer.querySelector('.crypt-enter'); if (pt) { pt.classList.add('cr-on'); styleHatch(pt, true); }
       s.portal = true; gsSave();
       try { toastText('Um mecanismo oculto reagiu: o portal da Cripta se abriu!'); } catch (e) { }
     }, 1700);
