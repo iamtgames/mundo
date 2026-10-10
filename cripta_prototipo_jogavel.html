@@ -60,28 +60,41 @@ function update(dt){
 }
 // ===== câmera =====
 const BZ=1.3;
-const C={z:BZ,x:0,y:0,tz:BZ,fx:480,fy:300,hold:0,why:'',zv:0};
+const C={z:BZ,x:0,y:0,tz:BZ,fx:480,fy:300,tfx:480,tfy:300,vz:0,vx:0,vy:0,hold:0,why:'',zv:0,bl:0,ts:.7};
+// SmoothDamp (mola criticamente amortecida, a mesma do Unity): sem overshoot, velocidade contínua → sem "tranco" no início/fim
+function sd(cur,tgt,vel,st,dt){st=Math.max(.0001,st);const o=2/st,x=o*dt,e=1/(1+x+.48*x*x+.235*x*x*x),ch=cur-tgt,t=(vel+o*ch)*dt;return[tgt+(ch+t)*e,(vel-o*t)*e]}
 function camTarget(dt){
  const s=Wd.sam,d=Math.hypot(P.x-s[0],P.y-s[1]),door=Math.hypot(P.x-195,P.y-330),ev=Math.hypot(P.x-EV.x,P.y-EV.y);
- let tz=BZ,fx=P.x,fy=P.y-70,why=C.why;
+ // antecipação: usa a posição daqui a ~0.35s na direção do movimento, assim a câmera começa a mover ANTES de chegar
+ const vx=(keys['d']||keys['arrowright']?1:0)-(keys['a']||keys['arrowleft']?1:0),mv=P.tx!==null?Math.sign(P.tx-P.x):vx,ax=P.x+mv*60;
+ const da=Math.hypot(ax-s[0],P.y-s[1]),dra=Math.hypot(ax-195,P.y-330);
+ let want='',tz=BZ,fx=P.x+(P.moving?P.face*45:0),fy=P.y-70,ts=.55;
  if(EV.cool>0)EV.cool-=dt;
- if(!EV.done&&ev<EV.r&&EV.cool<=0){EV.done=true;EV.run=3.2;say('Algo se move entre os ossos…')}
- if(EV.run>0){EV.run-=dt;tz=1.9;fx=EV.x;fy=EV.y-60;why='ev';C.hold=.6}
- else if(dlg){tz=2.0;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-70;why='dlg';C.hold=.6}
- else if(d<(C.why==='npc'?270:215)){tz=1.75;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-70;why='npc';C.hold=.6}
- else if(door<(C.why==='door'?200:150)){tz=1.7;fx=(P.x+195)/2;fy=Math.min(P.y,330)-60;why='door';C.hold=.6}
- else{why='';}
+ if(!EV.done&&ev<EV.r&&EV.cool<=0){EV.done=true;EV.run=3.4;say('Algo se move entre os ossos…')}
+ if(EV.run>0){EV.run-=dt;want='ev';tz=1.85;fx=EV.x;fy=EV.y-60;ts=.8}
+ else if(dlg){want='dlg';tz=1.9;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-72;ts=.6}
+ else if(Math.min(d,da)<(C.why==='npc'?270:200)){want='npc';tz=1.75;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-72;ts=.7}
+ else if(Math.min(door,dra)<(C.why==='door'?210:150)){want='door';tz=1.65;fx=(P.x+195)/2;fy=Math.min(P.y,330)-62;ts=.7}
  if(EV.done&&ev>EV.r*2.5&&EV.cool<=0&&!(EV.run>0))EV.done=false,EV.cool=8;
- // histerese: mantém aproximação por um tempo mínimo para não ficar oscilando
- if(why){C.why=why;C.tz=tz;C.fx=fx;C.fy=fy}else if(C.hold>0){C.hold-=dt}else{C.why='';C.tz=BZ;C.fx=P.x;C.fy=P.y-70}
+ // tempo mínimo (dwell) antes de voltar ao plano aberto: evita "pumping"
+ if(want){if(want!==C.why)C.hold=1.1;C.why=want}
+ else if(C.hold>0){C.hold-=dt;tz=C.tz;fx=C.tfx;fy=C.tfy;ts=C.ts}
+ else C.why='';
+ C.tz=tz;C.tfx=fx;C.tfy=fy;C.ts=ts;
 }
-function camStep(dt){camTarget(dt);const pz=C.z;const k=1-Math.exp(-dt*4.6);C.z+=(C.tz-C.z)*k;
- const vw=W/C.z,vh=H/C.z,kx=1-Math.exp(-dt*5.5);
- const tx=Math.max(0,Math.min(W-vw,C.fx-vw/2)),ty=Math.max(0,Math.min(H-vh,C.fy-vh/2));
- C.x+=(tx-C.x)*kx;C.y+=(ty-C.y)*kx;C.x=Math.max(0,Math.min(W-vw,C.x));C.y=Math.max(0,Math.min(H-vh,C.y));
+function camStep(dt){camTarget(dt);
+ const pz=C.z;let r;
+ r=sd(C.z,C.tz,C.vz,C.ts,dt);C.z=r[0];C.vz=r[1];
+ const vw=W/C.z,vh=H/C.z;
+ r=sd(C.fx,C.tfx,C.vx,C.why?C.ts:.38,dt);C.fx=r[0];C.vx=r[1];
+ r=sd(C.fy,C.tfy,C.vy,C.why?C.ts:.38,dt);C.fy=r[0];C.vy=r[1];
+ C.x=Math.max(0,Math.min(W-vw,C.fx-vw/2));C.y=Math.max(0,Math.min(H-vh,C.fy-vh/2));
+ // intensidade do blur = velocidade do zoom, suavizada (sobe e desce em sino, nunca "liga/desliga")
  C.zv=Math.abs(C.z-pz)/Math.max(dt,.001);
- const b=Math.min(1.5,C.zv*1.1),bq=Math.round(b*4)/4;if(bq!==camStep.b){camStep.b=bq;cv.style.filter='sepia(.28) contrast(1.08) saturate(.9)'+(bq>0?' blur('+bq+'px)':'')}}
+ const tb=Math.min(1,C.zv/.9);C.bl+=(tb-C.bl)*(1-Math.exp(-dt*9));
+ const bq=Math.round(C.bl*1.1*8)/8;if(bq!==camStep.b){camStep.b=bq;cv.style.filter='sepia(.28) contrast(1.08) saturate(.9)'+(bq>0?' blur('+bq+'px)':'')}}
 function cam(){return C}
+const prv=document.createElement('canvas');prv.width=W;prv.height=H;const pg=prv.getContext('2d');
 // ===== desenho =====
 const scl=y=>.88+(Math.max(0,Math.min(1,(y-Wd.minY)/(Wd.maxY-Wd.minY))))*.18;
 const sil=document.createElement('canvas');sil.width=sil.height=128;const sg=sil.getContext('2d');
@@ -140,6 +153,10 @@ function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);c
  g.save();g.fillStyle='#000';g.fillRect(0,0,W,H);
  {const c=C;g.setTransform(c.z,0,0,c.z,-c.x*c.z,-c.y*c.z)}
  drawWorld();g.restore();
- light();filmFx();ui();requestAnimationFrame(frame)}
+ light();filmFx();
+ // mistura com o quadro anterior durante a transição (motion blur barato, estilo película)
+ if(C.bl>.04){g.save();g.globalAlpha=Math.min(.38,C.bl*.4);g.drawImage(prv,0,0);g.restore()}
+ pg.drawImage(cv,0,0);
+ ui();requestAnimationFrame(frame)}
 function start(){hud();requestAnimationFrame(frame)}
 </script></html>
