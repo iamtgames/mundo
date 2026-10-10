@@ -1,10 +1,10 @@
 <!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cripta — protótipo jogável (câmeras)</title>
+<title>Cripta — protótipo jogável (câmera inteligente)</title>
 <style>
 html,body{margin:0;height:100%;background:#050807;color:#e6dcc0;font-family:Georgia,'DejaVu Serif',serif;overflow:hidden}
 #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #cv{width:min(100vw,177.78vh);height:min(56.25vw,100vh);image-rendering:pixelated;background:#000;cursor:crosshair}
-#cv.film{filter:sepia(.28) contrast(1.08) saturate(.9)}
+#cv{filter:sepia(.28) contrast(1.08) saturate(.9)}
 #hud{position:fixed;left:10px;top:8px;font:13px/1.5 system-ui,sans-serif;background:rgba(5,8,7,.78);border:1px solid #6b5a30;padding:7px 11px;border-radius:4px;max-width:420px}
 #hud b{color:#d9b45a}#hud .on{color:#7fe0c4}
 #hud kbd{background:#1b2420;border:1px solid #4b5a50;border-radius:3px;padding:0 5px;color:#d9b45a}
@@ -19,33 +19,25 @@ Promise.all(Object.keys(A).map(load)).then(start);
 const cv=document.getElementById('cv'),g=cv.getContext('2d');g.imageSmoothingEnabled=false;
 const W=960,H=540;
 // ===== estado =====
-let mode=1,film=true,t=0,last=0,toast='',toastT=0,intro=4.5;
+let film=true,t=0,last=0,toast='',toastT=0,intro=4.5;
 const keys={};
 const P={x:330,y:430,tx:null,ty:null,face:1,moving:false,fr:0};
-const modes={1:{n:'Lateral + camadas (Blasphemous)'},2:{n:'Câmera próxima + escuro'},3:{n:'Lanterna em cone'},4:{n:'Vista de cima (top-down)'}};
-const worlds={
- lat:{bg:'latbg',fg:'latfg',minX:70,maxX:890,minY:338,maxY:500,torches:[[130,170],[390,170],[650,170],[880,170]],sam:[700,430],obst:[]},
- td:{bg:'tdbg',fg:null,minX:60,maxX:900,minY:175,maxY:495,torches:[[150,135],[420,135],[690,135]],sam:[780,300],
-  obst:[[110,205,170,262],[775,190,840,255],[815,385,870,430],[105,410,170,470]]}
-};
-let Wd=worlds.lat;
+const Wd={minX:70,maxX:890,minY:338,maxY:500,torches:[[130,170],[390,170],[650,170],[880,170]],sam:[700,430],obst:[]};
+const EV={x:470,y:430,r:70,done:false,cool:0};
+
 const NPC={name:'Samurai Abandonado',lines:['Você não deveria estar aqui, viajante.','O Ossário só responde a quem leva fogo. Apague o medo e acenda o primeiro selo.','(Protótipo: aqui entraria a missão do primeiro selo.)']};
-const things=()=>[{id:'sam',x:Wd.sam[0],y:Wd.sam[1],r:80,txt:'Falar com o Samurai'},{id:'door',x:Wd===worlds.lat?195:420,y:Wd===worlds.lat?330:190,r:80,txt:'Examinar a porta'}];
+const things=()=>[{id:'sam',x:Wd.sam[0],y:Wd.sam[1],r:80,txt:'Falar com o Samurai'},{id:'door',x:195,y:330,r:80,txt:'Examinar a porta'}];
 let dlg=null,dlgI=0,dlgC=0;
 // ===== entrada =====
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();keys[k]=1;
- if(['1','2','3','4'].includes(k)){setMode(+k)} if(k==='f'){film=!film;cv.classList.toggle('film',film);hud()}
  if(k==='e')interact(); if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault()});
 addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=0});
 cv.addEventListener('mousedown',e=>{if(dlg){advance();return}
  const r=cv.getBoundingClientRect();let mx=(e.clientX-r.left)/r.width*W,my=(e.clientY-r.top)/r.height*H;
- if(mode===2){const c=cam();mx=c.x+mx/c.z;my=c.y+my/c.z}
+ {const c=cam();mx=c.x+mx/c.z;my=c.y+my/c.z}
  P.tx=Math.max(Wd.minX,Math.min(Wd.maxX,mx));P.ty=Math.max(Wd.minY,Math.min(Wd.maxY,my))});
-function setMode(m){mode=m;Wd=m===4?worlds.td:worlds.lat;
- P.x=Math.max(Wd.minX,Math.min(Wd.maxX,P.x));P.y=Math.max(Wd.minY,Math.min(Wd.maxY,P.y));if(Wd===worlds.td&&P.y<Wd.minY+10)P.y=Wd.minY+60;P.tx=null;hud();say(modes[m].n)}
 function say(s){toast=s;toastT=2.4}
-function hud(){const h=document.getElementById('hud');h.innerHTML='<b>Protótipo da Cripta</b> — sala 1 (Ossário)<br>'+
- '<kbd>WASD</kbd>/setas ou clique para andar · <kbd>E</kbd> interagir<br>Câmeras: '+[1,2,3,4].map(i=>'<kbd>'+i+'</kbd>'+(mode===i?'<span class="on"> '+modes[i].n+'</span>':'')).join(' ')+'<br><kbd>F</kbd> película antiga: '+(film?'<span class="on">ligada</span>':'desligada')}
+function hud(){document.getElementById('hud').innerHTML='<b>Protótipo da Cripta</b> — Ossário<br><kbd>WASD</kbd>/setas ou clique para andar · <kbd>E</kbd> interagir · <kbd>Shift</kbd> corre<br>A câmera se aproxima sozinha de personagens, portas e eventos.'}
 function interact(){if(dlg){advance();return}
  for(const o of things()){if(Math.hypot(P.x-o.x,P.y-o.y)<o.r){
   if(o.id==='sam'){dlg=NPC.lines;dlgI=0;dlgC=0}else say('Uma porta de madeira. Leva ao próximo cômodo (ainda não construído).');return}}}
@@ -59,8 +51,7 @@ function update(dt){
  else if(P.tx!==null){const ax=P.tx-P.x,ay=P.ty-P.y,l=Math.hypot(ax,ay);if(l<4){P.tx=null}else{dx=ax/l;dy=ay/l}}
  if(dlg){dx=dy=0}
  const sp=(keys['shift']?230:150);
- if(mode===1||mode===2||mode===3){} // faixa do chão: movimento livre em x e y
- const nx=P.x+dx*sp*dt,ny=P.y+dy*sp*dt*(Wd===worlds.td?1:.7);
+  const nx=P.x+dx*sp*dt,ny=P.y+dy*sp*dt*.7;
  const cx=Math.max(Wd.minX,Math.min(Wd.maxX,nx)),cy=Math.max(Wd.minY,Math.min(Wd.maxY,ny));
  if(!blocked(cx,P.y))P.x=cx; if(!blocked(P.x,cy))P.y=cy;
  P.moving=!!(dx||dy);if(dx)P.face=dx>0?1:-1;
@@ -68,38 +59,55 @@ function update(dt){
  if(dlg&&dlgC<dlg[dlgI].length)dlgC+=dt*38;
 }
 // ===== câmera =====
-function cam(){const z=1.7,vw=W/z,vh=H/z;return{z,x:Math.max(0,Math.min(W-vw,P.x-vw/2)),y:Math.max(0,Math.min(H-vh,P.y-70-vh/2))}}
+const C={z:1,x:0,y:0,tz:1,fx:480,fy:300,hold:0,why:'',zv:0};
+function camTarget(dt){
+ const s=Wd.sam,d=Math.hypot(P.x-s[0],P.y-s[1]),door=Math.hypot(P.x-195,P.y-330),ev=Math.hypot(P.x-EV.x,P.y-EV.y);
+ let tz=1,fx=P.x,fy=P.y-70,why=C.why;
+ if(EV.cool>0)EV.cool-=dt;
+ if(!EV.done&&ev<EV.r&&EV.cool<=0){EV.done=true;EV.run=3.2;say('Algo se move entre os ossos…')}
+ if(EV.run>0){EV.run-=dt;tz=1.9;fx=EV.x;fy=EV.y-60;why='ev';C.hold=1.4}
+ else if(dlg){tz=2.0;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-70;why='dlg';C.hold=1.4}
+ else if(d<(C.why==='npc'?200:150)){tz=1.7;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-70;why='npc';C.hold=1.2}
+ else if(door<(C.why==='door'?150:105)){tz=1.6;fx=(P.x+195)/2;fy=Math.min(P.y,330)-60;why='door';C.hold=1.2}
+ else{why='';}
+ if(EV.done&&ev>EV.r*2.5&&EV.cool<=0&&!(EV.run>0))EV.done=false,EV.cool=8;
+ // histerese: mantém aproximação por um tempo mínimo para não ficar oscilando
+ if(why){C.why=why;C.tz=tz;C.fx=fx;C.fy=fy}else if(C.hold>0){C.hold-=dt}else{C.why='';C.tz=1;C.fx=P.x;C.fy=P.y-70}
+}
+function camStep(dt){camTarget(dt);const pz=C.z;const k=1-Math.exp(-dt*2.6);C.z+=(C.tz-C.z)*k;
+ const vw=W/C.z,vh=H/C.z,kx=1-Math.exp(-dt*3.4);
+ const tx=Math.max(0,Math.min(W-vw,C.fx-vw/2)),ty=Math.max(0,Math.min(H-vh,C.fy-vh/2));
+ C.x+=(tx-C.x)*kx;C.y+=(ty-C.y)*kx;C.x=Math.max(0,Math.min(W-vw,C.x));C.y=Math.max(0,Math.min(H-vh,C.y));
+ C.zv=Math.abs(C.z-pz)/Math.max(dt,.001);
+ const b=Math.min(2.6,C.zv*1.8),bq=Math.round(b*4)/4;if(bq!==camStep.b){camStep.b=bq;cv.style.filter='sepia(.28) contrast(1.08) saturate(.9)'+(bq>0?' blur('+bq+'px)':'')}}
+function cam(){return C}
 // ===== desenho =====
 const scl=y=>.88+(Math.max(0,Math.min(1,(y-Wd.minY)/(Wd.maxY-Wd.minY))))*.18;
 function drawChar(img,fr,fw,x,y,face,s){const w=128*s*.975,h=128*s*.975;g.save();g.translate(x,y);g.scale(face,1);
  g.drawImage(img,(fr%fw)*128,0,128,128,-w/2,-h,w,h);g.restore();
  g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(x,y-1,22*s,6*s,0,0,7);g.fill()}
 function drawWorld(){
- g.drawImage(IM[Wd.bg],0,0);
+ g.drawImage(IM.latbg,0,0);
  // chamas (pixel, 2x)
  for(const [tx,ty] of Wd.torches){const f=Math.floor(t*9+tx)%6;g.drawImage(IM.fire,f*44,0,44,48,tx-44,ty-48,88,96)}
  const ents=[{y:P.y,d:()=>{drawChar(P.moving?IM.hwalk:IM.hidle,Math.floor(P.fr),P.moving?8:6,P.x,P.y,P.face,scl(P.y))}},
   {y:Wd.sam[1],d:()=>drawChar(IM.sidle,Math.floor(t*6)%6,6,Wd.sam[0],Wd.sam[1],-1,scl(Wd.sam[1]))}];
  ents.sort((a,b)=>a.y-b.y).forEach(e=>e.d());
- if(Wd.fg)g.drawImage(IM[Wd.fg],0,0);
+ g.drawImage(IM.latfg,0,0);
 }
 const lc=document.createElement('canvas');lc.width=W;lc.height=H;const lg=lc.getContext('2d');
 function light(){
- const amb={1:[.42,.5,.55],2:[.10,.13,.15],3:[.05,.07,.08],4:[.4,.48,.54]}[mode];
+ const k=Math.max(0,Math.min(1,(C.z-1)/.7)),L=(a,b)=>a+(b-a)*k;
+ const a1=[.42,.5,.55],a2=[.10,.13,.15],amb=a1.map((v,i)=>L(v,a2[i]));
  lg.globalCompositeOperation='source-over';lg.fillStyle='rgb('+amb.map(v=>v*255|0)+')';lg.fillRect(0,0,W,H);
  lg.globalCompositeOperation='lighter';
- const C=mode===2?cam():{z:1,x:0,y:0};const tr=(x,y)=>[(x-C.x)*C.z,(y-C.y)*C.z];
+ const tr=(x,y)=>[(x-C.x)*C.z,(y-C.y)*C.z];
  const spot=(x,y,r,a,col)=>{const [sx,sy]=tr(x,y);r*=C.z;const gr=lg.createRadialGradient(sx,sy,2,sx,sy,r);gr.addColorStop(0,'rgba('+col+','+a+')');gr.addColorStop(1,'rgba('+col+',0)');lg.fillStyle=gr;lg.fillRect(sx-r,sy-r,r*2,r*2)};
- const fl=(k)=>1+Math.sin(t*13+k)*.03+Math.sin(t*7.3+k*2)*.04;
- if(mode!==3)Wd.torches.forEach(([x,y],i)=>spot(x,y+10,(mode===2?200:250)*fl(i),mode===2?.8:.9,'255,170,80'));
- else Wd.torches.forEach(([x,y],i)=>spot(x,y+10,90*fl(i),.35,'255,150,60'));
- const hy=P.y-40;
- if(mode===2)spot(P.x,hy,230*fl(9),.62,'255,200,130');
- if(mode===1||mode===4)spot(P.x,hy,150*fl(9),.38,'255,190,120');
- if(mode===3){spot(P.x,hy,80,.7,'255,200,130');
-  const [sx,sy]=tr(P.x,hy);lg.save();lg.filter='blur(10px)';lg.beginPath();lg.moveTo(sx,sy);const a0=(P.face>0?0:Math.PI),sp=.56;lg.arc(sx,sy,560,a0-sp,a0+sp);lg.closePath();
-  const gr=lg.createRadialGradient(sx,sy,10,sx,sy,560);gr.addColorStop(0,'rgba(255,215,150,.95)');gr.addColorStop(1,'rgba(255,200,130,0)');lg.fillStyle=gr;lg.fill();lg.restore()}
- g.save();g.globalCompositeOperation='multiply';g.drawImage(lc,0,0);g.restore();
+ const fl=(q)=>1+Math.sin(t*13+q)*.03+Math.sin(t*7.3+q*2)*.04;
+ const ev=EV.run>0?(.55+.45*Math.abs(Math.sin(t*22))):1; // tochas tremem no evento
+ Wd.torches.forEach(([x,y],i)=>spot(x,y+10,L(250,200)*fl(i)*(EV.run>0?ev:1),L(.9,.8),'255,170,80'));
+ spot(P.x,P.y-40,L(150,230)*fl(9),L(.38,.62),'255,195,125');
+g.save();g.globalCompositeOperation='multiply';g.drawImage(lc,0,0);g.restore();
 }
 const nz=document.createElement('canvas');nz.width=240;nz.height=135;const ng=nz.getContext('2d');let nzT=0;
 function filmFx(){
@@ -110,7 +118,7 @@ function filmFx(){
  const v=g.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,H*.95);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.6)');g.fillStyle=v;g.fillRect(0,0,W,H)}
 function ui(){
  // aviso de interação
- if(!dlg)for(const o of things()){if(Math.hypot(P.x-o.x,P.y-o.y)<o.r){const c=mode===2?cam():{z:1,x:0,y:0};const sx=(o.x-c.x)*c.z,sy=(o.y-c.y)*c.z-120*c.z;
+ if(!dlg)for(const o of things()){if(Math.hypot(P.x-o.x,P.y-o.y)<o.r){const c=C;const sx=(o.x-c.x)*c.z,sy=(o.y-c.y)*c.z-120*c.z;
   g.font='bold 15px Georgia';const tx='[E] '+o.txt;const w=g.measureText(tx).width+18;g.fillStyle='rgba(8,6,5,.85)';g.fillRect(sx-w/2,sy-16,w,26);g.strokeStyle='#b89448';g.strokeRect(sx-w/2+.5,sy-15.5,w-1,25);g.fillStyle='#ecdfb8';g.textAlign='center';g.fillText(tx,sx,sy+3);g.textAlign='left';break}}
  if(dlg){g.fillStyle='rgba(8,6,5,.92)';g.fillRect(90,400,780,110);g.strokeStyle='#b89448';g.lineWidth=3;g.strokeRect(92,402,776,106);
   g.fillStyle='#b89448';g.font='bold 16px Georgia';g.fillText(NPC.name,112,428);g.fillStyle='#ecdfb8';g.font='18px Georgia';
@@ -120,10 +128,10 @@ function ui(){
   g.textAlign='center';g.fillStyle='#ecdfb8';g.font='bold 44px Georgia';g.fillText('O  OSSÁRIO',W/2,272);g.fillStyle='#b89448';g.font='bold 17px Georgia';g.fillText('SALA 1  ·  PRIMEIRO SELO',W/2,305);g.textAlign='left';g.globalAlpha=1}
 }
 function wrap(s,x,y,mw,lh){const ws=s.split(' ');let ln='';for(const w of ws){const tt=ln+w+' ';if(g.measureText(tt).width>mw){g.fillText(ln,x,y);ln=w+' ';y+=lh}else ln=tt}g.fillText(ln,x,y)}
-function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);
+function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);camStep(dt);
  g.save();g.fillStyle='#000';g.fillRect(0,0,W,H);
- if(mode===2){const c=cam();g.setTransform(c.z,0,0,c.z,-c.x*c.z,-c.y*c.z)}
+ {const c=C;g.setTransform(c.z,0,0,c.z,-c.x*c.z,-c.y*c.z)}
  drawWorld();g.restore();
- light();if(film)filmFx();ui();requestAnimationFrame(frame)}
-function start(){hud();cv.classList.add('film');requestAnimationFrame(frame)}
+ light();filmFx();ui();requestAnimationFrame(frame)}
+function start(){hud();requestAnimationFrame(frame)}
 </script></html>
