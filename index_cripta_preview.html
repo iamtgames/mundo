@@ -9485,6 +9485,7 @@ function sanitize(sv) {
   if (!Array.isArray(s.runes)) s.runes = [];
   if (!Array.isArray(s.offered)) s.offered = [];
   if (!s.inv.tocha) s.inv.tocha = 1;
+  Object.keys(s.inv).forEach(k => { if (!ITEMS[k]) delete s.inv[k]; else if (ITEMS[k].key && s.inv[k] > 1) s.inv[k] = 1; });
   if (!ITEM_OK(s.cp)) s.cp = 'cp_a';
   if (s.torch !== 'lit' && s.torch !== 'unlit') s.torch = 'unlit';
   if (s.sanct && !(s.sanct >= 1 && s.sanct <= 4)) s.sanct = 0;
@@ -9567,6 +9568,7 @@ function create(saved, opts) {
   function give(id, quiet) {
     const it = ITEMS[id]; if (!it) return false;
     if (!it.key && !st.inv[id] && matCount() >= MAT_SLOTS) { em('toast', { t: 'Mochila cheia: não cabe ' + it.n + '. Itens-chave nunca são perdidos.' }); em('sfx', { n: 'deny' }); return false; }
+    if (it.key && st.inv[id] > 0) return true;   // itens-chave nunca duplicam
     st.inv[id] = (st.inv[id] || 0) + 1;
     if (id === 'lagrima') st.tears = st.inv[id];
     if (!quiet) { em('toast', { t: 'Você obteve: ' + it.n, item: id }); em('sfx', { n: 'item' }); }
@@ -10672,6 +10674,20 @@ const CSS = `
 .crb img{width:calc(var(--u)*11);height:calc(var(--u)*11);image-rendering:pixelated}
 .crtabs{display:flex;gap:calc(var(--u)*2);margin-bottom:calc(var(--u)*4)}
 .crtabs .crb.on{background:#c9a24a;color:#1a1008}
+.bagh{display:flex;justify-content:space-between;align-items:center;margin-bottom:calc(var(--u)*4);border-bottom:calc(var(--u)*1) solid #4a3a20;padding-bottom:calc(var(--u)*2)}.bagh h3{margin:0;border:0;padding:0}
+.bag{display:grid;grid-template-columns:1.25fr 1fr;gap:calc(var(--u)*7);width:calc(var(--u)*270)}
+.bag .lb{font-size:calc(var(--u)*7);color:#a89878;letter-spacing:calc(var(--u)*1);text-transform:uppercase;margin:calc(var(--u)*2) 0 calc(var(--u)*2);display:flex;justify-content:space-between}.bag .lb span{color:#e8c870}
+.slots{display:grid;grid-template-columns:repeat(5,1fr);gap:calc(var(--u)*2.5);margin-bottom:calc(var(--u)*4)}
+.sl{aspect-ratio:1;border:calc(var(--u)*1) solid #4a3a60;background:#120c1a;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer}
+.sl.empty{border-color:#2a2038;cursor:default;opacity:.55}.sl:not(.empty):hover,.sl.sel{border-color:#e8c870;background:#241a30;box-shadow:0 0 calc(var(--u)*3) rgba(232,200,112,.35)}
+.sl img{width:62%;height:62%;image-rendering:pixelated}.sl em{position:absolute;right:calc(var(--u)*1.5);bottom:calc(var(--u)*0.5);font-style:normal;font-size:calc(var(--u)*6.5);color:#e8c870;text-shadow:0 calc(var(--u)*1) 0 #000}
+.bagr{display:flex;flex-direction:column;min-width:0}
+.det{display:flex;gap:calc(var(--u)*5);align-items:flex-start;border:calc(var(--u)*1) solid #3a2e4a;background:#120c1a;padding:calc(var(--u)*4);min-height:calc(var(--u)*46)}
+.det img{width:calc(var(--u)*20);height:calc(var(--u)*20);image-rendering:pixelated;flex:none}.det b{color:#e8c870;display:block}.det small{color:#a89878;font-size:calc(var(--u)*6.5)}.det p{margin:calc(var(--u)*2) 0 0;color:#cfc09a;font-size:calc(var(--u)*7.5)}
+.seals{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*2.5)}
+.sg{border:calc(var(--u)*1) solid #3a3048;background:#100c18;padding:calc(var(--u)*2);text-align:center;opacity:.55}.sg img{width:calc(var(--u)*14);height:calc(var(--u)*14);image-rendering:pixelated}.sg small{display:block;font-size:calc(var(--u)*5.5);color:#a89878;line-height:1.1}
+.sg.s1{opacity:.75;border-color:#6a5a7a}.sg.s2{opacity:.9;border-color:#a89040}.sg.s3,.sg.s4{opacity:1;border-color:#e8c870;box-shadow:0 0 calc(var(--u)*3) rgba(232,200,112,.5)}
+.diary{display:flex;flex-direction:column;gap:calc(var(--u)*1.5);max-height:calc(var(--u)*50);overflow:auto}.diary .crb{width:100%;font-size:calc(var(--u)*7.5);padding:calc(var(--u)*1.5) calc(var(--u)*4);text-align:left}.dim{color:#7a6c58}
 .crgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:calc(var(--u)*3)}
 .crgrid .it{border:calc(var(--u)*1) solid #4a3a60;background:#120c1a;padding:calc(var(--u)*2);text-align:center;cursor:pointer;font-size:calc(var(--u)*6.5);color:#cfc09a;position:relative}
 .crgrid .it:hover,.crgrid .it.sel{border-color:#e8c870;color:#fff}
@@ -10782,27 +10798,24 @@ function openPack(tab) {
   mode = 'pack'; if (tab) packTab = tab; renderPack();
 }
 function renderPack() {
-  const st = core.st; let h = '<div class="crtabs"><button class="crb ' + (packTab === 'itens' ? 'on' : '') + '" data-t="itens">Itens</button><button class="crb ' + (packTab === 'selos' ? 'on' : '') + '" data-t="selos">Selos</button><button class="crb ' + (packTab === 'diario' ? 'on' : '') + '" data-t="diario">Diário</button><button class="crb" data-t="x" style="margin-left:auto">Fechar [I]</button></div>';
-  if (packTab === 'itens') {
-    const ids = Object.keys(st.inv).filter(k => st.inv[k] > 0 && Core.ITEMS[k]);
-    h += '<div class="crgrid">';
-    ids.forEach(id => { const it = Core.ITEMS[id]; h += '<div class="it ' + (packSel === id ? 'sel' : '') + '" data-id="' + id + '"><img src="' + gfx.iconDataURL(id) + '">' + esc(id === 'tocha' ? (st.torch === 'lit' ? 'Tocha (acesa)' : 'Tocha (apagada)') : it.n) + (st.inv[id] > 1 ? '<em>x' + st.inv[id] + '</em>' : '') + '</div>'; });
-    h += '</div>';
-    const matN = ids.filter(k => !Core.ITEMS[k].key).length;
-    const sel = packSel && Core.ITEMS[packSel] && st.inv[packSel] ? Core.ITEMS[packSel] : null;
-    h += '<div class="crdet">' + (sel ? '<b>' + esc(packSel === 'tocha' ? 'Tocha' : sel.n) + '</b> · ' + esc(CATNAME[sel.cat] || sel.cat) + '<br>' + esc(sel.d) + (packSel === 'tocha' ? '<br>Estado: ' + (st.torch === 'lit' ? 'acesa. Ilumina e acende braseiros.' : 'apagada. Acenda-a na fogueira da praça.') : '') : 'Toque num item para ver a descrição.') + '<br><small>Materiais: ' + matN + '/' + Core.MAT_SLOTS + ' · Itens-chave nunca ocupam espaço nem se perdem.</small></div>';
-  } else if (packTab === 'selos') {
-    for (let n = 1; n <= 4; n++) {
-      const s = core.sealState(n); const rn = ['', 'olho', 'mao', 'chama', 'silencio'][n];
-      h += '<div class="crsl"><img src="' + gfx.runeDataURL(rn) + '"><div><b>' + SEALNAME[n] + '</b><small>' + STATE_TXT[s] + '</small>' + (st.flags['reward_' + n] ? '<small style="color:#e8dcc0">' + esc(Core.ITEMS['juramento_' + n].d) + '</small>' : '') + '</div></div>';
-    }
-    h += '<div class="crdet">Fragmentos do juramento: ' + [1, 2, 3, 4].filter(n => st.flags['reward_' + n]).length + '/4</div>';
-  } else {
-    const docs = Object.keys(st.lore).concat(['pagina_olho', 'pagina_mao', 'pagina_chama'].filter(k => st.inv[k])).filter(k => Core.DOCS[k]);
-    h += docs.length ? docs.map(k => '<button class="crb" style="display:block;width:100%;margin-bottom:' + 'calc(var(--u)*2)' + '" data-d="' + k + '">' + esc(Core.DOCS[k].t) + '</button>').join('') : '<div class="txt">Nada lido ainda. Documentos e páginas aparecem aqui.</div>';
-  }
+  const st = core.st;
+  const ids = Object.keys(st.inv).filter(k => st.inv[k] > 0 && Core.ITEMS[k]);
+  const keys = ids.filter(k => Core.ITEMS[k].key), mats = ids.filter(k => !Core.ITEMS[k].key);
+  if (!packSel || !st.inv[packSel]) packSel = keys[0] || mats[0] || null;
+  const slot = (id) => id ? '<div class="sl ' + (packSel === id ? 'sel' : '') + '" data-id="' + id + '" title="' + esc(Core.ITEMS[id].n) + '"><img src="' + gfx.iconDataURL(id) + '">' + (st.inv[id] > 1 ? '<em>' + st.inv[id] + '</em>' : '') + '</div>' : '<div class="sl empty"></div>';
+  const pad = (arr, n) => { const o = arr.slice(); while (o.length < n) o.push(null); return o; };
+  let h = '<div class="bagh"><h3>Mochila</h3><button class="crb" data-t="x">Fechar [I]</button></div><div class="bag">';
+  h += '<div class="bagl"><div class="lb">Itens-chave</div><div class="slots">' + pad(keys, 10).map(slot).join('') + '</div>';
+  h += '<div class="lb">Materiais <span>' + mats.length + '/' + Core.MAT_SLOTS + '</span></div><div class="slots">' + pad(mats, Core.MAT_SLOTS).map(slot).join('') + '</div></div>';
+  const sel = packSel && Core.ITEMS[packSel] ? Core.ITEMS[packSel] : null;
+  h += '<div class="bagr"><div class="det">' + (sel ? '<img src="' + gfx.iconDataURL(packSel) + '"><div><b>' + esc(packSel === 'tocha' ? (st.torch === 'lit' ? 'Tocha (acesa)' : 'Tocha (apagada)') : sel.n) + '</b><small>' + esc(CATNAME[sel.cat] || sel.cat) + '</small><p>' + esc(sel.d) + (packSel === 'tocha' ? ' ' + (st.torch === 'lit' ? 'Ilumina e acende braseiros.' : 'Acenda-a na fogueira da praça.') : '') + '</p></div>' : '<p>Mochila vazia.</p>') + '</div>';
+  h += '<div class="lb">Selos <span>' + [1, 2, 3, 4].filter(n => st.flags['reward_' + n]).length + '/4 fragmentos</span></div><div class="seals">';
+  for (let n = 1; n <= 4; n++) { const s = core.sealState(n); const rn = ['', 'olho', 'mao', 'chama', 'silencio'][n]; h += '<div class="sg s' + s + '" title="' + esc(SEALNAME[n] + ' — ' + STATE_TXT[s]) + '"><img src="' + gfx.runeDataURL(rn) + '"><small>' + esc(SEALNAME[n]) + '</small></div>'; }
+  h += '</div>';
+  const docs = Object.keys(st.lore).concat(['pagina_olho', 'pagina_mao', 'pagina_chama'].filter(k => st.inv[k])).filter(k => Core.DOCS[k]);
+  h += '<div class="lb">Diário <span>' + docs.length + '</span></div><div class="diary">' + (docs.length ? docs.map(k => '<button class="crb" data-d="' + k + '">' + esc(Core.DOCS[k].t) + '</button>').join('') : '<div class="txt dim">Nada lido ainda.</div>') + '</div></div></div>';
   const m = modal(h);
-  m.querySelectorAll('[data-t]').forEach(b => b.addEventListener('click', () => { if (b.dataset.t === 'x') closeModal(); else { packTab = b.dataset.t; renderPack(); } }));
+  m.querySelectorAll('[data-t]').forEach(b => b.addEventListener('click', closeModal));
   m.querySelectorAll('[data-id]').forEach(b => b.addEventListener('click', () => { packSel = b.dataset.id; renderPack(); }));
   m.querySelectorAll('[data-d]').forEach(b => b.addEventListener('click', () => { const d = Core.DOCS[b.dataset.d]; closeModalKeep(); openRead(d.t, d.x); onClose = () => openPack(); }));
 }
