@@ -4703,23 +4703,38 @@ const CAMX = (function(){
   const C = { z:1, x:0, y:0, fx:480, fy:300, tfx:480, tfy:300, tz:1, vz:0, vfx:0, vfy:0, ts:.7, why:'', hold:0,
               bl:0, ob:0, opT:1, opD:1, rx:0, px:0, py:0, pz:1, list:[], scanT:0, lastOp:-1 };
   /* ---- estilos do acabamento ---- */
+  /* ---- PARÂMETROS DE ACABAMENTO (ajuste aqui; CAMX.P + CAMX.restyle() permitem mudar ao vivo) ---- */
+  const P = {
+    blurPx: 2,            // desfoque máximo (px) na abertura/troca de câmera
+    blurMax: .7,          // opacidade máxima do desfoque
+    blurTrans: .35,       // quanto a troca de zoom desfoca (0 = nada)
+    grain: .06,           // intensidade do grão (0 = limpo)
+    scratch: .1,          // riscos/poeira de película
+    vignette: .2,         // escurecimento das bordas
+    moodLo: '#b4beba',    // cor das bordas do véu de ambiente (multiply)
+    sepia: .08, contrast: 1.05, saturate: 1.0, brightness: 1.06,   // correção de cor
+    outline: .92,         // opacidade do contorno dos personagens
+    rim: .3,              // brilho quente externo do contorno
+    heroLight: .24        // luz quente que acompanha o herói
+  };
   const st = document.createElement('style'); st.id = 'camxcss';
-  st.textContent = `
-  #camblur{position:absolute; inset:0; z-index:46; pointer-events:none; opacity:0; backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); will-change:opacity;}
+  const cssText = () => `
+  #camblur{position:absolute; inset:0; z-index:46; pointer-events:none; opacity:0; backdrop-filter:blur(${P.blurPx}px); -webkit-backdrop-filter:blur(${P.blurPx}px); will-change:opacity;}
   #moodveil{position:absolute; inset:0; z-index:43; pointer-events:none; mix-blend-mode:multiply;
-    background:radial-gradient(ellipse at 50% 56%, #f4f7f5 36%, #9aa7a2 100%);}
+    background:radial-gradient(ellipse at 50% 56%, #f4f7f5 38%, ${P.moodLo} 100%);}
   #herolight{position:absolute; width:440px; height:440px; margin:-220px 0 0 -220px; z-index:39; pointer-events:none; mix-blend-mode:screen;
-    background:radial-gradient(circle at 50% 50%, rgba(255,196,130,.26), rgba(255,170,100,.09) 44%, rgba(255,150,80,0) 70%);}
+    background:radial-gradient(circle at 50% 50%, rgba(255,196,130,${P.heroLight}), rgba(255,170,100,${P.heroLight*.35}) 44%, rgba(255,150,80,0) 70%);}
   #avatar:not(.ghost), .resident, .npc{
-    filter:drop-shadow(1px 0 0 rgba(10,7,5,.95)) drop-shadow(-1px 0 0 rgba(10,7,5,.95)) drop-shadow(0 1px 0 rgba(10,7,5,.95)) drop-shadow(0 -1px 0 rgba(10,7,5,.95)) drop-shadow(0 0 1.5px rgba(255,205,140,.35));}
+    filter:drop-shadow(1px 0 0 rgba(10,7,5,${P.outline})) drop-shadow(-1px 0 0 rgba(10,7,5,${P.outline})) drop-shadow(0 1px 0 rgba(10,7,5,${P.outline})) drop-shadow(0 -1px 0 rgba(10,7,5,${P.outline})) drop-shadow(0 0 1.5px rgba(255,205,140,${P.rim}));}
   #gradefx{position:fixed; inset:0; z-index:2147483000; pointer-events:none;
-    backdrop-filter:sepia(.1) contrast(1.07) saturate(.95) brightness(1.08); -webkit-backdrop-filter:sepia(.1) contrast(1.07) saturate(.95) brightness(1.08);
-    background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 58%, rgba(0,0,0,.24) 100%);}
+    backdrop-filter:sepia(${P.sepia}) contrast(${P.contrast}) saturate(${P.saturate}) brightness(${P.brightness}); -webkit-backdrop-filter:sepia(${P.sepia}) contrast(${P.contrast}) saturate(${P.saturate}) brightness(${P.brightness});
+    background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 60%, rgba(0,0,0,${P.vignette}) 100%);}
   #filmfx,#scratchfx{position:fixed; inset:0; width:100vw; height:100vh; z-index:2147483001; pointer-events:none;}
-  #filmfx{mix-blend-mode:soft-light; opacity:.16; image-rendering:pixelated;}
-  #scratchfx{opacity:.32;}
+  #filmfx{mix-blend-mode:soft-light; opacity:${P.grain}; image-rendering:pixelated;}
+  #scratchfx{opacity:${P.scratch*3};}
   `;
-  document.head.appendChild(st);
+  st.textContent = cssText(); document.head.appendChild(st);
+  const restyle = () => { st.textContent = cssText(); };
   const blurEl = document.createElement('div'); blurEl.id = 'camblur';
   const mood = document.createElement('div'); mood.id = 'moodveil';
   const fadeEl2 = document.getElementById('fade');
@@ -4817,12 +4832,13 @@ const CAMX = (function(){
     const x = C.px + (C.x - C.px) * a, y = C.py + (C.y - C.py) * a, z = C.pz + (C.z - C.pz) * a;
     camX = x; camY = y; camZoom = z; viewScale = baseScale * z; C.rx = x;
     applyCam();
-    const op = Math.min(1, Math.max(C.ob, C.bl * .6)) * .85;
+    { const mv = Math.abs(C.z - C.pz) > .0004 || Math.abs(C.x - C.px) > .02; if (mv) { C.still = 0; if (!C.wc) { world.style.willChange = 'transform'; C.wc = 1; } } else if ((C.still = (C.still || 0) + 1) === 20 && C.wc) { world.style.willChange = 'auto'; C.wc = 0; } }
+    const op = Math.min(1, Math.max(C.ob, C.bl * P.blurTrans)) * P.blurMax;
     if (Math.abs(op - C.lastOp) > .02) { C.lastOp = op; blurEl.style.opacity = op.toFixed(2); }
   }
   function hardReset(){ C.z = C.pz = C.tz = 1; C.vz = 0; C.y = C.py = 0; C.fy = C.tfy = STAGE_H / 2; C.vfy = 0; C.why = ''; C.hold = 0; camZoom = 1; camY = 0; viewScale = baseScale; applyCam(); }
   function open(d){ C.opT = 0; C.opD = d || 1.5; }
-  return { step, render, hardReset, open, scan, herolight: hl, state: C };
+  return { step, render, hardReset, open, scan, herolight: hl, state: C, P, restyle };
 })();
 
 /* ===== Passo fixo (120 Hz) + interpolação no desenho, velocidade com aceleração/atrito ===== */
