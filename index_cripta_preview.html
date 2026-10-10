@@ -9202,7 +9202,7 @@ requestAnimationFrame(tick);
 (function (root) {
 'use strict';
 const T = 16, W = 140, H = 64;
-const GRAV = 900, MOVE = 84, JUMP = -322, MAXFALL = 420, PW = 10, PH = 15;
+const GRAV = 900, MOVE = 104, JUMP = -322, MAXFALL = 420, PW = 10, PH = 15;
 
 /* ------------------------------ ITENS ------------------------------ */
 const ITEMS = {
@@ -9474,7 +9474,7 @@ function allSealsDone(s) { return [1, 2, 3, 4].every(n => !!s.flags['reward_' + 
 /* ------------------------------ ESTADO ------------------------------ */
 function freshState() {
   return { v: 1, torch: 'unlit', libLit: false, portal: false, inCrypt: false,
-    flags: {}, destroyed: {}, taken: {}, inv: { tocha: 1 }, lore: {}, said: {}, cp: 'cp_a',
+    flags: {}, destroyed: {}, taken: {}, inv: { tocha: 1 }, lore: {}, said: {}, cp: 'cp_a', cps: { cp_a: 1 },
     sanct: 0, lit: {}, samurai: 'bound', best: {}, tears: 0, runes: [], sconces: {}, offered: [] };
 }
 function sanitize(sv) {
@@ -9487,6 +9487,9 @@ function sanitize(sv) {
   if (!s.inv.tocha) s.inv.tocha = 1;
   Object.keys(s.inv).forEach(k => { if (!ITEMS[k]) delete s.inv[k]; else if (ITEMS[k].key && s.inv[k] > 1) s.inv[k] = 1; });
   if (!ITEM_OK(s.cp)) s.cp = 'cp_a';
+  if (!s.cps || typeof s.cps !== 'object') s.cps = {};
+  s.cps.cp_a = 1; if (ITEM_OK(s.cp)) s.cps[s.cp] = 1;
+  Object.keys(s.cps).forEach(k => { if (!ITEM_OK(k)) delete s.cps[k]; });
   if (s.torch !== 'lit' && s.torch !== 'unlit') s.torch = 'unlit';
   if (s.sanct && !(s.sanct >= 1 && s.sanct <= 4)) s.sanct = 0;
   return s;
@@ -9525,10 +9528,11 @@ function create(saved, opts) {
 
   /* ---------- player ---------- */
   const P = core.p = { x: 7 * T + 8, y: 38 * T, vx: 0, vy: 0, on: false, face: 1, coy: 0, jb: 0, atk: 0, atkCd: 0, dropT: 0, water: false, pushing: 0, rid: 0, hurt: 0, fall: 0, anim: 0, bump: 0, canJump: true, inSanct: 0 };
-  if (st.inCrypt) {
+  // ao entrar vindo do mundo, sempre começa na entrada (o progresso fica salvo; use as Lanternas para viajar)
+  if (opts.resume && st.inCrypt) {
     const cp = byId[st.cp] || byId.cp_a;
     P.x = cp.x + cp.w / 2; P.y = cp.y + cp.h;
-  }
+  } else { st.cp = 'cp_a'; st.sanct = 0; }
   if (st.sanct) { const s0 = SANCT[st.sanct]; P.x = s0.x * T + 8; P.y = s0.y * T; P.inSanct = st.sanct; }
 
   /* ---------- tiles e sólidos ---------- */
@@ -9876,6 +9880,15 @@ function create(saved, opts) {
     if (why) toast(why);
   }
   core.respawn = respawn;
+  /* viagem rápida entre lanternas já acesas */
+  core.lanterns = () => ents.filter(e => e.t === 'cp' && st.cps[e.id]).map(e => ({ id: e.id, name: e.name, here: st.cp === e.id }));
+  core.travel = function (id) {
+    const cp = byId[id];
+    if (!cp || cp.t !== 'cp' || !st.cps[id] || P.inSanct) return false;
+    st.cp = id; P.x = cp.x + cp.w / 2; P.y = cp.y + cp.h; P.vx = 0; P.vy = 0; P.on = false;
+    em('fade'); em('sfx', { n: 'cp' }); em('toast', { t: 'Você viaja até a ' + cp.name + '.' }); em('save');
+    return true;
+  };
 
   /* ---------- passo de simulação ---------- */
   function resolveX(dx) {
@@ -9983,7 +9996,7 @@ function create(saved, opts) {
     core.move(dt, inp);
     // checkpoints e gatilhos
     for (const e of ents) {
-      if (e.t === 'cp') { if (P.x > e.x - 10 && P.x < e.x + e.w + 10 && Math.abs(P.y - (e.y + e.h)) < 24 && st.cp !== e.id) { st.cp = e.id; em('sfx', { n: 'cp' }); em('toast', { t: e.name + ' acesa. Você recomeça daqui.' }); em('save'); } }
+      if (e.t === 'cp') { if (P.x > e.x - 10 && P.x < e.x + e.w + 10 && Math.abs(P.y - (e.y + e.h)) < 24 && st.cp !== e.id) { const nova = !st.cps[e.id]; st.cp = e.id; st.cps[e.id] = 1; em('sfx', { n: 'cp' }); em('toast', { t: nova ? e.name + ' acesa. Você recomeça daqui e pode viajar até ela com L.' : e.name + ' acesa. Você recomeça daqui.' }); em('save'); } }
       if (e.t === 'trig') { const ok = P.x > e.x && P.x < e.x + e.w && Math.abs(P.y - (e.ty0 * T)) < 12; if (ok && !st.flags[e.flag]) { setFlag(e.flag); em('sfx', { n: 'unlock' }); em('toast', { t: 'A Pedra da Prova reconhece a travessia. O Selo da Prova despertou.' }); } }
     }
     // descobertas por região
@@ -10821,12 +10834,24 @@ function renderPack() {
   m.querySelectorAll('[data-d]').forEach(b => b.addEventListener('click', () => { const d = Core.DOCS[b.dataset.d]; closeModalKeep(); openRead(d.t, d.x); onClose = () => openPack(); }));
 }
 function closeModalKeep() { const m = $('#cr-modal'); m.classList.remove('on'); m.innerHTML = ''; }
+function openTravel() {
+  if (mode !== 'play') return; mode = 'pause';
+  const L = core.lanterns();
+  if (core.p.inSanct) { const m0 = modal('<h3>Lanternas</h3><div class="doc">Não é possível viajar de dentro de um santuário.</div><div class="btns"><button class="crb sel" data-a="x">Fechar</button></div>'); m0.querySelector('[data-a="x"]').addEventListener('click', closeModal); return; }
+  let h = '<h3>Viajar entre Lanternas</h3><div class="doc">Escolha uma lanterna já acesa. Você reaparece lá, sem custo.</div><div class="btns" style="flex-direction:column;align-items:stretch">';
+  L.forEach((l, i) => { h += '<button class="crb' + (i === 0 ? ' sel' : '') + '" data-t="' + esc(l.id) + '">' + esc(l.name) + (l.here ? ' (aqui)' : '') + '</button>'; });
+  h += '<button class="crb" data-a="x">Cancelar [Esc]</button></div>';
+  const m = modal(h);
+  m.querySelectorAll('[data-t]').forEach(b => b.addEventListener('click', () => { closeModal(); core.travel(b.dataset.t); handleEvents(); }));
+  m.querySelector('[data-a="x"]').addEventListener('click', closeModal);
+}
 function openPause() {
   if (mode !== 'play') return; mode = 'pause';
-  const m = modal('<h3>Cripta da Biblioteca</h3><div class="btns" style="flex-direction:column;align-items:stretch"><button class="crb sel" data-a="go">Continuar</button><button class="crb" data-a="pack">Mochila [I]</button><button class="crb" data-a="lamp">Voltar à última lanterna (sem custo)</button><button class="crb" data-a="help">Como jogar</button><button class="crb" data-a="exit">Voltar ao mundo (salva o progresso)</button></div>');
+  const m = modal('<h3>Cripta da Biblioteca</h3><div class="btns" style="flex-direction:column;align-items:stretch"><button class="crb sel" data-a="go">Continuar</button><button class="crb" data-a="pack">Mochila [I]</button><button class="crb" data-a="travel">Viajar entre Lanternas [L]</button><button class="crb" data-a="lamp">Voltar à última lanterna (sem custo)</button><button class="crb" data-a="help">Como jogar</button><button class="crb" data-a="exit">Voltar ao mundo (salva o progresso)</button></div>');
   m.querySelector('[data-a="go"]').addEventListener('click', closeModal);
   m.querySelector('[data-a="pack"]').addEventListener('click', () => { closeModalKeep(); openPack(); });
   m.querySelector('[data-a="lamp"]').addEventListener('click', () => { closeModal(); core.respawn(); handleEvents(); });
+  m.querySelector('[data-a="travel"]').addEventListener('click', () => { closeModalKeep(); mode = 'play'; openTravel(); });
   m.querySelector('[data-a="help"]').addEventListener('click', () => { closeModalKeep(); openRead('Como jogar', 'A / D ou setas: andar\nW, Espaço ou ↑: pular\n↓ + pular: atravessar tábuas\nJ, K, X ou Z: golpear (quebra vasos e estantes frágeis)\nE ou Enter: interagir, ler, acender\nEmpurre blocos andando contra eles\nI: mochila · Esc: pausa\n\nCair nos fossos não custa nada: você volta à última lanterna.\nSe um bloco ficar preso, use a alavanca de reinício da sala.'); onClose = () => openPause(); });
   m.querySelector('[data-a="exit"]').addEventListener('click', () => { closeModal(); leave(); });
 }
@@ -10904,6 +10929,7 @@ function onKey(e) {
     else if (k === 'e' || k === 'enter') edge.actP = 1;
     else if (k === 'j' || k === 'k' || k === 'x' || k === 'z') edge.atkP = 1;
     else if (k === 'i') openPack();
+    else if (k === 'l') openTravel();
     else if (k === 'escape' || k === 'p') openPause();
   } else if (mode === 'dialog') {
     if (k === 'e' || k === 'enter' || k === ' ') dlgAdvance();
@@ -10926,7 +10952,7 @@ function open(opts) {
   const s = S();
   if (!s.portal && !opts.force) return false;
   hookMusic();
-  core = Core.create(s); core.st.inCrypt = true;
+  core = Core.create(s, { resume: !!opts.resume }); core.st.inCrypt = true;
   gfx = GfxMod.create(core); gfx.buildStatic();
   buildDOM(); (function(){ const mb = $('#cr-menubtn'); if (mb) mb.addEventListener('click', ev => { const b = ev.target.closest('[data-m]'); if (!b || mode !== 'play') return; ev.stopPropagation(); if (b.dataset.m === 'menu') openPause(); else if (b.dataset.m === 'pack') openPack(); else leave(); }); })(); running = true; mode = 'play'; regionShown = ''; helpT = 0; acc = 0; finalPending = false; dlg = null;
   window.addEventListener('keydown', onKey, true); window.addEventListener('keyup', onKey, true); window.addEventListener('resize', fit);
