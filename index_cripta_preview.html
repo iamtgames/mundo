@@ -11130,7 +11130,7 @@ function libDoorArt() {
 function styleLibDoor() {
   const d = roomlayer.querySelector('.hotspot.door.arch-stone[data-door="out"]'); if (!d || d.dataset.crLib) return;
   d.dataset.crLib = 1; d.classList.add('cr-libdoor');
-  const a = d.querySelector('.arch-img'); if (a) a.style.backgroundImage = 'url(' + libDoorArt() + ')';
+  const a = d.querySelector('.arch-img'); if (a) a.style.setProperty('background-image', 'url(' + libDoorArt() + ')', 'important');
 }
 
 /* alçapão de pedra da Cripta, na paleta musgo/pedra da Biblioteca (não usado: o portal de fogo original foi mantido) */
