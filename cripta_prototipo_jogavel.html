@@ -66,21 +66,21 @@ function camTarget(dt){
  let tz=BZ,fx=P.x,fy=P.y-70,why=C.why;
  if(EV.cool>0)EV.cool-=dt;
  if(!EV.done&&ev<EV.r&&EV.cool<=0){EV.done=true;EV.run=3.2;say('Algo se move entre os ossos…')}
- if(EV.run>0){EV.run-=dt;tz=1.9;fx=EV.x;fy=EV.y-60;why='ev';C.hold=1.4}
- else if(dlg){tz=2.0;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-70;why='dlg';C.hold=1.4}
- else if(d<(C.why==='npc'?200:150)){tz=1.75;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-70;why='npc';C.hold=1.2}
- else if(door<(C.why==='door'?150:105)){tz=1.7;fx=(P.x+195)/2;fy=Math.min(P.y,330)-60;why='door';C.hold=1.2}
+ if(EV.run>0){EV.run-=dt;tz=1.9;fx=EV.x;fy=EV.y-60;why='ev';C.hold=.6}
+ else if(dlg){tz=2.0;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-70;why='dlg';C.hold=.6}
+ else if(d<(C.why==='npc'?270:215)){tz=1.75;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-70;why='npc';C.hold=.6}
+ else if(door<(C.why==='door'?200:150)){tz=1.7;fx=(P.x+195)/2;fy=Math.min(P.y,330)-60;why='door';C.hold=.6}
  else{why='';}
  if(EV.done&&ev>EV.r*2.5&&EV.cool<=0&&!(EV.run>0))EV.done=false,EV.cool=8;
  // histerese: mantém aproximação por um tempo mínimo para não ficar oscilando
  if(why){C.why=why;C.tz=tz;C.fx=fx;C.fy=fy}else if(C.hold>0){C.hold-=dt}else{C.why='';C.tz=BZ;C.fx=P.x;C.fy=P.y-70}
 }
-function camStep(dt){camTarget(dt);const pz=C.z;const k=1-Math.exp(-dt*2.6);C.z+=(C.tz-C.z)*k;
- const vw=W/C.z,vh=H/C.z,kx=1-Math.exp(-dt*3.4);
+function camStep(dt){camTarget(dt);const pz=C.z;const k=1-Math.exp(-dt*4.6);C.z+=(C.tz-C.z)*k;
+ const vw=W/C.z,vh=H/C.z,kx=1-Math.exp(-dt*5.5);
  const tx=Math.max(0,Math.min(W-vw,C.fx-vw/2)),ty=Math.max(0,Math.min(H-vh,C.fy-vh/2));
  C.x+=(tx-C.x)*kx;C.y+=(ty-C.y)*kx;C.x=Math.max(0,Math.min(W-vw,C.x));C.y=Math.max(0,Math.min(H-vh,C.y));
  C.zv=Math.abs(C.z-pz)/Math.max(dt,.001);
- const b=Math.min(2.6,C.zv*1.8),bq=Math.round(b*4)/4;if(bq!==camStep.b){camStep.b=bq;cv.style.filter='sepia(.28) contrast(1.08) saturate(.9)'+(bq>0?' blur('+bq+'px)':'')}}
+ const b=Math.min(1.5,C.zv*1.1),bq=Math.round(b*4)/4;if(bq!==camStep.b){camStep.b=bq;cv.style.filter='sepia(.28) contrast(1.08) saturate(.9)'+(bq>0?' blur('+bq+'px)':'')}}
 function cam(){return C}
 // ===== desenho =====
 const scl=y=>.88+(Math.max(0,Math.min(1,(y-Wd.minY)/(Wd.maxY-Wd.minY))))*.18;
