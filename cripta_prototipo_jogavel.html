@@ -4,7 +4,7 @@
 html,body{margin:0;height:100%;background:#050807;color:#e6dcc0;font-family:Georgia,'DejaVu Serif',serif;overflow:hidden}
 #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #cv{width:min(100vw,177.78vh);height:min(56.25vw,100vh);image-rendering:pixelated;background:#000;cursor:crosshair}
-#cv{filter:sepia(.28) contrast(1.08) saturate(.9)}
+#cv{filter:sepia(.12) contrast(1.14) saturate(1.12) brightness(.98) blur(.35px)}
 #hud{position:fixed;left:10px;top:8px;font:13px/1.5 system-ui,sans-serif;background:rgba(5,8,7,.78);border:1px solid #6b5a30;padding:7px 11px;border-radius:4px;max-width:420px}
 #hud b{color:#d9b45a}#hud .on{color:#7fe0c4}
 #hud kbd{background:#1b2420;border:1px solid #4b5a50;border-radius:3px;padding:0 5px;color:#d9b45a}
@@ -92,7 +92,7 @@ function camStep(dt){camTarget(dt);
  // intensidade do blur = velocidade do zoom, suavizada (sobe e desce em sino, nunca "liga/desliga")
  C.zv=Math.abs(C.z-pz)/Math.max(dt,.001);
  const tb=Math.min(1,C.zv/.9);C.bl+=(tb-C.bl)*(1-Math.exp(-dt*9));
- const bq=Math.round(C.bl*1.1*8)/8;if(bq!==camStep.b){camStep.b=bq;cv.style.filter='sepia(.28) contrast(1.08) saturate(.9)'+(bq>0?' blur('+bq+'px)':'')}}
+ const bq=Math.round(C.bl*1.1*8)/8;if(bq!==camStep.b){camStep.b=bq;cv.style.filter='sepia(.12) contrast(1.14) saturate(1.12) brightness(.98) blur('+(.35+bq).toFixed(2)+'px)'}}
 function cam(){return C}
 const prv=document.createElement('canvas');prv.width=W;prv.height=H;const pg=prv.getContext('2d');
 // ===== desenho =====
@@ -119,24 +119,31 @@ function drawWorld(){
 const lc=document.createElement('canvas');lc.width=W;lc.height=H;const lg=lc.getContext('2d');
 function light(){
  const k=Math.max(0,Math.min(1,(C.z-BZ)/.6)),L=(a,b)=>a+(b-a)*k;
- const a1=[.42,.5,.55],a2=[.10,.13,.15],amb=a1.map((v,i)=>L(v,a2[i]));
+ const a1=[.30,.40,.44],a2=[.09,.12,.14],amb=a1.map((v,i)=>L(v,a2[i]));
  lg.globalCompositeOperation='source-over';lg.fillStyle='rgb('+amb.map(v=>v*255|0)+')';lg.fillRect(0,0,W,H);
  lg.globalCompositeOperation='lighter';
  const tr=(x,y)=>[(x-C.x)*C.z,(y-C.y)*C.z];
  const spot=(x,y,r,a,col)=>{const [sx,sy]=tr(x,y);r*=C.z;const gr=lg.createRadialGradient(sx,sy,2,sx,sy,r);gr.addColorStop(0,'rgba('+col+','+a+')');gr.addColorStop(1,'rgba('+col+',0)');lg.fillStyle=gr;lg.fillRect(sx-r,sy-r,r*2,r*2)};
  const fl=(q)=>1+Math.sin(t*13+q)*.03+Math.sin(t*7.3+q*2)*.04;
  const ev=EV.run>0?(.55+.45*Math.abs(Math.sin(t*22))):1; // tochas tremem no evento
- Wd.torches.forEach(([x,y],i)=>spot(x,y+10,L(250,200)*fl(i)*(EV.run>0?ev:1),L(.9,.8),'255,170,80'));
- spot(P.x,P.y-40,L(150,230)*fl(9),L(.38,.62),'255,195,125');
-g.save();g.globalCompositeOperation='multiply';g.drawImage(lc,0,0);g.restore();
+ Wd.torches.forEach(([x,y],i)=>spot(x,y+10,L(270,215)*fl(i)*(EV.run>0?ev:1),L(1.0,.9),'255,150,60'));
+ spot(P.x,P.y-40,L(130,230)*fl(9),L(.26,.58),'255,195,125');
+lg.globalCompositeOperation='source-over';
+ {const fy=(C.y>=0?(Wd.minY-30-C.y)*C.z:0),gr=lg.createLinearGradient(0,fy,0,H);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,.55)');lg.fillStyle=gr;lg.fillRect(0,Math.max(0,fy),W,H)}
+ g.save();g.globalCompositeOperation='multiply';g.drawImage(lc,0,0);g.restore();
 }
 const nz=document.createElement('canvas');nz.width=240;nz.height=135;const ng=nz.getContext('2d');let nzT=0;
+function bloom(){
+ const tr=(x,y)=>[(x-C.x)*C.z,(y-C.y)*C.z];g.save();g.globalCompositeOperation='screen';
+ Wd.torches.forEach(([x,y],i)=>{const [sx,sy]=tr(x,y-8),r=70*C.z*(1+Math.sin(t*13+i)*.05),gr=g.createRadialGradient(sx,sy,0,sx,sy,r);
+  gr.addColorStop(0,'rgba(255,170,70,.42)');gr.addColorStop(.35,'rgba(255,120,40,.16)');gr.addColorStop(1,'rgba(255,100,30,0)');g.fillStyle=gr;g.fillRect(sx-r,sy-r,r*2,r*2)});
+ g.restore()}
 function filmFx(){
  if(t-nzT>.08){nzT=t;const d=ng.createImageData(240,135);for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255}ng.putImageData(d,0,0)}
  g.save();g.globalAlpha=.10;g.globalCompositeOperation='overlay';g.imageSmoothingEnabled=true;g.drawImage(nz,0,0,W,H);g.restore();
  g.save();g.globalAlpha=.5;for(let i=0;i<2;i++){if(Math.random()<.5){g.fillStyle='rgba(235,225,200,'+(Math.random()*.25)+')';g.fillRect(Math.random()*W,0,1,H)}}
  for(let i=0;i<5;i++){g.fillStyle='rgba(240,230,200,.5)';g.fillRect(Math.random()*W,Math.random()*H,2,2)}g.restore();
- const v=g.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,H*.95);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.6)');g.fillStyle=v;g.fillRect(0,0,W,H)}
+ const v=g.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,H*.95);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.72)');g.fillStyle=v;g.fillRect(0,0,W,H)}
 function ui(){
  // aviso de interação
  if(!dlg)for(const o of things()){if(Math.hypot(P.x-o.x,P.y-o.y)<o.r){const c=C;const sx=(o.x-c.x)*c.z,sy=(o.y-c.y)*c.z-120*c.z;
@@ -153,7 +160,7 @@ function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);c
  g.save();g.fillStyle='#000';g.fillRect(0,0,W,H);
  {const c=C;g.setTransform(c.z,0,0,c.z,-c.x*c.z,-c.y*c.z)}
  drawWorld();g.restore();
- light();filmFx();
+ light();bloom();filmFx();
  // mistura com o quadro anterior durante a transição (motion blur barato, estilo película)
  if(C.bl>.04){g.save();g.globalAlpha=Math.min(.38,C.bl*.4);g.drawImage(prv,0,0);g.restore()}
  pg.drawImage(cv,0,0);
