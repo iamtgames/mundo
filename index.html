@@ -8946,7 +8946,9 @@ function createShinobi(assets,done){
     return g.canvas};
   function aura(g,type,t,b,back){if(type==='none')return;
     const col={fogo:['255,150,40','255,80,20'],gelo:['120,220,255','180,240,255'],raio:['255,240,120','255,255,255'],sombra:['150,70,220','60,10,100'],veneno:['120,255,90','40,160,40'],sagrada:['255,200,70','255,235,160'],sangue:['230,30,50','120,0,20'],vento:['190,255,230','120,230,200'],cosmica:['120,140,255','255,120,230'],agua:['70,160,255','150,220,255'],terra:['190,140,70','110,80,40']}[type];
-    if(back){const gr=g.createRadialGradient(b.cx,b.cy,6,b.cx,b.cy,56);const p=.55+.25*Math.sin(t*4);gr.addColorStop(0,`rgba(${col[0]},${p})`);gr.addColorStop(.55,`rgba(${col[1]},${p*.45})`);gr.addColorStop(1,`rgba(${col[1]},0)`);g.fillStyle=gr;g.fillRect(0,0,CW,CH);return}
+    const pu=.5+.5*Math.sin(t*3.2);
+    if(back){/* halo tênue e pulsante (antes era um bloco sólido) */const p=.05+.08*pu+.02*Math.sin(t*17);const gr=g.createRadialGradient(b.cx,b.cy,4,b.cx,b.cy,34);gr.addColorStop(0,`rgba(${col[0]},${p})`);gr.addColorStop(.6,`rgba(${col[1]},${p*.35})`);gr.addColorStop(1,`rgba(${col[1]},0)`);g.fillStyle=gr;g.fillRect(0,0,CW,CH);return}
+    g.save();g.globalAlpha=.5+.4*pu;
     const N=14;for(let i=0;i<N;i++){const sd=i*7.31,ph=(t*(type==='gelo'?.28:.6)+sd)%1,x=b.cx+Math.sin(sd*3.1+t*(type==='sombra'?1.5:.8))*(16+(i%3)*5),y=b.bot-ph*(b.bot-b.top+14);
       if(type==='gelo'){g.fillStyle=`rgba(${col[1]},${1-ph})`;const s=i%2?3:2;g.fillRect(Math.round(x),Math.round(y),s,s);g.fillRect(Math.round(x)+1,Math.round(y)-1,1,s+2)}
       else if(type==='veneno'){const x0=Math.round(x),y0=Math.round(y),A=1-ph;g.fillStyle=`rgba(${col[0]},${A*.9})`;g.fillRect(x0,y0,3,1);g.fillRect(x0,y0+2,3,1);g.fillRect(x0,y0,1,3);g.fillRect(x0+2,y0,1,3)}
@@ -8957,6 +8959,14 @@ function createShinobi(assets,done){
       else if(type==='terra'){g.fillStyle=`rgba(${i%2?col[0]:col[1]},${(1-ph)})`;g.fillRect(Math.round(x),Math.round(y),3,3);g.fillStyle=`rgba(${col[1]},${1-ph})`;g.fillRect(Math.round(x),Math.round(y)+2,3,1)}
       else if(type==='sombra'){g.fillStyle=`rgba(${i%2?'190,120,255':'90,20,150'},${(1-ph)*.9})`;g.fillRect(Math.round(x),Math.round(y),3,3)}
       else{g.fillStyle=`rgba(${i%2?col[0]:col[1]},${1-ph})`;g.fillRect(Math.round(x),Math.round(y),2,type==='fogo'?3:2)}}
+    g.restore();
+    /* faíscas/raios curtos que correm rente ao corpo, cintilando (pixel a pixel) */
+    {const rn=q=>{const x=Math.sin(q*127.1+311.7)*43758.5453;return x-Math.floor(x)},stp=Math.floor(t*13),tid=type.length*7+type.charCodeAt(0),nA=(type==='raio'?4:type==='terra'||type==='veneno'?1:2)+(pu>.65?1:0);
+      for(let k=0;k<nA;k++){const q=stp*13.7+k*91.3+tid;if(rn(q+.5)<.28)continue;
+        let x=b.cx+(rn(q+1)*2-1)*8,y=b.top+4+rn(q+2)*(b.bot-b.top-8);const dir=x>=b.cx?1:-1,len=5+Math.floor(rn(q+3)*6);
+        for(let sI=0;sI<len;sI++){const fade=1-sI/len;
+          if(type==='fogo'){x+=dir*(rn(q+sI)>.6?1:0);y-=2}else if(type==='vento'){x+=dir*3;y+=(rn(q+sI*3)-.5)*2}else if(type==='agua'){x+=dir*.5;y+=2}else{x+=dir*(1+Math.floor(rn(q+sI*5)*2));y+=Math.floor((rn(q+sI*7)-.5)*5)}
+          const X=Math.round(x),Y=Math.round(y);g.fillStyle=`rgba(${col[1]},${.28*fade})`;g.fillRect(X-1,Y,3,1);g.fillStyle=`rgba(${col[0]},${.85*fade})`;g.fillRect(X,Y,1,1);if(sI===0&&type!=='terra'){g.fillStyle=`rgba(255,255,255,${.7*pu})`;g.fillRect(X,Y,1,1)}}}}
     if(type==='raio'&&Math.floor(t*9)%2===0){g.strokeStyle='rgba(255,255,200,.95)';g.lineWidth=1.5;for(let k=0;k<2;k++){g.beginPath();let x=b.cx+(k?14:-14),y=b.top+4;g.moveTo(x,y);for(let s=0;s<5;s++){x+=((Math.sin(t*50+k*9+s*4)>0)?1:-1)*(4+s%2*3);y+=(b.bot-b.top)/5;g.lineTo(x,y)}g.stroke()}}}
   return R}
 
