@@ -60,7 +60,8 @@ function update(dt){
 }
 // ===== câmera =====
 const BZ=1.3;
-const C={z:BZ,x:0,y:0,tz:BZ,fx:480,fy:300,tfx:480,tfy:300,vz:0,vx:0,vy:0,hold:0,why:'',zv:0,bl:0,ts:.7};
+const OP={t:0,d:3.2};
+const C={z:1.0,x:0,y:0,tz:BZ,fx:480,fy:300,tfx:480,tfy:300,vz:0,vx:0,vy:0,hold:0,why:'',zv:0,bl:0,ts:.7};
 // SmoothDamp (mola criticamente amortecida, a mesma do Unity): sem overshoot, velocidade contínua → sem "tranco" no início/fim
 function sd(cur,tgt,vel,st,dt){st=Math.max(.0001,st);const o=2/st,x=o*dt,e=1/(1+x+.48*x*x+.235*x*x*x),ch=cur-tgt,t=(vel+o*ch)*dt;return[tgt+(ch+t)*e,(vel-o*t)*e]}
 function camTarget(dt){
@@ -68,31 +69,38 @@ function camTarget(dt){
  // antecipação: usa a posição daqui a ~0.35s na direção do movimento, assim a câmera começa a mover ANTES de chegar
  const vx=(keys['d']||keys['arrowright']?1:0)-(keys['a']||keys['arrowleft']?1:0),mv=P.tx!==null?Math.sign(P.tx-P.x):vx,ax=P.x+mv*60;
  const da=Math.hypot(ax-s[0],P.y-s[1]),dra=Math.hypot(ax-195,P.y-330);
- let want='',tz=BZ,fx=P.x+(P.moving?P.face*45:0),fy=P.y-70,ts=.55;
+ let o=null,want='',tz=BZ,fx=P.x+(P.moving?P.face*45:0),fy=P.y-70,ts=.55;
  if(EV.cool>0)EV.cool-=dt;
  if(!EV.done&&ev<EV.r&&EV.cool<=0){EV.done=true;EV.run=3.4;say('Algo se move entre os ossos…')}
- if(EV.run>0){EV.run-=dt;want='ev';tz=1.85;fx=EV.x;fy=EV.y-60;ts=.8}
- else if(dlg){want='dlg';tz=1.9;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-72;ts=.6}
- else if(Math.min(d,da)<(C.why==='npc'?270:200)){want='npc';tz=1.75;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-72;ts=.7}
- else if(Math.min(door,dra)<(C.why==='door'?210:150)){want='door';tz=1.65;fx=(P.x+195)/2;fy=Math.min(P.y,330)-62;ts=.7}
+ if(EV.run>0){EV.run-=dt;want='ev';tz=1.8;fx=(P.x+EV.x)/2;fy=Math.min(P.y,EV.y)-66;ts=.8;o=[EV.x,EV.y-60]}
+ else if(dlg){want='dlg';o=[s[0],s[1]-40];tz=1.9;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-72;ts=.6}
+ else if(Math.min(d,da)<(C.why==='npc'?270:200)){want='npc';o=[s[0],s[1]-40];tz=1.75;fx=(P.x+s[0])/2;fy=Math.min(P.y,s[1])-72;ts=.7}
+ else if(Math.min(door,dra)<(C.why==='door'?210:150)){want='door';o=[195,300];tz=1.65;fx=(P.x+195)/2;fy=Math.min(P.y,330)-62;ts=.7}
  if(EV.done&&ev>EV.r*2.5&&EV.cool<=0&&!(EV.run>0))EV.done=false,EV.cool=8;
+ // o zoom nunca pode ser maior do que o necessário para manter herói E alvo na tela
+ if(o){const zx=.72*W/(Math.abs(P.x-o[0])+150),zy=.72*H/(Math.abs(P.y-70-o[1])+150);tz=Math.max(BZ,Math.min(tz,zx,zy))}
  // tempo mínimo (dwell) antes de voltar ao plano aberto: evita "pumping"
  if(want){if(want!==C.why)C.hold=1.1;C.why=want}
  else if(C.hold>0){C.hold-=dt;tz=C.tz;fx=C.tfx;fy=C.tfy;ts=C.ts}
  else C.why='';
  C.tz=tz;C.tfx=fx;C.tfy=fy;C.ts=ts;
 }
-function camStep(dt){camTarget(dt);
+function camStep(dt){OP.t=Math.min(OP.d,OP.t+dt);camTarget(dt);
+ if(OP.t<1.0){C.tz=1.0;C.ts=.6}
  const pz=C.z;let r;
  r=sd(C.z,C.tz,C.vz,C.ts,dt);C.z=r[0];C.vz=r[1];
  const vw=W/C.z,vh=H/C.z;
  r=sd(C.fx,C.tfx,C.vx,C.why?C.ts:.38,dt);C.fx=r[0];C.vx=r[1];
  r=sd(C.fy,C.tfy,C.vy,C.why?C.ts:.38,dt);C.fy=r[0];C.vy=r[1];
  C.x=Math.max(0,Math.min(W-vw,C.fx-vw/2));C.y=Math.max(0,Math.min(H-vh,C.fy-vh/2));
+ {const hx=(P.x-C.x)*C.z,hy=(P.y-72-C.y)*C.z,mx=W*.26,my=H*.26;let sx=0,sy=0;
+  if(hx<mx)sx=(hx-mx)/C.z;else if(hx>W-mx)sx=(hx-(W-mx))/C.z;
+  if(hy<my)sy=(hy-my)/C.z;else if(hy>H-my)sy=(hy-(H-my))/C.z;
+  if(sx||sy){C.x=Math.max(0,Math.min(W-vw,C.x+sx));C.y=Math.max(0,Math.min(H-vh,C.y+sy));C.fx=C.x+vw/2;C.fy=C.y+vh/2;C.vx*=.5;C.vy*=.5}}
  // intensidade do blur = velocidade do zoom, suavizada (sobe e desce em sino, nunca "liga/desliga")
  C.zv=Math.abs(C.z-pz)/Math.max(dt,.001);
  const tb=Math.min(1,C.zv/.9);C.bl+=(tb-C.bl)*(1-Math.exp(-dt*9));
- const bq=Math.round(C.bl*1.1*8)/8;if(bq!==camStep.b){camStep.b=bq;cv.style.filter='sepia(.14) contrast(1.1) saturate(.84) brightness(1.04) blur('+(.45+bq).toFixed(2)+'px)'}}
+ const oe=1-Math.min(1,OP.t/OP.d),ob=7*oe*oe;const bq=Math.round((C.bl*1.1+ob)*8)/8;if(bq!==camStep.b){camStep.b=bq;cv.style.filter='sepia(.14) contrast(1.1) saturate(.84) brightness(1.04) blur('+(.45+bq).toFixed(2)+'px)'}}
 function cam(){return C}
 const prv=document.createElement('canvas');prv.width=W;prv.height=H;const pg=prv.getContext('2d');
 // ===== desenho =====
@@ -114,7 +122,7 @@ function drawWorld(){
  const ents=[{y:P.y,d:()=>{drawChar(P.moving?IM.hwalk:IM.hidle,Math.floor(P.fr),P.moving?8:6,P.x,P.y,P.face,scl(P.y))}},
   {y:Wd.sam[1],d:()=>drawChar(IM.sidle,Math.floor(t*6)%6,6,Wd.sam[0],Wd.sam[1],-1,scl(Wd.sam[1]))}];
  ents.sort((a,b)=>a.y-b.y).forEach(e=>e.d());
- g.drawImage(IM.latfg,0,0);
+ g.save();g.filter='blur('+(1.2+C.bl*2.5).toFixed(2)+'px)';g.drawImage(IM.latfg,0,0);g.restore();
 }
 const lc=document.createElement('canvas');lc.width=W;lc.height=H;const lg=lc.getContext('2d');
 function light(){
