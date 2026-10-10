@@ -11041,6 +11041,10 @@ const CSS = `
 .crypt-enter.cr-on{opacity:1 !important;filter:none !important;z-index:12}
 .crypt-enter.cr-on .cf{display:block !important}
 .crypt-enter.cr-on .td-grid{filter:drop-shadow(0 0 12px rgba(255,120,30,.9)) brightness(1.2)}
+.door.cr-libdoor{width:104px !important;height:122px !important;margin-top:-30px}
+.door.cr-libdoor .arch-img{image-rendering:pixelated;filter:drop-shadow(0 4px 3px rgba(0,0,0,.55))}
+.door.cr-libdoor .glow{display:none !important}
+.door.cr-libdoor:hover .arch-img{filter:drop-shadow(0 0 8px rgba(255,200,120,.7)) brightness(1.15)}
 .crypt-enter.cr-new{width:112px !important;height:60px !important;opacity:1 !important;filter:none !important}
 .crypt-enter.cr-new::before,.crypt-enter.cr-new .td-grid,.crypt-enter.cr-new .cf,.crypt-enter.cr-new .td-lbl{display:none !important}
 .crypt-enter .cr-hatch{position:absolute;inset:0;background:center/100% 100% no-repeat;image-rendering:pixelated;filter:drop-shadow(0 4px 3px rgba(0,0,0,.55))}
@@ -11084,7 +11088,52 @@ function lightTorch(bx, by) {
 /* candelabros fixados nos pilares de pedra (pilares em x=289,515,741,967,1193; largura 46) */
 const SCONCES = [{ id: 1, x: 523, y: 214 }, { id: 2, x: 749, y: 214 }, { id: 3, x: 1201, y: 214 }];
 
-/* alçapão de pedra da Cripta, na paleta musgo/pedra da Biblioteca */
+/* porta de saída da Biblioteca (para a Rua): arco de pedra com musgo e porta de madeira ferrada, entreaberta */
+function libDoorArt() {
+  const W = 48, H = 56, c = mk(W, H), g = c.getContext('2d');
+  const R = (col, x, y, w, h) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  const inside = (x, y) => { // vão em arco: x 10..37, topo semicircular
+    if (y >= 23) return x >= 10 && x <= 37 && y <= 53;
+    const dx = x - 23.5, dy = y - 23; return dx * dx + dy * dy <= 13.7 * 13.7;
+  };
+  const outer = (x, y) => {
+    if (y >= 20) return x >= 4 && x <= 43 && y <= 55;
+    const dx = x - 23.5, dy = y - 20; return dx * dx + dy * dy <= 20 * 20;
+  };
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (!outer(x, y)) continue;
+    const row = Math.floor(y / 5), off = row % 2 ? 4 : 0, brick = Math.floor((x + off) / 8);
+    let col = (brick + row) % 3 === 0 ? '#5f817a' : (brick + row) % 3 === 1 ? '#4e6c66' : '#557670';
+    if (y % 5 === 0 || (x + off) % 8 === 0) col = '#2b4340';
+    if (inside(x, y)) {
+      // madeira escura em tábuas verticais
+      col = (x % 6 === 0) ? '#1e2a26' : (x % 6 === 3 ? '#2b3b34' : '#24342e');
+      if (y < 24) col = (Math.floor(x / 3) % 2) ? '#22312b' : '#2a3a33';
+    }
+    R(col, x, y, 1, 1);
+  }
+  // abertura central: luz quente da rua
+  for (let y = 24; y <= 52; y++) { const w = y < 30 ? 2 : 4; R(y > 44 ? '#ffd88a' : '#f0b562', 23 - (w >> 1) + 1, y, w, 1); }
+  R('#2b3b34', 21, 24, 1, 29); R('#2b3b34', 27, 24, 1, 29);
+  // ferragens: faixas e argola
+  R('#10181a', 10, 32, 28, 2); R('#10181a', 10, 44, 28, 2);
+  [12, 17, 30, 35].forEach(x => { R('#8a9b98', x, 32, 1, 1); R('#8a9b98', x, 44, 1, 1); });
+  R('#9fb0ad', 16, 38, 3, 3); R('#10181a', 17, 39, 1, 1);
+  // aduela (pedra-chave) e degrau
+  R('#6f938a', 21, 3, 6, 5); R('#2b4340', 21, 8, 6, 1); R('#9fc8bc', 22, 4, 4, 1);
+  R('#3a5551', 2, 52, 44, 3); R('#5f817a', 2, 52, 44, 1); R('#1c2c2e', 2, 55, 44, 1);
+  // musgo e vinhas
+  [[4, 24, 2, 5], [5, 30, 1, 3], [41, 28, 2, 6], [12, 6, 3, 2], [33, 8, 4, 2], [6, 52, 6, 2], [34, 52, 8, 2], [20, 1, 5, 2]].forEach(m => R('#4f8a4a', m[0], m[1], m[2], m[3]));
+  [[4, 24, 1, 2], [41, 28, 1, 3], [13, 6, 1, 1], [35, 8, 2, 1], [8, 52, 2, 1]].forEach(m => R('#7bb868', m[0], m[1], m[2], m[3]));
+  return c.toDataURL();
+}
+function styleLibDoor() {
+  const d = roomlayer.querySelector('.hotspot.door.arch-stone[data-door="out"]'); if (!d || d.dataset.crLib) return;
+  d.dataset.crLib = 1; d.classList.add('cr-libdoor');
+  const a = d.querySelector('.arch-img'); if (a) a.style.backgroundImage = 'url(' + libDoorArt() + ')';
+}
+
+/* alçapão de pedra da Cripta, na paleta musgo/pedra da Biblioteca (não usado: o portal de fogo original foi mantido) */
 function hatchArt(open) {
   const W = 56, H = 30, c = mk(W, H), g = c.getContext('2d');
   const R = (col, x, y, w, h) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
@@ -11129,8 +11178,8 @@ function setupLibrary() {
   const s = Cr.S();
   ['.bv-dark', '.bv-lantern'].forEach(q => layer.querySelectorAll(q).forEach(e => e.remove()));
   SCONCES.forEach(c => layer.insertAdjacentHTML('beforeend', '<div class="cr-sconce' + (s.sconces[c.id] ? ' lit' : '') + '" data-id="' + c.id + '" style="left:' + c.x + 'px;top:' + c.y + 'px;" title="Candelabro apagado"></div>'));
+  styleLibDoor();
   const pt = layer.querySelector('.crypt-enter'); if (pt && s.portal) pt.classList.add('cr-on');
-  styleHatch(pt, s.portal);
   if (pt) pt.title = s.portal ? 'Portal da Cripta' : 'Uma laje de pedra selada';
   if (!s.libLit) startDark(); else stopDark(true);
 }
@@ -11170,7 +11219,7 @@ function clickSconce(el) {
     bubble(p.bx, p.by, '🕯️ A Biblioteca inteira se ilumina...', 3000);
     setTimeout(() => {
       Cr.sfx('gate'); stage.classList.add('cr-quake'); setTimeout(() => stage.classList.remove('cr-quake'), 600);
-      const pt = roomlayer.querySelector('.crypt-enter'); if (pt) { pt.classList.add('cr-on'); styleHatch(pt, true); }
+      const pt = roomlayer.querySelector('.crypt-enter'); if (pt) pt.classList.add('cr-on');
       s.portal = true; gsSave();
       try { toastText('Um mecanismo oculto reagiu: o portal da Cripta se abriu!'); } catch (e) { }
     }, 1700);
@@ -11209,6 +11258,7 @@ world.addEventListener('click', e => {
     if (currentRoomId === 'biblioteca') {
       roomlayer.querySelectorAll('.cr-sconce:not(.lit)').forEach(el => { if (s.torch === 'lit') cand.push([el, 'ACENDER']); });
       roomlayer.querySelectorAll('.crypt-enter').forEach(el => cand.push([el, s.portal ? 'ENTRAR' : 'EXAMINAR']));
+      roomlayer.querySelectorAll('.hotspot.door[data-door="out"]').forEach(el => cand.push([el, 'SAIR']));
     }
     for (const [el, lab] of cand) {
       const cx = el.offsetLeft + el.offsetWidth / 2, cy = el.offsetTop + el.offsetHeight / 2;
