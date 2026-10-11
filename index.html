@@ -6202,6 +6202,104 @@ document.getElementById('svLoad').addEventListener('click', () => {
 saveBox.addEventListener('click', e => { if (e.target.classList.contains('xback') || e.target.classList.contains('xclose')) saveBox.classList.remove('show'); });
 saveBox.addEventListener('keydown', e => e.stopPropagation());
 
+/* =====================================================================
+   CONTA — login com usuário e senha (Cloudflare Worker + D1): nome do personagem e progresso na nuvem.
+   Funciona sem conta (progresso local continua igual). Servidor: worker-contas.js / schema-contas.sql.
+   ===================================================================== */
+const ACC_URL = 'https://iamtworld-contas.ocultobadguy.workers.dev';   // URL do Worker de contas, sem barra no final. Vazio = recurso desligado.
+const accBox = mkEl('div', { id:'accBox', className:'xpanel' },
+  '<div class="xback"></div><div class="xbox" style="width:min(460px,92%)"><button class="xclose" aria-label="Fechar">✕</button>' +
+  '<div class="xhead">👤 Conta</div><div class="sv-body" id="accBody"></div></div>');
+stage.appendChild(accBox);
+(function(){
+  const st = document.createElement('style');
+  st.textContent = '#heroname{position:absolute; left:50%; top:-16px; transform:translateX(-50%); white-space:nowrap; font:12px/1 monospace; color:#f1e4c8; ' +
+    'text-shadow:1px 0 #0b0907,-1px 0 #0b0907,0 1px #0b0907,0 -1px #0b0907; pointer-events:none; letter-spacing:.5px;}' +
+    '#accBox .sv-in{text-transform:none !important; width:100%; box-sizing:border-box;} .acc-tabs{display:flex; gap:8px;} .acc-tabs .inv-tab{flex:1;} .acc-who{font-size:18px; color:#7ee59a;}';
+  document.head.appendChild(st);
+})();
+function accUser(){ return GS.acc && GS.acc.token ? GS.acc : null; }
+function accMsg(t){ const m = document.getElementById('accMsg'); if (m) m.textContent = t; }
+function paintHeroName(){
+  const av = document.getElementById('avatar'); if (!av) return;
+  let n = document.getElementById('heroname');
+  if (!n) { n = document.createElement('div'); n.id = 'heroname'; av.appendChild(n); }
+  n.textContent = GS.charName || '';
+}
+function accStrip(){ const o = Object.assign({}, GS); delete o.acc; delete o.cloud; return o; }
+async function accApi(path, opt){
+  opt = opt || {};
+  const h = { 'Content-Type':'application/json' }; if (opt.auth && accUser()) h.Authorization = 'Bearer ' + GS.acc.token;
+  const r = await fetch(ACC_URL + path, { method: opt.body ? 'POST' : (opt.method || 'GET'), headers:h, body: opt.body ? JSON.stringify(opt.body) : undefined, keepalive: !!opt.keep });
+  let j = {}; try { j = await r.json(); } catch (e) {}
+  if (!r.ok) { const e = new Error(j.erro || 'erro'); e.status = r.status; throw e; }
+  return j;
+}
+function accAdopt(token, nome, data){      // troca o progresso local pelo da conta e recarrega
+  const o = Object.assign({}, data || accStrip()); o.acc = { token, nome }; o.charName = nome;
+  window.__importing = true; localStorage.setItem(GS_KEY, JSON.stringify(o)); location.reload();
+}
+let accLastT = -1;
+async function accSave(silent){
+  if (!ACC_URL || !accUser()) return;
+  try { await accApi('/salvar', { auth:true, keep:true, body:{ nome:GS.charName, data:accStrip() } }); accLastT = GS.t; if (!silent) accMsg('Progresso salvo na sua conta.'); }
+  catch (e) { if (e.status === 401) { GS.acc = null; gsSave(); accRender(); accMsg('Sua sessão expirou. Entre de novo.'); } else if (!silent) accMsg('Não foi possível salvar agora. Tente de novo.'); }
+}
+function accRender(){
+  const b = document.getElementById('accBody'); if (!b) return;
+  const u = accUser();
+  if (!ACC_URL) { b.innerHTML = '<p class="sv-p">Contas ainda não estão ativas neste site.</p>'; return; }
+  if (u) {
+    b.innerHTML = '<div class="acc-who">' + esc(GS.charName || u.nome) + '</div>' +
+      '<p class="sv-p">Seu progresso, itens e nome ficam salvos na sua conta e acompanham você em qualquer aparelho. O jogo salva sozinho de tempos em tempos.</p>' +
+      '<div class="sv-row"><input id="accNome" class="sv-in" maxlength="16" placeholder="Nome do personagem" value="' + esc(GS.charName || u.nome) + '"><button class="inv-tab" id="accRename">Trocar nome</button></div>' +
+      '<div class="sv-row"><button class="inv-tab" id="accNow">☁️ Salvar agora</button><button class="inv-tab" id="accOut">Sair</button></div><div class="sv-msg" id="accMsg"></div>';
+    document.getElementById('accRename').onclick = () => { const n = document.getElementById('accNome').value.replace(/[<>]/g, '').trim().slice(0, 16); if (n.length < 2) return accMsg('Use de 2 a 16 letras.'); GS.charName = n; GS.acc.nome = n; gsSave(); paintHeroName(); accSave(false); };
+    document.getElementById('accNow').onclick = () => { accMsg('Salvando...'); accSave(false); };
+    document.getElementById('accOut').onclick = async () => { try { await accApi('/sair', { auth:true, body:{} }); } catch (e) {} GS.acc = null; gsSave(); accRender(); };
+  } else {
+    b.innerHTML = '<div class="acc-tabs"><button class="inv-tab" id="accTL">Entrar</button><button class="inv-tab" id="accTR">Criar conta</button></div>' +
+      '<input id="accU" class="sv-in" maxlength="20" placeholder="Usuário (letras minúsculas, números, _)" autocomplete="username" spellcheck="false">' +
+      '<input id="accP" class="sv-in" type="password" maxlength="72" placeholder="Senha (mínimo 6)" autocomplete="current-password">' +
+      '<input id="accN" class="sv-in" maxlength="16" placeholder="Nome do seu personagem" style="display:none">' +
+      '<button class="inv-tab" id="accGo">Entrar</button><div class="sv-msg" id="accMsg"></div>' +
+      '<p class="sv-p" style="font-size:13px">Não é preciso conta para jogar. Criando uma, o progresso atual deste navegador vai para ela.</p>';
+    let modo = 'in';
+    const setModo = m => { modo = m; document.getElementById('accN').style.display = m === 'new' ? '' : 'none'; document.getElementById('accGo').textContent = m === 'new' ? 'Criar conta' : 'Entrar'; document.getElementById('accP').autocomplete = m === 'new' ? 'new-password' : 'current-password'; accMsg(''); };
+    document.getElementById('accTL').onclick = () => setModo('in'); document.getElementById('accTR').onclick = () => setModo('new');
+    const go = async () => {
+      const usuario = document.getElementById('accU').value.trim().toLowerCase(), senha = document.getElementById('accP').value, nome = document.getElementById('accN').value.replace(/[<>]/g, '').trim();
+      accMsg('Aguarde...');
+      try {
+        if (modo === 'new') { const j = await accApi('/registrar', { body:{ usuario, senha, nome, data:accStrip() } }); accAdopt(j.token, j.nome, null); }
+        else {
+          const j = await accApi('/entrar', { body:{ usuario, senha } });
+          if (j.data && (j.data.t || 0) < (GS.t || 0) && !confirm('Este navegador tem mais progresso que a sua conta. Manter o deste navegador e enviá-lo para a conta?\n\nOK = manter este navegador · Cancelar = usar o da conta')) accAdopt(j.token, j.nome, j.data);
+          else if (j.data && (j.data.t || 0) < (GS.t || 0)) { GS.acc = { token:j.token, nome:j.nome }; GS.charName = j.nome; gsSave(); await accSave(true); accRender(); paintHeroName(); }
+          else accAdopt(j.token, j.nome, j.data);
+        }
+      } catch (e) { accMsg(e.message === 'Failed to fetch' ? 'Sem conexão com o servidor.' : e.message); }
+    };
+    document.getElementById('accGo').onclick = go;
+    b.querySelectorAll('input').forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') go(); }));
+  }
+}
+function openAcc(){ accRender(); accBox.classList.add('show'); }
+accBox.addEventListener('click', e => { if (e.target.classList.contains('xback') || e.target.classList.contains('xclose')) accBox.classList.remove('show'); });
+accBox.addEventListener('keydown', e => e.stopPropagation());
+setInterval(() => { if (ACC_URL && accUser() && GS.t !== accLastT && !document.hidden) accSave(true); }, 90000);
+document.addEventListener('visibilitychange', () => { if (document.hidden && ACC_URL && accUser() && GS.t !== accLastT) accSave(true); });
+setInterval(() => { const n = document.getElementById('heroname'); if (!n || n.textContent !== (GS.charName || '') || n.parentNode !== document.getElementById('avatar')) paintHeroName(); }, 2000);
+(async function accBoot(){      // ao abrir: se a conta tem progresso mais novo (outro aparelho), usa o da conta
+  paintHeroName();
+  if (!ACC_URL || !accUser()) return;
+  try {
+    const j = await accApi('/eu', { auth:true });
+    if (j.data && (j.data.t || 0) > (GS.t || 0) + 5) accAdopt(GS.acc.token, j.nome, j.data);
+    else { accLastT = -1; }
+  } catch (e) { if (e.status === 401) { GS.acc = null; gsSave(); } }
+})();
+
 /* gatilhos passivos removidos: agora dependem de ações (ver extras7) */
 applyStats(); mkPet();
 
@@ -8417,6 +8515,7 @@ window.__f12 = { F, fGerar, fAbrir, fSair, showTravel, fAtualiza, fDesenha };
     ['Inventário', () => showInv()],
     ['Missões', () => showQuests()],
     ['Configurações', () => openSet()],
+    ['Conta / Login', () => openAcc()],
     ['Salvar / Exportar', () => openSaveBox()],
   ];
   const mb = document.getElementById('gmBody');
