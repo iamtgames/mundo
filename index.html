@@ -6218,7 +6218,8 @@ stage.appendChild(accBox);
     '#accBox .sv-in{text-transform:none !important; width:100%; box-sizing:border-box;} .acc-tabs{display:flex; gap:8px;} .acc-tabs .inv-tab{flex:1;} .acc-who{font-size:18px; color:#7ee59a;}';
   document.head.appendChild(st);
 })();
-function accUser(){ return GS.acc && GS.acc.token ? GS.acc : null; }
+if (GS.acc && GS.acc.token) { GS.conta = { token:GS.acc.token, nome:GS.acc.nome }; delete GS.acc; }   // migra: GS.acc é dos contadores de ações
+function accUser(){ return GS.conta && GS.conta.token ? GS.conta : null; }
 function accMsg(t){ const m = document.getElementById('accMsg'); if (m) m.textContent = t; }
 function paintHeroName(){
   const av = document.getElementById('avatar'); if (!av) return;
@@ -6226,24 +6227,24 @@ function paintHeroName(){
   if (!n) { n = document.createElement('div'); n.id = 'heroname'; av.appendChild(n); }
   n.textContent = GS.charName || '';
 }
-function accStrip(){ const o = Object.assign({}, GS); delete o.acc; delete o.cloud; return o; }
+function accStrip(){ const o = Object.assign({}, GS); delete o.conta; delete o.cloud; return o; }
 async function accApi(path, opt){
   opt = opt || {};
-  const h = { 'Content-Type':'application/json' }; if (opt.auth && accUser()) h.Authorization = 'Bearer ' + GS.acc.token;
+  const h = { 'Content-Type':'application/json' }; if (opt.auth && accUser()) h.Authorization = 'Bearer ' + GS.conta.token;
   const r = await fetch(ACC_URL + path, { method: opt.body ? 'POST' : (opt.method || 'GET'), headers:h, body: opt.body ? JSON.stringify(opt.body) : undefined, keepalive: !!opt.keep });
   let j = {}; try { j = await r.json(); } catch (e) {}
   if (!r.ok) { const e = new Error(j.erro || 'erro'); e.status = r.status; throw e; }
   return j;
 }
 function accAdopt(token, nome, data){      // troca o progresso local pelo da conta e recarrega
-  const o = Object.assign({}, data || accStrip()); o.acc = { token, nome }; o.charName = nome;
+  const o = Object.assign({}, data || accStrip()); o.conta = { token, nome }; o.charName = nome;
   window.__importing = true; localStorage.setItem(GS_KEY, JSON.stringify(o)); location.reload();
 }
 let accLastT = -1;
 async function accSave(silent){
   if (!ACC_URL || !accUser()) return;
   try { await accApi('/salvar', { auth:true, keep:true, body:{ nome:GS.charName, data:accStrip() } }); accLastT = GS.t; if (!silent) accMsg('Progresso salvo na sua conta.'); }
-  catch (e) { if (e.status === 401) { GS.acc = null; gsSave(); accRender(); accMsg('Sua sessão expirou. Entre de novo.'); } else if (!silent) accMsg('Não foi possível salvar agora. Tente de novo.'); }
+  catch (e) { if (e.status === 401) { GS.conta = null; gsSave(); accRender(); accMsg('Sua sessão expirou. Entre de novo.'); } else if (!silent) accMsg('Não foi possível salvar agora. Tente de novo.'); }
 }
 function accRender(){
   const b = document.getElementById('accBody'); if (!b) return;
@@ -6254,9 +6255,9 @@ function accRender(){
       '<p class="sv-p">Seu progresso, itens e nome ficam salvos na sua conta e acompanham você em qualquer aparelho. O jogo salva sozinho de tempos em tempos.</p>' +
       '<div class="sv-row"><input id="accNome" class="sv-in" maxlength="16" placeholder="Nome do personagem" value="' + esc(GS.charName || u.nome) + '"><button class="inv-tab" id="accRename">Trocar nome</button></div>' +
       '<div class="sv-row"><button class="inv-tab" id="accNow">☁️ Salvar agora</button><button class="inv-tab" id="accOut">Sair</button></div><div class="sv-msg" id="accMsg"></div>';
-    document.getElementById('accRename').onclick = () => { const n = document.getElementById('accNome').value.replace(/[<>]/g, '').trim().slice(0, 16); if (n.length < 2) return accMsg('Use de 2 a 16 letras.'); GS.charName = n; GS.acc.nome = n; gsSave(); paintHeroName(); accSave(false); };
+    document.getElementById('accRename').onclick = () => { const n = document.getElementById('accNome').value.replace(/[<>]/g, '').trim().slice(0, 16); if (n.length < 2) return accMsg('Use de 2 a 16 letras.'); GS.charName = n; GS.conta.nome = n; gsSave(); paintHeroName(); accSave(false); };
     document.getElementById('accNow').onclick = () => { accMsg('Salvando...'); accSave(false); };
-    document.getElementById('accOut').onclick = async () => { try { await accApi('/sair', { auth:true, body:{} }); } catch (e) {} GS.acc = null; gsSave(); accRender(); };
+    document.getElementById('accOut').onclick = async () => { try { await accApi('/sair', { auth:true, body:{} }); } catch (e) {} GS.conta = null; gsSave(); accRender(); };
   } else {
     b.innerHTML = '<div class="acc-tabs"><button class="inv-tab" id="accTL">Entrar</button><button class="inv-tab" id="accTR">Criar conta</button></div>' +
       '<input id="accU" class="sv-in" maxlength="20" placeholder="Usuário (letras minúsculas, números, _)" autocomplete="username" spellcheck="false">' +
@@ -6275,7 +6276,7 @@ function accRender(){
         else {
           const j = await accApi('/entrar', { body:{ usuario, senha } });
           if (j.data && (j.data.t || 0) < (GS.t || 0) && !confirm('Este navegador tem mais progresso que a sua conta. Manter o deste navegador e enviá-lo para a conta?\n\nOK = manter este navegador · Cancelar = usar o da conta')) accAdopt(j.token, j.nome, j.data);
-          else if (j.data && (j.data.t || 0) < (GS.t || 0)) { GS.acc = { token:j.token, nome:j.nome }; GS.charName = j.nome; gsSave(); await accSave(true); accRender(); paintHeroName(); }
+          else if (j.data && (j.data.t || 0) < (GS.t || 0)) { GS.conta = { token:j.token, nome:j.nome }; GS.charName = j.nome; gsSave(); await accSave(true); accRender(); paintHeroName(); }
           else accAdopt(j.token, j.nome, j.data);
         }
       } catch (e) { accMsg(e.message === 'Failed to fetch' ? 'Sem conexão com o servidor.' : e.message); }
@@ -6295,9 +6296,9 @@ setInterval(() => { const n = document.getElementById('heroname'); if (!n || n.t
   if (!ACC_URL || !accUser()) return;
   try {
     const j = await accApi('/eu', { auth:true });
-    if (j.data && (j.data.t || 0) > (GS.t || 0) + 5) accAdopt(GS.acc.token, j.nome, j.data);
+    if (j.data && (j.data.t || 0) > (GS.t || 0) + 5) accAdopt(GS.conta.token, j.nome, j.data);
     else { accLastT = -1; }
-  } catch (e) { if (e.status === 401) { GS.acc = null; gsSave(); } }
+  } catch (e) { if (e.status === 401) { GS.conta = null; gsSave(); } }
 })();
 
 /* gatilhos passivos removidos: agora dependem de ações (ver extras7) */
@@ -8085,7 +8086,7 @@ const GH = {
     if (Date.now() - this.ultimoEnvio < 180000) return;           // no máx. 1 rastro a cada 3 min (limite de gravações do KV)
     this.ultimoEnvio = Date.now();
     const equip = {}; Object.keys(GS.equip || {}).forEach(k => { if (GS.equip[k]) equip[k] = GS.equip[k]; });
-    try { await fetch(GHOST_URL + '/ghost', { method:'POST', keepalive:true, headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ id:GS.gid, room:r.room, pts:r.pts, equip }) }); } catch (e) { this.falhou = true; }
+    try { await fetch(GHOST_URL + '/ghost', { method:'POST', keepalive:true, headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ id:GS.gid, room:r.room, pts:r.pts, equip, token:(GS.conta && GS.conta.token) || undefined }) }); } catch (e) { this.falhou = true; }
   },
   async busca(room){
     if (!GHOST_URL || GS.ghostOff || this.falhou) return;
@@ -8097,11 +8098,12 @@ const GH = {
   },
   cria(g, i){
     if (!Array.isArray(g.pts) || g.pts.length < 2) return;
-    const el = avatar.cloneNode(true); el.removeAttribute('id'); el.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    const el = avatar.cloneNode(true); const hn = el.querySelector('#heroname'); if (hn) hn.remove(); el.removeAttribute('id'); el.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
     el.classList.add('ghost'); el.classList.remove('walking');
     const eq = {}; Object.keys(g.equip || {}).forEach(k => { if (ITEM_BY_ID[g.equip[k]]) eq[k] = g.equip[k]; });
     try { applyEquip(el, eq); } catch (e) {}
-    const tag = mkEl('div', { className:'ghost-tag' }, 'Viajante ' + String(g.id || '').slice(0, 4)); el.appendChild(tag);
+    const nm = typeof g.nome === 'string' ? g.nome.replace(/[<>]/g, '').slice(0, 16) : '';
+    const tag = mkEl('div', { className:'ghost-tag' }, nm || ('Viajante ' + String(g.id || '').slice(0, 4))); if (nm) tag.style.color = '#ffe9a8'; el.appendChild(tag);
     world.appendChild(el);
     const dur = g.pts[g.pts.length - 1][0] + 3;
     this.vivos.push({ el, pts:g.pts, dur, off:i * 4.3 + Math.random() * 3, ultimoX:g.pts[0][1] });
@@ -8250,7 +8252,7 @@ function fHudAtualiza(){
 }
 function fCriaAvatar(){
   if (F.av) F.av.remove();
-  const el = avatar.cloneNode(true); el.removeAttribute('id'); el.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+  const el = avatar.cloneNode(true); const hn = el.querySelector('#heroname'); if (hn) hn.remove(); el.removeAttribute('id'); el.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
   el.className = 'f-avatar'; el.style.cssText = '';
   try { applyEquip(el, GS.equip); } catch (e) {}
   fPanel.insertBefore(el, fTop); F.av = el;
