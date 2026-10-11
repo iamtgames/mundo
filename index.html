@@ -4700,7 +4700,7 @@ window.addEventListener('blur', () => { keys.up = keys.down = keys.left = keys.r
    ===================================================================== */
 const CAMX = (function(){
   const BZ = 1.0;
-  const C = { z:1, x:0, y:0, fx:480, fy:300, tfx:480, tfy:300, tz:1, vz:0, vfx:0, vfy:0, ts:.7, why:'', hold:0,
+  const C = { uo:1, uoT:1, z:1, x:0, y:0, fx:480, fy:300, tfx:480, tfy:300, tz:1, vz:0, vfx:0, vfy:0, ts:.7, why:'', hold:0,
               bl:0, ob:0, opT:1, opD:1, rx:0, px:0, py:0, pz:1, list:[], scanT:0, lastOp:-1 };
   /* ---- estilos do acabamento ---- */
   /* ---- PARÂMETROS DE ACABAMENTO (ajuste aqui; CAMX.P + CAMX.restyle() permitem mudar ao vivo) ---- */
@@ -4812,7 +4812,8 @@ const CAMX = (function(){
     C.scanT -= dt; if (C.scanT <= 0) { scan(); C.scanT = .35; }
     target(dt);
     if (C.opT < C.opD) { C.opT += dt; }
-    let r = sd(C.z, C.tz, C.vz, C.ts, dt); C.z = r[0]; C.vz = r[1];
+    C.uo += (C.uoT - C.uo) * (1 - Math.exp(-dt * 10));   /* zoom manual (scroll): 1 = câmera automática, 0 = totalmente aberta */
+    let r = sd(C.z, 1 + (C.tz - 1) * C.uo, C.vz, C.ts, dt); C.z = r[0]; C.vz = r[1];
     const vw = STAGE_W / C.z, vh = STAGE_H / C.z, ws = C.why ? C.ts : .36;
     r = sd(C.fx, C.tfx, C.vfx, ws, dt); C.fx = r[0]; C.vfx = r[1];
     r = sd(C.fy, C.tfy, C.vfy, ws, dt); C.fy = r[0]; C.vfy = r[1];
@@ -4836,7 +4837,13 @@ const CAMX = (function(){
     const op = Math.min(1, Math.max(C.ob, C.bl * P.blurTrans)) * P.blurMax;
     if (Math.abs(op - C.lastOp) > .02) { C.lastOp = op; blurEl.style.opacity = op.toFixed(2); }
   }
-  function hardReset(){ C.z = C.pz = C.tz = 1; C.vz = 0; C.y = C.py = 0; C.fy = C.tfy = STAGE_H / 2; C.vfy = 0; C.why = ''; C.hold = 0; camZoom = 1; camY = 0; viewScale = baseScale; applyCam(); }
+  function hardReset(){ C.z = C.pz = C.tz = 1; C.vz = 0; C.y = C.py = 0; C.fy = C.tfy = STAGE_H / 2; C.vfy = 0; C.why = ''; C.hold = 0; C.uo = C.uoT = 1; camZoom = 1; camY = 0; viewScale = baseScale; applyCam(); }
+  /* scroll do mouse: para baixo afasta a câmera (vista aberta), para cima devolve à câmera automática */
+  document.addEventListener('wheel', e => {
+    if (!(e.target === stage || world.contains(e.target))) return;
+    e.preventDefault();
+    C.uoT = clamp(C.uoT - e.deltaY * 0.0016, 0, 1);
+  }, { passive:false });
   function open(d){ C.opT = 0; C.opD = d || 1.5; }
   return { step, render, hardReset, open, scan, herolight: hl, state: C, P, restyle };
 })();
