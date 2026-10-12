@@ -2105,19 +2105,21 @@
 #stage .dgate.hatch{width:75px;height:78px}
 #stage .dgate.hatch .dg-glow{border:0;border-radius:0;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAB8klEQVR42rWWz2vUQBTHPwmBJqkSWFt2dRskilYsQgvdi4LgxYsePJVeFjz25qF/h3/FXqQnD716FqygIKgV2kX6ww1dl6bpTOKpHiQhm0zY7Lp9MDC8N/N9875v3rzRANbbmxdcgrzpvNa09fbmxb0Hy3jNFsF5b2rgg+CA718+owN4zRbdox2cK42pgXvNFgBGoqw5Lt2jndQwiQTnvRQ8YcPILkicbG91mJurFwD6fT+dJ/YokqnuybMXBaqNPMj2VofWymMGgT98urNTZmevIkRYsD9cfsqv3z/59vFDgQFDzaGfgk5iH+lAtTlLRWLP61Si5xVxLNnb3yWK5NAAECIkjiU9/xjPXaRRvzFZBHGsPlmZfiwHS/dXCvT0+34Kbpo2QoSpLTtX5UQfh3vTtEsjuX7tZnWKsqBChEgp0HWtlKJ3799WpyibUAApxT+9lKyuPiI4O+XwsJuuT2qjsoOTk+KD9yeOlJtrTp2ef8ztW4sA7O3vjnZQBpaXrz8+AWBZ9lClj0wywIxpseB6WLbNnbtLLLie0kkWvHKhzZgW8/MNhAiJZPV7X1bVyluU3JxxQVXJLkSw9nIDKQXhiIdMiLAwnq+1C13RUHWijVfuf3WzmuMWI8h3okml5rgMgoPhCLKtcpp9GUC77G/LX2V3GX+2LwcLAAAAAElFTkSuQmCC) center/100% 100% no-repeat;image-rendering:pixelated;box-shadow:none;filter:drop-shadow(0 4px 3px rgba(0,0,0,.6)) drop-shadow(0 0 8px rgba(255,150,60,.55))}
 #stage .dgate.hatch.key .dg-glow{filter:drop-shadow(0 4px 3px rgba(0,0,0,.6)) drop-shadow(0 0 12px rgba(255,220,90,.9))}
-#stage .dgate.hatch:hover .dg-glow{filter:drop-shadow(0 0 12px rgba(255,200,120,.9)) brightness(1.2)}
+#stage .dgate.hatch.open:hover .dg-glow{filter:drop-shadow(0 0 12px rgba(255,200,120,.9)) brightness(1.2)}
+#stage .dgate.hatch .dg-lbl{display:none}
+#stage .dgate.hatch.open:hover .dg-lbl{display:block}
 
 #stage .dgate.hatch .dg-lid{position:absolute;left:21%;right:21%;top:19%;bottom:23%;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABA0lEQVR42t1WuxGDMAx1ci6pDWWOAWhZJgtkisxHywAcJbimTyo40CFbskUMUQVnI56enj635+v9UQntrhKbdh3aoVdlVavJjsp3j2qmeNABUK2s6uW5a5vNOzQYjAiAPYZ8rG0AuCjs2oZMJ9Xs0C/f6tlRZnIvfZBiapQkEa6dURxL/FxMA7AaXGmDaRAFgKUPS+1kR1kAvrTsnWuO6uGd0CpAAUCauE0lGgDmUErxP6sCTtq0b3Bwog/RRPJxfL59IGa2iwDglKJ4GR5RiuvRm0wDmckvupRKNyFnIwrpYrAiKFsVupTOH8WonrtVoSvZ0QPov1sxd4CdjwFuBJfXwBcRqpqN7QLWrwAAAABJRU5ErkJggg==) 0 0/48px 48px;image-rendering:pixelated;border:2px solid #1a1626;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 2px 0 rgba(0,0,0,.5)}
 #stage .dgate.hatch.open .dg-glow::after,#stage .dgate.hatch.opening .dg-glow::after{content:'';position:absolute;left:21%;right:21%;top:19%;bottom:23%;background:radial-gradient(ellipse at 50% 70%,rgba(255,150,50,.75),rgba(255,90,20,.25) 60%,transparent 80%);mix-blend-mode:screen;animation:fjFlick 2.4s ease-in-out infinite}
-@keyframes dgRev{0%{opacity:0;transform:translateY(-8px) scale(.7);filter:brightness(3)}60%{opacity:1;transform:translateY(2px) scale(1.06)}100%{opacity:1;transform:none;filter:none}}
-#stage .dgate.hatch.reveal{animation:dgRev 1.3s steps(8,end) 1}
+@keyframes dgRev{0%{opacity:0}100%{opacity:1}}
+#stage .dgate.hatch.reveal{animation:dgRev 2.5s ease-in 1}
 @keyframes dgShake{0%,100%{transform:translate(0,0)}15%{transform:translate(-2px,1px)}30%{transform:translate(2px,-1px)}45%{transform:translate(-2px,0)}60%{transform:translate(2px,1px)}75%{transform:translate(-1px,-1px)}}
 @keyframes dgLid{0%,35%{transform:translateX(0);opacity:1}100%{transform:translateX(-120%);opacity:0}}
 @keyframes dgBurst{0%,30%{opacity:0;transform:scale(.4)}60%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(2)}}
 #stage .dgate.hatch.opening{animation:dgShake .5s steps(2,end) 3}
 #stage .dgate.hatch.opening .dg-lid{animation:dgLid 1.5s ease-in forwards}
 #stage .dgate.hatch.opening::before{content:'';position:absolute;left:-30%;right:-30%;top:-40%;bottom:-10%;background:radial-gradient(circle,rgba(255,200,100,.9),rgba(255,110,30,.4) 45%,transparent 70%);mix-blend-mode:screen;pointer-events:none;animation:dgBurst 1.6s ease-out forwards}
-#stage .dgate.hatch.closed .dg-glow{filter:drop-shadow(0 4px 3px rgba(0,0,0,.6))}
+#stage .dgate.hatch.closed .dg-glow,#stage .dgate.hatch.closed:hover .dg-glow{filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));animation:none}
 </style>
 </head>
 <body>
@@ -7545,9 +7547,8 @@ function pintaEntradas(){
       if (H.open) d.classList.add('open');
       else {
         d.classList.add('closed'); d.querySelector('.dg-glow').insertAdjacentHTML('beforeend', '<div class="dg-lid"></div>');
-        d.querySelector('.dg-lbl').textContent = '▼ ALÇAPÃO SELADO';
       }
-      if (!H.seen) { H.seen = 1; gsSave(); d.classList.add('reveal'); setTimeout(() => toastText('Algo rangeu no chão...'), 600); }
+      if (!H.seen) { H.seen = 1; gsSave(); d.classList.add('reveal'); }
     }
   });
 }
